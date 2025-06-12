@@ -1,29 +1,42 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { Stack } from "expo-router";
+import "./globals.css";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { useFonts } from "expo-font";
+import { Text } from "react-native";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+  // const MyTheme = {
+  //   ...DefaultTheme,
+  //   colors: {
+  //     ...DefaultTheme.colors,
+  //     background: "#000",
+  //   },
+  // };
+  const [fontsLoaded] = useFonts({
+    "ClashDisplay-Regular": require("../assets/fonts/ClashDisplay-Regular.ttf"),
   });
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
+  if (!fontsLoaded) {
+    return (
+      <SafeAreaView className="flex-1 items-center justify-center">
+        <Text>Loading...</Text>
+      </SafeAreaView>
+    );
   }
 
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <SafeAreaView className="flex-1 bg-primary">
+        <Stack>
+          <Stack.Screen name="launch" options={{ headerShown: false }} />
+          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+        ;
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
+ 
