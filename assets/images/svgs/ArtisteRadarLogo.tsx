@@ -5,6 +5,7 @@ interface props {
   color?: string;
 }
 
+// eslint-disable-next-line react/display-name
 export default function ({ color }: props) {
   return (
     <Svg width="20" height="23" viewBox="0 0 20 23" fill="none">

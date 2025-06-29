@@ -1,5 +1,6 @@
 import Svg, { Rect, Defs, Pattern, Use, Image } from "react-native-svg";
 
+// eslint-disable-next-line react/display-name
 export default function () {
   return (
     <Svg width="327" height="327" viewBox="0 0 327 327" fill="none">

@@ -1,5 +1,6 @@
 import Svg, { Circle, Path } from "react-native-svg";
 
+// eslint-disable-next-line react/display-name
 export default function () {
   return (
     <Svg width="25" height="25" viewBox="0 0 25 25" fill="none">

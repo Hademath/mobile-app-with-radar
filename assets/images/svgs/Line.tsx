@@ -1,5 +1,6 @@
 import Svg, { Path } from "react-native-svg";
 
+// eslint-disable-next-line react/display-name
 export default function () {
   return (
     <Svg

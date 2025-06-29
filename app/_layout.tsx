@@ -13,17 +13,17 @@ export default function RootLayout() {
   //     background: "#000",
   //   },
   // };
-  const [fontsLoaded] = useFonts({
-    "ClashDisplay-Regular": require("../assets/fonts/ClashDisplay-Regular.ttf"),
-  });
+  // const [fontsLoaded] = useFonts({
+  //   "ClashDisplay-Regular": require("../assets/fonts/ClashDisplay-Regular.ttf"),
+  // });
 
-  if (!fontsLoaded) {
-    return (
-      <SafeAreaView className="flex-1 items-center justify-center">
-        <Text>Loading...</Text>
-      </SafeAreaView>
-    );
-  }
+  // if (!fontsLoaded) {
+  //   return (
+  //     <SafeAreaView className="flex-1 items-center justify-center">
+  //       <Text>Loading...</Text>
+  //     </SafeAreaView>
+  //   );
+  // }
 
 
   return (
@@ -32,9 +32,11 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen name="launch" options={{ headerShown: false }} />
           <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)/Registration" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)/Login" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         </Stack>
-        ;
+        
       </SafeAreaView>
     </SafeAreaProvider>
   );

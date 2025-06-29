@@ -4,6 +4,10 @@ import browseicon from "@/assets/icons/browseicon.png";
 import storeicon from "@/assets/icons/storeicon.png";
 import rankicon from "@/assets/icons/rankicon.png";
 import homeicon from "@/assets/icons/homeicon.png";
+import YoutubeIcon from "@/assets/images/svgs/YoutubuRedIcon";
+import AppleMusic from "@/assets/images/svgs/AppleMusics";
+import SpotifyIcon from "@/assets/images/svgs/SpotifyIcon"
+import ArtisteSecondaryLogo from "@/assets/images/svgs/ArtisteSecondaryLogo";
 
 
 export type IconType = {
@@ -12,6 +16,10 @@ export type IconType = {
     storeicon: ImageSourcePropType;
     rankicon: ImageSourcePropType;
     homeicon: ImageSourcePropType;
+    YoutubeIcon: typeof YoutubeIcon;
+    AppleMusic: typeof AppleMusic;
+    SpotifyIcon: typeof SpotifyIcon
+    ArtisteSecondaryLogo: typeof ArtisteSecondaryLogo;
 };
 
 const icons: IconType = {
@@ -20,6 +28,10 @@ const icons: IconType = {
     storeicon,
     rankicon,
     homeicon,
+    YoutubeIcon,
+    AppleMusic,
+    SpotifyIcon,
+    ArtisteSecondaryLogo
 
 };
 export default icons;
