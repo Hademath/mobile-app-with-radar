@@ -18,7 +18,7 @@ module.exports = {
         background: "#000000",
         text: "#FFFFFF",
         icongray: "#5F6368",
-        boarderColor: "#CCCCCC",
+        boarderColor: "#CCCCCC", 
         artblue: {
           600: "#007AFF",
           500: "#5A55F4",

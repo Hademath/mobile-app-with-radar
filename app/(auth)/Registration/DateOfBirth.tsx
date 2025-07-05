@@ -32,7 +32,7 @@ export default function DOBScreen() {
 
         <TouchableOpacity
           onPress={() => setShowPicker(true)}
-          className="bg-[#1A1A1A] rounded-xl py-6 px-4 mb-10"
+          className="bg-[#1A1A1A] rounded-xl py-4 px-4 mb-10"
         >
           <Text className="text-boarderColor/45 text-2xl">
             {date ? date.toDateString() : "September 17, 2021"}

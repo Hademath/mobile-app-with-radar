@@ -3,9 +3,9 @@ import {
   Text,
   TouchableOpacity,
   Image,
-  FlatList,
   Dimensions,
   Alert,
+
 } from "react-native";
 import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
@@ -14,21 +14,8 @@ import { useRouter } from "expo-router";
 import ProgressHeader from "../../components/ProgressHeader";
 import ProfileSelect from "@/assets/images/ProviileSelect"; // Make sure this name is correct!
 
-const avatars = [
-  { id: "1", Icon: require("@/assets/images/avatars/avatar1.png") },
-  { id: "2", Icon: require("@/assets/images/avatars/avatar2.png") },
-  { id: "3", Icon: require("@/assets/images/avatars/avatar3.png") },
-  { id: "4", Icon: require("@/assets/images/avatars/avatar4.png") },
-  { id: "5", Icon: require("@/assets/images/avatars/avatar3.png") },
-  { id: "6", Icon: require("@/assets/images/avatars/avatar5.png") },
-  { id: "7", Icon: require("@/assets/images/avatars/avatar1.png") },
-  { id: "8", Icon: require("@/assets/images/avatars/avatar2.png") },
-];
 
-const { width } = Dimensions.get("window");
-const CARD_WIDTH = (width - 48 - 16) / 4;
-
-export default function ProfilePictureScreen() {
+export default function ArtisteProfilePicture() {
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const router = useRouter();
@@ -41,7 +28,7 @@ export default function ProfilePictureScreen() {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
+      mediaTypes: ['images'],
       quality: 1,
     });
 
@@ -55,7 +42,7 @@ export default function ProfilePictureScreen() {
   return (
     <SafeAreaView className="flex-1 bg-black px-6">
       <ProgressHeader step={13} total={14} type={"onboardingBar"} />
-      <View className="flex-1 py-6">
+      <View className="flex-1 justify-between py-6">
         <View className="mb-6">
           <Text className="text-white text-3xl font-bold uppercase mb-2">
             Choose a profile picture
@@ -76,57 +63,12 @@ export default function ProfilePictureScreen() {
                 source={{ uri: selectedImage }}
                 className="w-full h-full rounded-full"
               />
-            ) : selectedAvatar ? (
-              <Image
-                source={avatars.find((a) => a.id === selectedAvatar)?.Icon}
-                className="w-full h-full rounded-full"
-              />
             ) : (
               <ProfileSelect />
             )}
           </TouchableOpacity>
         </View>
 
-        {/* Avatar section */}
-        <Text className="text-white text-xl text-center mb-2">
-          Or choose a Talent avatar
-        </Text>
-
-        <FlatList
-          data={avatars}
-          keyExtractor={(item) => item.id}
-          numColumns={4}
-          columnWrapperStyle={{ justifyContent: "space-between" }}
-          contentContainerStyle={{ paddingBottom: 20 }}
-          renderItem={({ item }) => {
-            const isSelected = selectedAvatar === item.id;
-            return (
-              <TouchableOpacity
-                onPress={() => {
-                  setSelectedAvatar(item.id);
-                  setSelectedImage(null);
-                }}
-                style={{
-                  width: CARD_WIDTH,
-                  aspectRatio: 1,
-                  marginBottom: 16,
-                  borderRadius: CARD_WIDTH / 2,
-                  borderWidth: 2,
-                  borderColor: isSelected ? "#fff" : "transparent",
-                  overflow: "hidden",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={item.Icon}
-                  style={{ width: "100%", height: "100%" }}
-                  resizeMode="cover"
-                />
-              </TouchableOpacity>
-            );
-          }}
-        />
 
         {/* Continue */}
         <View className="items-center">

@@ -93,10 +93,10 @@ export default function RegistrationStep({
     <SafeAreaView className="flex-1 bg-black px-6">
       <CreateAccountHeader />
 
-      <View className="flex-1 py-20">
+      <View className="flex-1 py-10">
         <Text className="text-white text-2xl font-bold mb-1">{title}</Text>
         {!!description && (
-          <Text className="text-boarderColor/45 mb-4">{description}</Text>
+          <Text className="text-boarderColor mb-4">{description}</Text>
         )}
 
         {/* Text Input */}
@@ -111,7 +111,7 @@ export default function RegistrationStep({
                 onBlur={onBlur}
                 placeholder={placeholder}
                 placeholderTextColor="#888"
-                className="bg-[#1A1A1A] text-white px-4 py-5 rounded-xl mb-4"
+                className="bg-[#1A1A1A] text-white px-4 py-5 rounded-xl mb-20"
                 secureTextEntry={secureTextEntry}
                 multiline={multiline}
                 keyboardType={keyboardType}
@@ -188,7 +188,7 @@ export default function RegistrationStep({
         <View className="items-center">
           <TouchableOpacity
             onPress={handleSubmit(handleFormSubmit)}
-            className="bg-white py-4 px-12 rounded-xl items-center"
+            className="bg-white py-3 px-12 rounded-xl items-center"
           >
             <Text className="text-center text-2xl text-black font-semibold">
               Next

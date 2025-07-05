@@ -67,7 +67,7 @@ export default function LoginScreen() {
             </TouchableOpacity>
           </View>
           <TouchableOpacity
-            onPress={() => router.push("./Index")}
+            onPress={() => router.push("/Index")}
             className="bg-secondary py-3 rounded-xl mb-3"
           >
             <Text className="text-center text-black font-semibold text-base">

@@ -27,7 +27,7 @@ export default function GenderScreen() {
             <TouchableOpacity
               key={gender}
               onPress={() => setSelectedGender(gender)}
-              className={`py-5 rounded-2xl  px-6 ${
+              className={`py-3 rounded-2xl  px-8 ${
                 selectedGender === gender
                   ? "bg-white"
                   : "bg-[#1A1A1A] border border-boarderColor/25"
@@ -47,7 +47,7 @@ export default function GenderScreen() {
         <View className="items-center">
           <TouchableOpacity
             onPress={() => router.push("./DateOfBirth")}
-            className={`py-4 px-12 items-center rounded-xl ${
+            className={`py-4 px-14 items-center rounded-xl ${
               selectedGender ? "bg-white" : ""
             }`}
           >

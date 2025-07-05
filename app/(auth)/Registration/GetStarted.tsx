@@ -14,9 +14,9 @@ export default function GetStartedScreen() {
       className="flex-1"
       resizeMode="cover"
     >
-      <SafeAreaView className="flex-1 justify-end p-6 bg-black/40">
-        <View className="bg-black/70 p-6 rounded-3xl">
-          <ArtisteSecondaryLogo   />
+      <SafeAreaView className="flex-1 justify-end pl-6 pr-6  bg-black/40">
+        <View className="bg-black/70 p-6  rounded-3xl">
+          <ArtisteSecondaryLogo />
           <Text className="text-white font-clash text-3xl  font-bold  mb-2 mt-4">
             Get Started
           </Text>
@@ -25,7 +25,7 @@ export default function GetStartedScreen() {
           </Text>
           <TouchableOpacity
             onPress={() => router.push("./FirstName")}
-            className="bg-secondary py-3 rounded-xl mb-3"
+            className="bg-secondary py-4 rounded-xl mb-3" 
           >
             <Text className="text-center text-black font-semibold text-base">
               Sign up free
@@ -34,11 +34,14 @@ export default function GetStartedScreen() {
           <SocialButton Icon={icons.YoutubeIcon} text="Sign up with YouTube Music" />
           <SocialButton Icon={icons.AppleMusic} text="Sign up with Apple Music" />
           <SocialButton Icon={icons.SpotifyIcon} text="Sign up with Spotify" />
-          <TouchableOpacity onPress={() => router.push('../Login/LoginScreen')} className="mt-6">
+          <TouchableOpacity
+            onPress={() => router.push("../Login/LoginScreen")}
+            className="mt-2"
+          >
             <Text className="text-center text-white  text-xl">Log in</Text>
           </TouchableOpacity>
         </View>
-        <View className="justify-center items-center mt-3 px-6">
+        <View className="justify-center items-center mt-2  px-6">
           <Text className="text-white font-light text-lg text-center leading-6">
             By signing up, you are creating a Radar account and agree to Radar’s{" "}
             <Text
@@ -64,7 +67,7 @@ export default function GetStartedScreen() {
 
 function SocialButton({ Icon, text }: { Icon: React.FC<any>; text: string }) {
   return (
-    <TouchableOpacity className="flex-row  items-center  bg-[#1A1A1A]  border border-boarderColor/25 py-3 px-6 w-full rounded-xl mb-3 ">
+    <TouchableOpacity className="flex-row  items-center  bg-[#1A1A1A]  border border-boarderColor/25 py-3 px-6 w-full rounded-xl mb-2 ">
       <Icon />
       <Text className="text-white text-xl items-start ml-5">
         {text}

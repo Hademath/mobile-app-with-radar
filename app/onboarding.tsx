@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { View, FlatList, } from "react-native";
+import { View, Text, FlatList, SafeAreaView, TouchableOpacity, } from "react-native";
 import { onboardingData } from "../data/onboardingData";
 import  OnboardingItem  from "./components/OnboardingItem";
 import { useRef, useState } from "react";
@@ -22,7 +22,7 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <View className="flex-1 bg-primary">
+    <SafeAreaView className="flex-1 bg-primary">
       <FlatList
         data={onboardingData}
         horizontal
@@ -40,10 +40,10 @@ export default function OnboardingScreen() {
           )
         }
       />
-      <View className="absolute bottom-10 left-0 right-0 flex-row justify-between items-center px-6 py-2">
+      <View className="flex flex-row justify-between items-center px-6 py-2 absolute bottom-10 left-0 right-0">
         <Button
           textClassName="text-lg text-white"
-          className="bg-background px-4 py-2 rounded-lg w-[150px]"
+          className="py-4 px-[50px]  rounded-xl items-center"
           title="Skip"
           onPress={() => router.replace("/Index")}
           // onPress={async () => {
@@ -52,13 +52,13 @@ export default function OnboardingScreen() {
           // }}
         />
         <Button
-          className="bg-white px-4 py-2 rounded-lg w-[150px]"
+          className="bg-white py-4 px-[50px] font-bold rounded-xl items-center"
           title="Next"
           onPress={handleNext}
           variant="secondary"
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
   
 }

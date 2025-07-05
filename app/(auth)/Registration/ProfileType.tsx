@@ -1,37 +1,77 @@
-// app/register/10-profile-type.tsx
 import { View, Text, TouchableOpacity } from "react-native";
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import ProgressHeader from "../../components/ProgressHeader";
+// import ProgressHeader from "../../components/ProgressHeader";
+import ArtisteLogo3 from "../../../assets/images/svgs/ArtisteLogo3";
+import icons from "@/constants/icons";
 
-const profileTypes = [
-  { id: "listener", label: "Listener", emoji: "🎧" },
-  { id: "artiste", label: "Artiste", emoji: "🎤" },
-  { id: "music-pro", label: "Music Pro", emoji: "🎚️" },
+interface profilePop {
+  id: string,
+  label:string
+  description:string
+  emoji:React.ReactNode
+
+}
+
+const profileTypes  = [
+  {
+    id: "listener",
+    label: "Listeners",
+    description:"Earn and redeem rewards by listening  to music and giving feedback in split seconds. ",
+    emoji: <ArtisteLogo3 />,
+  },
+  {
+    id: "artiste",
+    label: "Artistes",
+    description:
+      "Run feedback campaigns, and reach a wider audience of potential fans and music professionals. ",
+    emoji: <ArtisteLogo3 />,
+  },
+  {
+    id: "music-pro",
+    label: "Music Pros",
+    description:
+      "Anonymously give feedbacks, run campaigns, and discover talent.",
+    emoji: <ArtisteLogo3 />,
+  },
 ];
-
-export default function ProfileTypeScreen() {
+interface Props {
+  step: number;
+  total: number;
+}
+export default function ProfileTypeScreen( { step = 1, total = 5 }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
   const router = useRouter();
-
+  const progress = (step / total) * 100;
   return (
-    <SafeAreaView className="flex-1 bg-black">
-      <ProgressHeader step={9} total={14} />
-      <View className="flex-1 px-6 justify-center">
-        <Text className="text-white text-2xl font-semibold mb-6">
-          Choose your profile type
-        </Text>
+    <SafeAreaView className="flex-1 bg-black px-6">
+      {/* <ProgressHeader step={1} total={5} /> */}
+      <View className="w-full h-1  bg-neutral-800 rounded-full">
+        <View
+          style={{ width: `${progress}%` }}
+          className="h-full bg-white rounded-full"
+        />
+      </View>
+      <View className="flex-1 py-20">
+        <View>
+          <Text className="text-white text-3xl font-bold mb-1">
+            Select profile
+          </Text>
+          <Text className="text-boarderColor mb-4">
+            Select a persona that suits you.
+          </Text>
+        </View>
 
-        <View className="space-y-4 mb-10">
-          {profileTypes.map((item) => (
+        <View className="space-y-4 mb-10 py-6 gap-3">
+          {profileTypes.map((item: profilePop) => (
             <TouchableOpacity
               key={item.id}
               onPress={() => setSelected(item.id)}
-              className={`flex-row items-center p-4 rounded-xl ${
+              className={`flex-row  p-4  gap-4 rounded-3xl ${
                 selected === item.id
-                  ? "bg-white"
-                  : "bg-[#1A1A1A] border border-gray-700"
+                  ? "bg-secondary/40"
+                  : "border border-[#161616B2]/70"
               }`}
             >
               <Text
@@ -41,30 +81,45 @@ export default function ProfileTypeScreen() {
               >
                 {item.emoji}
               </Text>
-              <Text
-                className={`text-base font-medium ${
-                  selected === item.id ? "text-black" : "text-white"
-                }`}
-              >
-                {item.label}
-              </Text>
+              <View className="flex-1">
+                <Text
+                  className={`text-2xl font-bold ${
+                    selected === item.id ? "text-white" : "text-white"
+                  }`}
+                >
+                  {item.label}
+                </Text>
+                <Text
+                  className={`text-base mt-2  ${
+                    selected === item.id ? "text-white" : "text-white"
+                  }`}
+                >
+                  {item.description}
+                </Text>
+              </View>
             </TouchableOpacity>
           ))}
         </View>
 
-        <TouchableOpacity
-          onPress={() => {
-            if (selected) {
-              router.push("./profile-type-selected");
-            }
-          }}
-          disabled={!selected}
-          className={`py-3 rounded-xl ${selected ? "bg-white" : "bg-gray-600"}`}
-        >
-          <Text className="text-center text-black font-semibold text-base">
-            Next
-          </Text>
-        </TouchableOpacity>
+        <View className="items-center">
+          <TouchableOpacity
+            onPress={() => {
+              if (selected === "listener") {
+                router.push("./Username");
+              } else if (selected === "artiste") {
+                router.push("./ArtistName");
+              } else if (selected === "music-pro") {
+                router.push("./MusicProUniqueName");
+              }
+            }}
+            disabled={!selected}
+            className={`py-4 rounded-xl px-12 items-center ${selected ? "bg-white" : ""}`}
+          >
+            <Text className="text-center text-2xl text-black font-semibold">
+              Next
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );

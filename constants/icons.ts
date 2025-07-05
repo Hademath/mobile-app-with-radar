@@ -8,6 +8,7 @@ import YoutubeIcon from "@/assets/images/svgs/YoutubuRedIcon";
 import AppleMusic from "@/assets/images/svgs/AppleMusics";
 import SpotifyIcon from "@/assets/images/svgs/SpotifyIcon"
 import ArtisteSecondaryLogo from "@/assets/images/svgs/ArtisteSecondaryLogo";
+import ArtisteLogo3 from "@/assets/images/svgs/ArtisteLogo3";
 
 
 export type IconType = {
@@ -20,6 +21,7 @@ export type IconType = {
     AppleMusic: typeof AppleMusic;
     SpotifyIcon: typeof SpotifyIcon
     ArtisteSecondaryLogo: typeof ArtisteSecondaryLogo;
+    ArtisteLogo3: typeof ArtisteLogo3;
 };
 
 const icons: IconType = {
@@ -31,7 +33,8 @@ const icons: IconType = {
     YoutubeIcon,
     AppleMusic,
     SpotifyIcon,
-    ArtisteSecondaryLogo
+    ArtisteSecondaryLogo,
+    ArtisteLogo3
 
 };
 export default icons;

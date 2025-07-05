@@ -40,7 +40,7 @@ export default function OTPVerifyScreen() {
       <View className="px-6">
         <CreateAccountHeader />
       </View>
-      <View className="flex-1 px-6 py-20">
+      <View className="flex-1 px-6 py-10">
         <Text className="text-white text-2xl font-bold mb-1">
           Input the 6-digit code.
         </Text>
@@ -84,7 +84,7 @@ export default function OTPVerifyScreen() {
         <View className="items-center">
           <TouchableOpacity
             onPress={() => router.push("./Password")}
-            className="bg-white py-4 px-12 rounded-xl items-center"
+            className="bg-white py-3 px-12 rounded-xl items-center"
           >
             <Text className="text-center text-2xl text-black font-semibold">
               Next

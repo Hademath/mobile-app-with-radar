@@ -26,7 +26,7 @@ const genres = [
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = (width - 48 - 16) / 3;
 
-export default function GenresScreen() {
+export default function ArtisteGenres() {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const router = useRouter();
 
@@ -46,9 +46,14 @@ export default function GenresScreen() {
     <SafeAreaView className="flex-1 bg-black px-6">
       <ProgressHeader step={3} total={5} type={"onboardingBar"} />
       <View className="flex-1 py-10 pb-2">
-        <Text className="text-white text-3xl font-bold mb-4 font-clash uppercase">
-          Pick 5 genres you Love
-        </Text>
+        <View>
+          <Text className="text-white text-3xl font-bold mb-4 font-clash uppercase">
+            Define Your Sound
+          </Text>
+          <Text className="text-boarderColor mb-4">
+            Select up to 5 genres that best describe your music.
+          </Text>
+        </View>
 
         <FlatList
           data={genres}
@@ -70,14 +75,14 @@ export default function GenresScreen() {
                   }}
                   disabled={disabled}
                   className={`
-                    aspect-square rounded-full overflow-hidden justify-center items-center 
-                    ${
-                      selected
-                        ? "border-2 border-white"
-                        : "border border-gray-700"
-                    } 
-                    ${disabled ? "opacity-40" : ""}
-                  `}
+                      aspect-square rounded-full overflow-hidden justify-center items-center 
+                      ${
+                        selected
+                          ? "border-2 border-white"
+                          : "border border-gray-700"
+                      } 
+                      ${disabled ? "opacity-40" : ""}
+                    `}
                 >
                   <GenreIcon
                     width="100%"
@@ -100,19 +105,19 @@ export default function GenresScreen() {
         />
 
         {/* <TouchableOpacity
-          onPress={() => router.push("./ProfilePicture")}
-          disabled={selectedGenres.length === 0}
-          className={`py-3 rounded-xl ${
-            selectedGenres.length > 0 ? "bg-white" : "bg-gray-600"
-          }`}
-        >
-          <Text className="text-center text-black font-semibold text-base">
-            Next
-          </Text>
-        </TouchableOpacity> */}
+            onPress={() => router.push("./ProfilePicture")}
+            disabled={selectedGenres.length === 0}
+            className={`py-3 rounded-xl ${
+              selectedGenres.length > 0 ? "bg-white" : "bg-gray-600"
+            }`}
+          >
+            <Text className="text-center text-black font-semibold text-base">
+              Next
+            </Text>
+          </TouchableOpacity> */}
         <View className="items-center">
           <TouchableOpacity
-            onPress={() => router.push("./ProfilePicture")}
+            onPress={() => router.push("./ArtisteProfilePicture")}
             className="bg-white py-4 px-12 rounded-xl items-center"
           >
             <Text className="text-center text-2xl text-black font-semibold">

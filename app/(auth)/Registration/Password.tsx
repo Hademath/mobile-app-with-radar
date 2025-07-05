@@ -14,7 +14,7 @@ export default function PasswordScreen() {
   return (
     <SafeAreaView className="flex-1 bg-black px-6">
       <CreateAccountHeader />
-      <View className="flex-1 py-20">
+      <View className="flex-1 py-10">
         <Text className="text-white text-2xl font-bold mb-1">
           Create a password
         </Text>
@@ -47,7 +47,7 @@ export default function PasswordScreen() {
         <View className="items-center">
           <TouchableOpacity
             onPress={() => router.push("./Residential")}
-            className="bg-white py-4 px-12 rounded-xl items-center"
+            className="bg-white py-3 px-12 rounded-xl items-center"
           >
             <Text className="text-center text-2xl text-black font-semibold">
               Next

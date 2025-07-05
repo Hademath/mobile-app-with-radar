@@ -1,13 +1,14 @@
-// components/StyledPicker.tsx
+import { useState } from "react";
+import DropDownPicker from "react-native-dropdown-picker";
 import { View, Platform } from "react-native";
-import RNPickerSelect from "react-native-picker-select";
 import { ChevronDown } from "lucide-react-native";
 
 interface StyledPickerProps {
-  value: string;
+  value: string | null;
   onValueChange: (val: string) => void;
   items: { label: string; value: string }[];
   placeholder: { label: string; value: null };
+  zIndex?: number;
 }
 
 export default function StyledPicker({
@@ -15,37 +16,53 @@ export default function StyledPicker({
   onValueChange,
   items,
   placeholder,
+  zIndex = 1000,
 }: StyledPickerProps) {
+  const [open, setOpen] = useState(false);
+  const [dropdownItems, setDropdownItems] = useState(items);
+
   return (
-    <View className="bg-[#1A1A1A] rounded-xl px-4 py-5 mb-5 justify-center">
-      <RNPickerSelect
-        onValueChange={onValueChange}
+    <View className="mb-3" style={{ zIndex, position: "relative" }}>
+      <DropDownPicker
+        open={open}
         value={value}
-        items={items}
-        placeholder={placeholder}
-        useNativeAndroidPickerStyle={false}
-        Icon={() => <ChevronDown color="#888" size={20} />}
+        items={dropdownItems}
+        setOpen={setOpen}
+        setValue={(cb) => onValueChange(cb(value))}
+        setItems={setDropdownItems}
+        placeholder={placeholder.label}
+        ArrowDownIconComponent={() => <ChevronDown color="#fff" size={20} />}
+        dropDownDirection="BOTTOM"
         style={{
-          inputIOS: {
-            fontSize: 18,
-            color: "#fff",
-            paddingVertical: 14,
-            paddingHorizontal: 0,
-          },
-          inputAndroid: {
-            fontSize: 18,
-            color: "#888",
-            paddingVertical: 12,
-            paddingHorizontal: 0,
-          },
-          placeholder: {
-            color: "#888",
-            fontSize: 18,
-          },
-          iconContainer: {
-            top: Platform.OS === "ios" ? 20 : 16,
-            right: 12,
-          },
+          backgroundColor: "#1A1A1A",
+          borderRadius: 12,
+        }}
+        dropDownContainerStyle={{
+          backgroundColor: "#1A1A1A",
+          borderColor: "#333",
+          borderRadius: 12,
+          maxHeight: 250, // Controls visible area
+          zIndex,
+          elevation: 10, // Android
+        }}
+        listMode="SCROLLVIEW"
+        scrollViewProps={{
+          nestedScrollEnabled: true,
+          persistentScrollbar: true,
+          showsVerticalScrollIndicator: true,
+          scrollEnabled: true,
+          scrollToOverflowEnabled: true
+          
+        }}
+        textStyle={{
+          color: "#fff",
+          fontSize: 16,
+        }}
+        placeholderStyle={{
+          color: "#888",
+        }}
+        listItemLabelStyle={{
+          color: "#fff",
         }}
       />
     </View>

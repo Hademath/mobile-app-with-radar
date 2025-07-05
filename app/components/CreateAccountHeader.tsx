@@ -10,7 +10,7 @@ type CreateAccountHeaderProps = {
 export default function CreateAccountHeader(headerTitle: CreateAccountHeaderProps) {
   const router = useRouter();
   return (
-    <View className="flex-row items-center pt-6 w-full ">
+    <View className="flex-row items-center w-full ">
       <TouchableOpacity
         onPress={() => router.back()}
         className="w-10 h-10 rounded-full bg-white items-center justify-center mr-4 "

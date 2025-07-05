@@ -15,7 +15,7 @@ export default function ConfirmProfileTypeScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-black">
-      <ProgressHeader step={10} total={14} />
+      <ProgressHeader step={10} total={14} type={"onboardingBar"} />
       <View className="flex-1 px-6 justify-center items-center">
         <Text className="text-white text-2xl font-semibold mb-4">
           You’ve selected:

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useRouter } from "expo-router";
 import ProgressHeader from "../../components/ProgressHeader";
 
-export default function UsernameScreen() {
+export default function MusicProUniqueName() {
   const [username, setUsername] = useState("");
   const router = useRouter();
 
@@ -15,17 +15,17 @@ export default function UsernameScreen() {
       <View className="flex-1 py-10 ">
         <View>
           <Text className="text-white text-3xl font-bold mb-1 font-clash uppercase">
-            CHOOSE A Username
+            Choose a Unique name
           </Text>
           <Text className="text-boarderColor mb-4">
-            Let&apos;s get started by setting up your username.
+            Select an anonymous name from our suggestions or create your own
           </Text>
         </View>
 
         <TextInput
           value={username}
           onChangeText={setUsername}
-          placeholder="Username"
+          placeholder="Anonymous"
           placeholderTextColor="#888"
           autoCapitalize="none"
           className="bg-[#1A1A1A] text-white px-6 py-4 rounded-xl mb-20"

@@ -1,4 +1,3 @@
-// app/register/04-email.tsx
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState } from "react";
@@ -11,7 +10,7 @@ export default function EmailScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
+    <>
       <RegistrationStepProps
         title="What's your email"
         description="Please enter your email address."
@@ -22,6 +21,6 @@ export default function EmailScreen() {
         }}
       />
 
-    </SafeAreaView>
+    </>
   );
 }

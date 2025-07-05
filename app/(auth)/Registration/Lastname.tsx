@@ -6,16 +6,16 @@ export default function LastNameScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
+    <>
       <RegistrationStepProps
-        title=" Enter your last name"
-        description="This will be used to personalize your experience."
+        title="What’s your last name?"
+        description="Please enter your last name."
         placeholder="Last Name"
         nextLabel="Next"
         onNext={(val) => {
           router.push("/Registration/Email");
         }}
       />
-    </SafeAreaView>
+    </>
   );
 }
