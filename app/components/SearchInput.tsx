@@ -1,5 +1,5 @@
 // SearchInput.tsx
-import { View, TextInput, TouchableOpacity, Pressable } from "react-native";
+import {  TextInput, Pressable } from "react-native";
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 

@@ -1,14 +1,11 @@
-// app/referrals.tsx
-
 import { View, Text, TouchableOpacity, ScrollView, Image } from "react-native";
 import { useRouter } from "expo-router";
-import { ArrowLeft, Copy, ArrowRight } from "lucide-react-native";
-import ProgressHeader from "../components/ProgressHeader";
+import { ArrowLeft, Copy } from "lucide-react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
 
 export default function Referrals() {
   const router = useRouter();
-  const referralCode = "U83H8hd";
+
 
   return (
     <ScrollView className="flex-1 bg-black px-4 pt-14">

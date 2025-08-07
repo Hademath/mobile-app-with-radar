@@ -3,7 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import CreateAccountHeader from "@/app/components/CreateAccountHeader";
-import { set } from "react-hook-form";
+// import { set } from "react-hook-form";
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");

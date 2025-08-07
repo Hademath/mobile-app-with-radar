@@ -1,13 +1,8 @@
 import { router } from "expo-router";
 import { Text, TouchableOpacity, View, Image, ScrollView } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-// import ArtisteLogo3 from "@/assets/images/svgs/ArtisteLogo3";
-
-// import {} from "@expo/vector-icons"; // For play and volume icons
-import { Feather, FontAwesome6, Ionicons, Entypo } from "@expo/vector-icons";
-import ProgressHeader from "../components/ProgressHeader";
+import {  Ionicons, } from "@expo/vector-icons";
 import { ArrowLeft } from "lucide-react-native";
-// import ArtisteLogo3 from "";
 
 export default function Index() {
   return (

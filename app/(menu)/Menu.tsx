@@ -1,8 +1,7 @@
 
 import { View, Text, TouchableOpacity, ScrollView, Image } from "react-native";
 import { useRouter } from "expo-router";
-import { ArrowLeft, User2, Zap, Clock3, Settings, Users, User, UserPlus } from "lucide-react-native";
-import Button from "../components/Button";
+import { Zap, Clock3, Settings, User, UserPlus } from "lucide-react-native";
 
 export default function Profile() {
   const router = useRouter();

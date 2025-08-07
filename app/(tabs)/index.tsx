@@ -4,7 +4,7 @@ import { LinearGradient } from "expo-linear-gradient";
 // import ArtisteLogo3 from "@/assets/images/svgs/ArtisteLogo3";
 
 // import {} from "@expo/vector-icons"; // For play and volume icons
-import { Feather, FontAwesome6, Ionicons, Entypo } from "@expo/vector-icons";
+import {  FontAwesome6, Ionicons, Entypo } from "@expo/vector-icons";
 import ProgressHeader from "../components/ProgressHeader";
 // import ArtisteLogo3 from "";
 
