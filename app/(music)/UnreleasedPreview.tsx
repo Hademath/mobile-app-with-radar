@@ -1,35 +1,19 @@
-import { View, Text, TouchableOpacity, TextInput, } from "react-native";
+import { View, Text, TouchableOpacity, TextInput,ScrollView, Image} from "react-native";
 import { useState } from "react";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import * as DocumentPicker from "expo-document-picker";
+import { Ionicons } from "@expo/vector-icons";
 import RNPickerSelect from "react-native-picker-select";
 import { useRouter } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 
-export default function Unreleased() {
+export default function UnreleasedPreview() {
   const router = useRouter();
   const [uploadingAs, setUploadingAs] = useState("Artiste");
   const [genre, setGenre] = useState("Afrobeat");
   const [songTitle, setSongTitle] = useState("");
-  const [file, setFile] = useState<any>(null);
 
-  const pickFile = async () => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: ["audio/*", "application/zip", "application/x-rar-compressed"],
-        copyToCacheDirectory: true,
-      });
-
-      if (result) {
-        setFile(result);
-      }
-    } catch (err) {
-      console.log("File pick error:", err);
-    }
-  };
 
   return (
-    <View className="flex-1 bg-primary px-5 pt-12">
+    <ScrollView className="flex-1 bg-primary px-5 pt-12 ">
       {/* Header */}
       <View className="flex-row justify-between items-center mb-6">
         <TouchableOpacity
@@ -38,7 +22,7 @@ export default function Unreleased() {
         >
           <ArrowLeft size={20} color="black" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/UnreleasedPreview")}>
+        <TouchableOpacity onPress={() => router.push("/CampaignSetup")}>
           <Text className="text-teal-400 font-semibold text-lg">Continue</Text>
         </TouchableOpacity>
       </View>
@@ -114,32 +98,47 @@ export default function Unreleased() {
                 right: 10,
               },
             }}
-            Icon={() => <Ionicons name="chevron-down" size={20} color="gray" />}
+            Icon={() => {
+              return <Ionicons name="chevron-down" size={20} color="#666767" />;
+            }}
           />
         </View>
-              
-
-        {/* Upload Box */}
-        <TouchableOpacity
-          className="items-center justify-center py-8 rounded-2xl bg-[#181819]"
-          onPress={pickFile}
-        >
-          <View className="bg-teal-500/20 p-4 rounded-full mb-3">
-            <MaterialCommunityIcons
-              name="file-upload-outline"
-              size={24}
-              color="#00BFA5"
-            />
-            {/* <Ionicons name="cloud-upload-outline" size={28} color="#00BFA5" /> */}
-          </View>
-          <Text className="text-white font-bold text-lg">
-            {file ? file.name : "Browse to upload music"}
-          </Text>
-          <Text className="text-[#666767] text-sm mt-1">
-            Support zip and rar files
-          </Text>
-        </TouchableOpacity>
       </View>
-    </View>
+
+      {/* Upload Box */}
+
+      <View className=" rounded-3xl mt-6">
+        <Text className="text-white font-semibold mb-3"> Upload Preview </Text>
+        <View className="bg-accent rounded-3xl overflow-hidden">
+          <Image
+            className="w-full h-56"
+            resizeMode="cover"
+            source={require("@/assets/images/content/rema1.jpg")}
+          />
+          <View className="absolute top-3 right-2 mr-3 bg-black/40 p-2 rounded-full">
+            <Ionicons name="volume-medium" size={16} color="white" />
+          </View>
+        </View>
+
+        {/* details  */}
+        <View className="mt-4 rounded-3xl bg-accent  p-6">
+          <View className="flex-row items-center gap-2 space-x-2 mb-2">
+            <Image
+              source={require("@/assets/images/ArtisteRadarLogo.png")}
+              className="w-5 h-5"
+            />
+            <Text className="text-xs text-gray-400 font-semibold">Genre</Text>
+          </View>
+          <Text className="text-2xl text-white font-bold">Ravage</Text>
+          <Text className="text-sm text-tertiary mt-2">
+            {" "}
+            EP • Rema • 5 songs • 2023{" "}
+          </Text>
+        </View>
+      </View>
+      <Text></Text>
+      <Text></Text>
+      <Text></Text>
+    </ScrollView>
   );
 }
