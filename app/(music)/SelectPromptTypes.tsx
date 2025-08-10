@@ -32,7 +32,7 @@ export default function SelectPromptType() {
   const router = useRouter();
 
   return (
-    <SafeAreaView className="flex-1 bg-black px-6">
+    <SafeAreaView className="flex-1 bg-primary px-6">
       <TouchableOpacity
         onPress={() => router.back()}
         className="w-10 h-10 rounded-full bg-white items-center justify-center mr-4"
@@ -102,7 +102,7 @@ export default function SelectPromptType() {
               selected ? "bg-white" : ""
             }`}
           >
-            <Text className="text-center text-2xl text font-semibold">
+            <Text className="text-center text-primary text-2xl text font-semibold">
               Continue
             </Text>
           </TouchableOpacity>

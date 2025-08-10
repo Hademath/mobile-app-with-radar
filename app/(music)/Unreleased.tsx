@@ -48,7 +48,7 @@ export default function Unreleased() {
       <Text className="text-tertiary mb-6">To proceed, upload the file.</Text>
 
       {/* Form Container */}
-      <View className="bg-accent rounded-3xl p-5 gap-5">
+      <View className="bg-accent rounded-3xl p-4 gap-5">
         {/* Uploading as */}
         <Text className="text-inputLabelCol ">Uploading as</Text>
         <View className="rounded-2xl overflow-hidden">
@@ -82,7 +82,7 @@ export default function Unreleased() {
           onChangeText={setSongTitle}
           placeholder="CVABank"
           placeholderTextColor="#666767"
-          className="bg-[#181819] rounded-xl text-inputLabelCol px-4 py-4 "
+          className="bg-[#181819] rounded-xl text-white px-4 py-4 "
         />
 
         {/* Genre */}

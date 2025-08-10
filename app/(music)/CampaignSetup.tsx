@@ -1,17 +1,18 @@
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import { useState } from "react";
+import { SetStateAction, useCallback, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 import Slider from "@react-native-community/slider";
+import RangeSlider from "rn-range-slider";
 
 export default function CampaignSetup() {
   const router = useRouter();
   const [audienceType, setAudienceType] = useState("listeners");
 
   // Age Range State
-  const [minAge, setMinAge] = useState(18);
-  const [maxAge, setMaxAge] = useState(30);
+  const [low, setLow] = useState(18);
+  const [high, setHigh] = useState(30);
 
   // Duration State
   const [duration, setDuration] = useState(6);
@@ -19,14 +20,24 @@ export default function CampaignSetup() {
   const handleSubmit = () => {
     const formData = {
       audienceType,
-      minAge,
-      maxAge,
+      low,
+      high,
       duration,
     };
 
     console.log("Form Data:", formData);
-    router.push("/SelectPromptTypes");
+      router.push("/SelectPromptTypes");
+      
   };
+// const renderThumb = useCallback(() => <Thumb />, []);
+// const renderRail = useCallback(() => <Rail />, []);
+// const renderRailSelected = useCallback(() => <RailSelected />, []);
+// const renderLabel = useCallback((value: any) => <Label text={value} />, []);
+// const renderNotch = useCallback(() => <Notch />, []);
+// const handleValueChange = useCallback((low: SetStateAction<number>, high: SetStateAction<number>) => {
+//   setLow(low);
+//   setHigh(high);
+// }, []);
 
   return (
     <ScrollView className="flex-1 bg-primary px-5 pt-12">
@@ -43,20 +54,33 @@ export default function CampaignSetup() {
         </TouchableOpacity>
       </View>
       <View className="w-full border-b border-accent mb-8" />
-      
+
       <Text className="text-white font-bold text-3xl mb-2">Campaign Setup</Text>
-      <Text className="text-tertiary mb-6"> What kind of campaign do you want to run? </Text>
+      <Text className="text-tertiary mb-6">
+        {" "}
+        What kind of campaign do you want to run?{" "}
+      </Text>
 
       {/* Select audience type */}
-      <Text className="text-inputLabelCol font-semibold mb-3"> Select audience type </Text>
+      <Text className="text-inputLabelCol font-semibold mb-3">
+        {" "}
+        Select audience type{" "}
+      </Text>
       <View className="gap-4">
         {/* Listeners */}
-          <Ionicons
-            name={ audienceType === "listeners" ? "radio-button-on" : "radio-button-off" }
-            size={22}
-            color="#2dd4bf"    
-          />
-        <TouchableOpacity className="flex-row items-center bg-accent rounded-xl px-4 py-3" onPress={() => setAudienceType("listeners")} >
+        <Ionicons
+          name={
+            audienceType === "listeners"
+              ? "radio-button-on"
+              : "radio-button-off"
+          }
+          size={22}
+          color="#2dd4bf"
+        />
+        <TouchableOpacity
+          className="flex-row items-center bg-accent rounded-xl px-4 py-3"
+          onPress={() => setAudienceType("listeners")}
+        >
           <Text className="text-white ml-3 text-base">Listeners</Text>
         </TouchableOpacity>
 
@@ -81,36 +105,26 @@ export default function CampaignSetup() {
         <Text className="text-white font-semibold mb-4">Set Age</Text>
         <View className="flex-row justify-between mb-2">
           <View className="bg-accent px-3 py-1 rounded-md">
-            <Text className="text-white">{minAge}</Text>
+            <Text className="text-white">{low}</Text>
           </View>
           <View className="bg-accent px-3 py-1 rounded-md">
-            <Text className="text-white">{maxAge}</Text>
+            <Text className="text-white">{high}</Text>
           </View>
         </View>
-
-        {/* Min Age Slider */}
-        <Slider
-          minimumValue={10}
-          maximumValue={maxAge - 1}
+        {/* <RangeSlider
+          className=""
+          //   style={styles.slider}
+          min={0}
+          max={100}
           step={1}
-          value={minAge}
-          minimumTrackTintColor="#2dd4bf"
-          maximumTrackTintColor="#555"
-          thumbTintColor="#2dd4bf"
-          onValueChange={(val) => setMinAge(val)}
-        />
-
-        {/* Max Age Slider */}
-        <Slider
-          minimumValue={minAge + 1}
-          maximumValue={60}
-          step={1}
-          value={maxAge}
-          minimumTrackTintColor="#2dd4bf"
-          maximumTrackTintColor="#555"
-          thumbTintColor="#2dd4bf"
-          onValueChange={(val) => setMaxAge(val)}
-        />
+          floatingLabel
+          renderThumb={renderThumb}
+          renderRail={renderRail}
+          renderRailSelected={renderRailSelected}
+          renderLabel={renderLabel}
+          renderNotch={renderNotch}
+          onValueChanged={handleValueChange}
+        /> */}
       </View>
 
       {/* Set duration */}
@@ -134,10 +148,11 @@ export default function CampaignSetup() {
       </View>
 
       {/* Estimated Reach */}
-       <View className="items-center mt-12 mb-12">
+      <View className="items-center mt-12 mb-12">
         <Text className="text-teal-400 text-base">Estimated Reach</Text>
         <Text className="text-white text-3xl font-bold">640 - 1,700</Text>
       </View>
     </ScrollView>
   );
 }
+

@@ -23,7 +23,7 @@ module.exports = {
         boarderColor: "#CCCCCC",
         completedButton: "#181818",
         searchinputcolor: "#FAFAFAED",
-        inputLabelCol:"#666666",
+        inputLabelCol: "#666666",
         artblue: {
           600: "#007AFF",
           500: "#5A55F4",
