@@ -8,7 +8,7 @@ const SearchInput = () => {
 
   return (
     <Pressable
-      className="flex-row items-center bg-searchinputcolor px-3 py-2 rounded-3xl"
+      className="flex-row items-center bg-searchinputcolor px-3 py-0 rounded-3xl"
       onPress={() => router.push("/SearchScreen")} // 👈 Navigate to full screen search page
     >
       <Ionicons name="search-outline" size={24} color="#3C3C4399" />

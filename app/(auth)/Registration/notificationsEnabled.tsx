@@ -71,7 +71,7 @@ export default function NotificationScreen() {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => router.push("/Index")}
+            onPress={() => router.push("/(tabs)/Index")}
             className="bg-white py-4 px-14 rounded-xl items-center"
           >
             <Text className="text-center text-2xl text-black font-normal">

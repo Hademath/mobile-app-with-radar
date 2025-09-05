@@ -40,6 +40,7 @@ interface RegistrationStepProps {
   variant?: "text" | "otp" | "dropdown" | "avatar";
   options?: string[]; // for dropdown
   defaultValue?: string;
+  // schema?: any; 
 }
 
 export default function RegistrationStep({
@@ -55,8 +56,8 @@ export default function RegistrationStep({
   variant = "text",
   options = [],
   defaultValue = "",
+  // schema,
 }: RegistrationStepProps) {
-  const router = useRouter();
   const [image, setImage] = useState<string | null>(null);
   const [dropdownValue, setDropdownValue] = useState<string>("");
   // const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
@@ -71,6 +72,7 @@ export default function RegistrationStep({
   });
 
   const handleFormSubmit = (data: any) => {
+    console.log(data)
     if (variant === "dropdown") return onNext(dropdownValue);
     if (variant === "otp") return onNext(otp.join(""));
     if (variant === "avatar") return onNext(image || "");
@@ -181,8 +183,8 @@ export default function RegistrationStep({
         )}
 
         {/* Error */}
-        {errors.input && (
-          <Text className="text-red-500 mb-4">{errors.input.message}</Text>
+        {errors.input?.message && (
+          <Text className="text-red-500 mb-8">{String(errors.input.message)}</Text>
         )}
 
         <View className="items-center">

@@ -32,12 +32,11 @@ export default function RootLayout() {
       <SafeAreaView className="flex-1 bg-primary">
           <StatusBar style="light" />
         <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="launch" options={{ headerShown: false }} />
-          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)/Registration" options={{ headerShown: false }} />
+          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)/Login" options={{ headerShown: false }} />
-
           <Stack.Screen name="(menu)" options={{ headerShown: false }} />
           <Stack.Screen name="(music)" options={{ headerShown: false }} />
         </Stack>

@@ -1,10 +1,23 @@
 import {  router } from "expo-router";
-import { Text, TouchableOpacity, View, Image, ScrollView } from "react-native";
+import { Text, TouchableOpacity, View, Image, ScrollView, FlatList } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import {  FontAwesome6, Ionicons, Entypo } from "@expo/vector-icons";
-import ProgressHeader from "../components/ProgressHeader";
+import SmileIcon from "@/assets/icons/smileIcon";
+import SadIcon from "@/assets/icons/sadIcon";
+import {storeDetail} from "@/data/storedetail";
 
-export default function Store() {
+import {  Ionicons, } from "@expo/vector-icons";
+import { useState } from "react";
+
+
+export default function Index() {
+
+const Tabs = [
+  { id: "spotlight", title: "Spotlight" },
+  { id: "physical", title: "Physical Offers" },
+];
+    
+    const [activeTab, setActiveTab] = useState(Tabs[0].id);
+
   return (
     <LinearGradient
       colors={["#0f1e1d", "#000000", "#242424"]}
@@ -12,179 +25,213 @@ export default function Store() {
       end={{ x: 0.5, y: 1 }}
       className="flex-1"
     >
-      <ScrollView className="flex-1 px-4 pt-14">
-        {/* Top Row: Avatar - Days - Balance */}
+      <ScrollView className="flex-1 bg-[#0A1B1E] px-4 pt-14">
+        {/* Top Row */}
         <View className="flex-row justify-between items-center mb-6">
           <View className="flex-row items-center space-x-4">
-            <TouchableOpacity onPress={() => router.push("/Menu")}>
+            <TouchableOpacity>
               <Image
-                className="w-12 h-12 rounded-full"
+                className="w-10 h-10 rounded-full"
                 source={require("@/assets/images/avatars/avatar1.png")}
               />
             </TouchableOpacity>
-
             <View className="flex-row items-center space-x-1">
               <Image
-                className="w-12 h-12 rounded-full"
                 source={require("@/assets/icons/fireicon.png")}
+                className="w-5 h-5"
               />
-              <Text className="text-gray-400">250 days</Text>
+              <Text className="text-gray-400 text-sm">250 days</Text>
             </View>
           </View>
 
-          <TouchableOpacity
-            onPress={() => router.push("/Registration/GetStarted")}
-            className="flex-row  gap-3 items-center space-x-2 bg-accent px-6 py-4 rounded-3xl"
-          >
+          <TouchableOpacity className="flex-row items-center bg-[#033E3E] px-4 py-2 rounded-full">
             <Image
               source={require("@/assets/images/ArtisteRadarLogo.png")}
-              className="w-5 h-5"
+              className="w-5 h-5 mr-1"
             />
-            <Text className="text-white font-semibold">5000.00</Text>
+            <Text className="text-white font-semibold text-sm">5000.00</Text>
           </TouchableOpacity>
         </View>
-        {/* Logo + Title */}
 
-        <View className="mb-8">
-          {/* Header */}
-          <View className="flex-row justify-between items-center mb-4 px-1">
-            <Text className="text-white font-bold text-xl">
-              Top Artiste Rank
-            </Text>
-            <TouchableOpacity>
-              <FontAwesome6 name="circle-arrow-right" size={24} color="white" />
+        {/* Tabs */}
+        <View className="flex-row space-x-3 mb-6">
+          {Tabs.map((tab) => (
+            <TouchableOpacity
+              key={tab.id}
+              className={`px-5 py-4 rounded-full ${
+                activeTab === tab.id ? "bg-accent" : ""
+              }`}
+              onPress={() => setActiveTab(tab.id)}
+            >
+              <Text
+                className={`font-semibold ${
+                  activeTab === tab.id ? "text-white" : "text-white"
+                }`}
+              >
+                {tab.title}
+              </Text>
             </TouchableOpacity>
-          </View>
+          ))}
+        </View>
 
-          {/* Scrollable Cards */}
-          <ScrollView
-            style={{}}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-          >
-            {[1, 2, 3, 4, 5, 6, 7].map((rank, index) => (
-              <View key={rank} className="flex-row items-start space-x-2 ">
-                <View className="flex-row  items-center justify-end  px-1">
-                  <Text className="text-white text-2xl font-bold">{rank}</Text>
-                  {rank === 1 ? (
-                    <Entypo name="triangle-up" size={30} color="green" />
-                  ) : (
-                    <Entypo name="triangle-down" size={30} color="red" />
-                  )}
+        {/* Spotlight Section */}
+        <Text className="text-white font-bold text-lg mb-6 mt-6">
+          Spotlight
+        </Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {[1, 2, 3].map((_, i) => (
+            <View
+              key={i}
+              className="w-[280px] mr-4 rounded-2xl overflow-hidden bg-accent"
+            >
+              <View className="relative">
+                <Image
+                  source={require("@/assets/images/content/freeshop.jpg")}
+                  className="w-full h-52"
+                  resizeMode="cover"
+                />
+                {/* Top badges */}
+                <View className="absolute top-3 left-3 bg-accent px-3 py-1  rounded-full">
+                  <Text className="text-white text-xs">FREE</Text>
                 </View>
-                <View
-                  className={`mr-4 ${
-                    index === 0 ? "ml-1" : ""
-                  } flex-col w-44  rounded-2xl overflow-hidden`}
-                >
-                  {/* Rank & Movement */}
+                <View className="absolute top-3 right-3 bg-accent px-3 py-1 rounded-full flex-row items-center">
+                  <Image
+                    source={require("@/assets/images/ArtisteRadarLogo.png")}
+                    className="w-4 h-4 mr-1"
+                  />
+                  <Text className="text-white text-xs">01d21h41m23s</Text>
+                </View>
 
-                  {/* Song Block */}
-                  <View className="relative">
-                    <Image
-                      className="w-full h-64 rounded-lg"
-                      resizeMode="cover"
-                      source={
-                        rank === 1
-                          ? require("@/assets/images/content/rema1.jpg")
-                          : require("@/assets/images/content/secondrank.jpg") // Swap this out as needed
-                      }
-                    />
-
-                    {/* Volume Icon (Top Right) */}
-                    <View className="absolute m-2 w-full gap-4">
-                      <View className="flex-row justify-between">
-                        <Text className="text-white">Rema - Ravage</Text>
-                        <View className="absolute  right-2 bg-black/40 p-1 mr-3 rounded-full">
-                          <Ionicons
-                            name="volume-medium"
-                            size={14}
-                            color="white"
-                          />
-                        </View>
-                      </View>
-                      <View>
-                        <ProgressHeader
-                          step={3}
-                          total={5}
-                          type={"onboardingBar"}
-                          showBackArrow={false}
+                {/* Bottom overlay */}
+                <View className="bg-[#9BACCA] p-3">
+                  <Text className="text-accent text-xl font-bold mb-2">
+                    78% off + 2 free months with Surfshark Antivirus
+                  </Text>
+                  <View className="flex-row items-center">
+                    <View className="flex-row -space-x-3 mr-1 ml-5">
+                      {[
+                        require("@/assets/images/avatars/avatar1.png"),
+                        require("@/assets/images/avatars/avatar1.png"),
+                        require("@/assets/images/avatars/avatar2.png"),
+                        require("@/assets/images/avatars/avatar3.png"),
+                      ].map((img, idx) => (
+                        <Image
+                          key={idx}
+                          source={img}
+                          // className="w-6 h-6 rounded-full  border border-black"
+                          className={`w-10 h-10 rounded-full border border-white -ml-6 `}
                         />
+                      ))}
+                      <View className="w-10 h-10 border rounded-full border-white items-center justify-center -ml-6 bg-accent">
+                        <Text className="text-white">52k</Text>
                       </View>
                     </View>
-
-                    {/* Play count (Bottom Left) */}
-                    <View className="absolute bottom-2 left-2 bg-black/60 px-2 py-1 rounded-full flex-row items-center">
-                      <Ionicons name="play" size={14} color="white" />
-                      <Text className="text-white text-xs ml-1">20.4k</Text>
+                    <View>
+                      <Text className="text-black text-lg">
+                        {" "}
+                        Others Bought this{" "}
+                      </Text>
                     </View>
+                  </View>
+                  <View className="px-2 py-1 mt-2 rounded">
+                    <Text className="text-black text-lg ">Surfshark</Text>
                   </View>
                 </View>
               </View>
-            ))}
-          </ScrollView>
+            </View>
+          ))}
+        </ScrollView>
+
+        {/* Feedback Row */}
+        <View className="bg-accent mt-6 rounded-xl p-4">
+          <Text className="text-white text-xl text-center mb-3">
+            Do you enjoy the marketplace?
+          </Text>
+          <View className="flex-row justify-center space-x-10 gap-5 h-12">
+            <TouchableOpacity className="bg-[#FFFFFF33] justify-center items-center w-[138px]  px-4 py-2 rounded-xl">
+              <SadIcon />
+            </TouchableOpacity>
+            <TouchableOpacity className="bg-[#FFFFFF33] justify-center items-center w-[138px] px-4 py-2 rounded-xl">
+              <SmileIcon />
+            </TouchableOpacity>
+          </View>
         </View>
 
-        {/* Music Card */}
-        {[1, 2, 3, 4].map((_, index) => (
-          <View key={index} className=" rounded-3xl mb-6 overflow-hidden">
-            <View className="flex-row gap-3 items-center space-x-2 mb-4">
-              <Image
-                source={require("@/assets/images/content/moreafro.jpg")}
-                className="w-10 h-10 rounded-full"
-              />
-              <Text className="text-white font-semibold">
-                More of <Text className="font-bold">Afrobeat</Text>
-              </Text>
-            </View>
+        {/* Physical Offers */}
+        <View className="flex-row justify-between items-center mt-6 mb-4">
+          <Text className="text-white font-bold text-lg">Physical Offers</Text>
+          <Ionicons name="arrow-forward-circle" size={24} color="white" />
+        </View>
 
-            <View className="bg-accent rounded-3xl overflow-hidden">
-              <Image
-                className="w-full h-56"
-                resizeMode="cover"
-                source={require("@/assets/images/content/rema1.jpg")}
-              />
-
-              <View
-                className="absolute top-3 right-2 mr-3
-               bg-black/40 p-2 rounded-full"
-              >
-                <Ionicons name="volume-high" size={16} color="white" />
+        <FlatList
+          className="mb-[200px]"
+          data={storeDetail}
+          keyExtractor={(_, index) => index.toString()}
+          renderItem={({ item }) => (
+            <View
+              className="flex-row  rounded-2xl overflow-hidden mb-4"
+              style={{ backgroundColor: item.color }}
+            >
+              <View className="w-[48%]">
+                <Image
+                  source={item.image}
+                  className="w-full h-48"
+                  resizeMode="cover"
+                />
               </View>
-              <View className="p-4 space-y-1">
-                <View className="flex-row items-center gap-2 space-x-2 mb-2">
-                  <Image
-                    source={require("@/assets/images/ArtisteRadarLogo.png")}
-                    className="w-5 h-5"
-                  />
-                  <Text className="text-xs text-gray-400 font-semibold">
-                    Genre
-                  </Text>
-                </View>
-
-                <Text className="text-2xl text-white font-bold">Ravage</Text>
-                <Text className="text-sm text-tertiary mt-2">
-                  EP • Rema • 5 songs • 2023
-                </Text>
-                <Text className="text-sm text-tertiary mt-2 ">
-                  Because you listen to pop music
-                </Text>
-                <View className="flex-row justify-between mt-4 gap-4 space-x-4">
-                  <TouchableOpacity className="flex-1 h-10 bg-white items-center justify-center rounded-xl">
-                    <Text className="text-black font-semibold">
-                      Give feedback
+              <View className="absolute top-3 left-3 bg-accent px-4 py-2  rounded-full">
+                {/* <Text className="text-white text-xs">FREE</Text> */}
+                {item.amount === 0 ? (
+                  <Text className="text-white font-bold">FREE</Text>
+                ) : (
+                  <View className="flex-row items-center">
+                    <Image
+                      source={require("@/assets/images/ArtisteRadarLogo.png")}
+                      className="w-4 h-4 mr-1"
+                    />
+                    <Text className="text-white text-sm font-bold">
+                      {item.amount.toFixed(2)}
                     </Text>
-                  </TouchableOpacity>
+                  </View>
+                )}
+              </View>
 
-                  <TouchableOpacity className="flex-1 h-10 bg-primary items-center justify-center rounded-xl">
-                    <Text className="text-white font-semibold">Share</Text>
-                  </TouchableOpacity>
+              <View className="p-3 gap-10">
+                <Text
+                  className="text-sm font-semibold"
+                  style={{ backgroundColor: item.color }}
+                >
+                  {item.title}
+                </Text>
+                <Text  style={{ backgroundColor: item.color }} className="text-xs mt-1">{item.description}</Text>
+
+                <View className="flex-row items-center">
+                  <View className="flex-row -space-x-3 mr-1 ml-5">
+                    {[
+                      require("@/assets/images/avatars/avatar1.png"),
+                      require("@/assets/images/avatars/avatar1.png"),
+                      require("@/assets/images/avatars/avatar2.png"),
+                      require("@/assets/images/avatars/avatar3.png"),
+                    ].map((img, idx) => (
+                      <Image
+                        key={idx}
+                        source={img}
+                        // className="w-6 h-6 rounded-full  border border-black"
+                        className={`w-8 h-8 rounded-full border border-white -ml-4 `}
+                      />
+                    ))}
+                    <View className="w-8 h-8 border rounded-full border-white items-center justify-center -ml-4 bg-accent">
+                      <Text className="text-white">52k</Text>
+                    </View>
+                  </View>
+                  <View>
+                    <Text  className="text-sm">Others Bought this</Text>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
-        ))}
-
+          )}
+        />
       </ScrollView>
     </LinearGradient>
   );

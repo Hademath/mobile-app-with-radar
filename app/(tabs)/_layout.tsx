@@ -29,12 +29,13 @@ export default function _layout() {
   return (
     <>
       <TouchableOpacity
-        className="absolute z-10 bottom-28 right-6 w-16 h-16 bg-primary rounded-full items-center justify-center shadow-lg"
+        className="absolute  z-10 bottom-28 right-6 w-16 h-16 bg-primary rounded-full items-center justify-center shadow-lg"
         onPress={() => router.push("/MusicType")}
       >
         <Text className="text-4xl text-secondary  -mt-1"> + </Text>
       </TouchableOpacity>
       <Tabs
+        
         screenOptions={{
           tabBarShowLabel: false,
           tabBarStyle: {
@@ -43,6 +44,8 @@ export default function _layout() {
             left: 20,
             right: 20,
             height: 70,
+            marginLeft:12,
+            marginRight:12,
             borderRadius: 35,
             backgroundColor: "#121212",
             shadowColor: "#000",
@@ -124,11 +127,11 @@ export default function _layout() {
           }}
         />
       </Tabs>
-      <View className="items-center bg-primary">
+      {/* <View className="items-center bg-primary">
         <View className="w-[50%] items-center h-2 bg-white/50 rounded-full mb-2">
           <View className="h-full bg-white rounded-full w-[100%]" />
         </View>
-      </View>
+      </View> */}
     </>
   );
 }

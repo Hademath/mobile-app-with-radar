@@ -17,6 +17,20 @@ export default function DOBScreen() {
     }
   };
 
+
+    // const { data, updateData } = useRegisterStore();
+    // const mutation = useMutation({
+    //   mutationFn: (payload: typeof data) =>
+    //     new AuthEndpoints().registerUser(payload),
+    //   onSuccess: (res) => {
+    //     console.log("Registered ✅", res.data);
+    //     // navigate to dashboard or OTP screen
+    //   },
+    //   onError: (err) => {
+    //     console.log("Registration error ❌", err);
+    //   },
+    // });
+
   return (
     <SafeAreaView className="flex-1 bg-black px-6">
       <CreateAccountHeader />

@@ -33,7 +33,7 @@ const SearchScreen = () => {
             onChangeText={setSearch}
             placeholder="What you looking for?"
             placeholderTextColor="#3C3C4399"
-            className="flex-1 ml-2 px-3 text-accent/60"
+            className="flex-1 ml-2 text-accent/60"
           />
           <Ionicons name="mic" size={20} color="#3C3C4399" />
         </View>

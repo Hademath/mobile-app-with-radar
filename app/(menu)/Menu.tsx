@@ -55,7 +55,7 @@ export default function Profile() {
       {menuItems.map((item, index) => (
         <TouchableOpacity
           key={index}
-          onPress={() => item.route && router.push(item.route)}
+          onPress={() => item.route && router.push(item.route as any)}
           className="flex-row items-center justify-between mt-8 "
         >
           <View className="flex-row items-center size-8 w-full ">

@@ -65,7 +65,7 @@ export default function Success() {
 
       {/* Bottom Buttons */}
       <View className="flex-row justify-center gap-4 mt-6">
-              <TouchableOpacity onPress={() => router.push("/Index")}  className="bg-white items-center justify-center py-4 w-[160px] rounded-lg">
+              <TouchableOpacity onPress={() => router.push("/(music)/MusicType")}  className="bg-white items-center justify-center py-4 w-[160px] rounded-lg">
           <Text className="text-black font-bold text-lg">Run Again</Text>
         </TouchableOpacity>
 

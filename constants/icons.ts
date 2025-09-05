@@ -10,6 +10,8 @@ import SpotifyIcon from "@/assets/images/svgs/SpotifyIcon"
 import ArtisteSecondaryLogo from "@/assets/images/svgs/ArtisteSecondaryLogo";
 import ArtisteLogo3 from "@/assets/images/svgs/ArtisteLogo3";
 import fireIcon from "@/assets/icons/fireIcon";
+import sadIcon from "@/assets/icons/sadIcon";
+import smileIcon from "@/assets/icons/smileIcon";
 
 
 
@@ -19,12 +21,14 @@ export type IconType = {
   storeicon: typeof storeicon;
   rankicon: typeof rankicon;
   homeicon: typeof homeicon;
-  fireIcon: typeof fireIcon; // Assuming fireIcon is the same as activityIcon
+  fireIcon: typeof fireIcon;
   YoutubeIcon: typeof YoutubeIcon;
   AppleMusic: typeof AppleMusic;
   SpotifyIcon: typeof SpotifyIcon;
   ArtisteSecondaryLogo: typeof ArtisteSecondaryLogo;
   ArtisteLogo3: typeof ArtisteLogo3;
+  sadIcon: typeof sadIcon;
+  smileIcon: typeof smileIcon;
 };
 
 const icons: IconType = {
@@ -38,7 +42,9 @@ const icons: IconType = {
     SpotifyIcon,
     ArtisteSecondaryLogo,
     ArtisteLogo3,
-    fireIcon
+    fireIcon,
+    sadIcon,
+    smileIcon
 
 };
 export default icons;

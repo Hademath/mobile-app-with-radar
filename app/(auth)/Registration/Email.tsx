@@ -1,14 +1,34 @@
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useState } from "react";
 import { useRouter } from "expo-router";
-
 import RegistrationStepProps from "../../components/RegistrationStep";
+import useRegisterStore from "@/store/register-store";
+import { emailSchema } from "@/schemas/registerSchema";
+import AuthEndpoints from "@/endpoints/authEndpoints";
+import useDataMutation from "@/hooks/useEndpointMutation";
 
-export default function EmailScreen() {
-  const [email, setEmail] = useState("");
+export default function EmailScreen({ setSteps }: { setSteps: (val: number) => void }) {
+  const { updateData } = useRegisterStore();
+  const API = new AuthEndpoints();
+
+  
+  const { isPending, mutate } = useDataMutation({
+    mutationFn: API.verifyEmail,
+    mutationKey: ["verify email"],
+  });
+
+
+  const handleNext = (val: string) => {
+    const parsed = emailSchema.safeParse({ email: val });
+    if (!parsed.success) {
+      alert(parsed.error.errors[0].message);
+      return;
+    }
+    console.log(updateData);
+    router.push("/Registration/VerifyCode");
+    updateData({ email: val });
+    setSteps(4);
+  };
+
   const router = useRouter();
-
   return (
     <>
       <RegistrationStepProps
@@ -16,11 +36,8 @@ export default function EmailScreen() {
         description="Please enter your email address."
         placeholder="Email"
         nextLabel="Next"
-        onNext={(val) => {
-          router.push("/Registration/VerifyCode");
-        }}
+        onNext={handleNext}
       />
-
     </>
   );
 }
