@@ -5,14 +5,27 @@ import { useState } from "react";
 import { useRouter } from "expo-router";
 import { Eye, EyeOff } from "lucide-react-native";
 import CreateAccountHeader from "@/app/components/CreateAccountHeader";
+import useRegisterStore from "@/store/register-store";
+import { passwordSchema } from "@/schemas/registerSchema";
 
 export default function PasswordScreen() {
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
   const router = useRouter();
 
+    const { data, setData, updateData } = useRegisterStore();
+    const handleNext = (val: string) => {
+      const parsed = passwordSchema.safeParse({ password: val });
+      if (!parsed.success) {
+        alert(parsed.error.errors[0].message);
+        return;
+      }
+      console.log(parsed);
+      router.push("/Registration/Residential");
+      updateData({ password: val });
+    };
   return (
-    <SafeAreaView className="flex-1 bg-black px-6">
+    <SafeAreaView className="flex-1 bg-primary px-6">
       <CreateAccountHeader />
       <View className="flex-1 py-10">
         <Text className="text-white text-2xl font-bold mb-1">
@@ -46,7 +59,7 @@ export default function PasswordScreen() {
 
         <View className="items-center">
           <TouchableOpacity
-            onPress={() => router.push("./Residential")}
+            onPress={() => handleNext(password)}
             className="bg-white py-3 px-12 rounded-xl items-center"
           >
             <Text className="text-center text-2xl text-black font-semibold">

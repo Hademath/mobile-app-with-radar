@@ -10,6 +10,7 @@ interface registerData {
       password: string;
       dateOfBirth: Date;
       country: string;
+      city: string;
       state: string;
       avatar: string;
       gender: string;
@@ -35,6 +36,7 @@ const useRegisterStore = create<registerStore>()((set) => ({
       dateOfBirth: new Date(),
       country: "",
       state: "",
+      city: "",
       lastName: "",
       gender: "",
       avatar: "",

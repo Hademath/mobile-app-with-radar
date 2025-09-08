@@ -2,18 +2,34 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { router } from "expo-router";
+import Constants from "expo-constants";
 
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 
+function getBaseUrl() {
+  if (__DEV__) {
+    // Development:  resolve IP from Expo dev server
+    const debuggerHost = Constants.expoConfig?.hostUri?.split(":")[0];
+    if (debuggerHost) {
+      return `http://${debuggerHost}:5000/api`;
+    }
+    // fallback 
+    return "http://localhost:5000/api";
+  } else {
+    // Production
+    return BASE_URL || "https://api.artisteradar.com/api";
+  }
+}
+
 const baseInstance = axios.create({
-  baseURL: BASE_URL,
+  baseURL: getBaseUrl(),
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 const authInstance = axios.create({
-  baseURL: BASE_URL,
+  baseURL: getBaseUrl(),
   headers: {
     "Content-Type": "application/json",
   },

@@ -45,7 +45,7 @@ export default function ProfileTypeScreen( { step = 1, total = 5 }: Props) {
   const router = useRouter();
   const progress = (step / total) * 100;
   return (
-    <SafeAreaView className="flex-1 bg-black px-6">
+    <SafeAreaView className="flex-1 bg-primary px-6">
       {/* <ProgressHeader step={1} total={5} /> */}
       <View className="w-full h-1  bg-neutral-800 rounded-full">
         <View

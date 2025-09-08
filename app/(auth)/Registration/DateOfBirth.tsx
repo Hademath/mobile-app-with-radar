@@ -4,33 +4,76 @@ import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import CreateAccountHeader from "@/app/components/CreateAccountHeader";
+import AuthEndpoints from "@/endpoints/authEndpoints";
+import useDataMutation from "@/hooks/useEndpointMutation";
+import { dateSchema } from "@/schemas/registerSchema";
+import * as SecureStore from "expo-secure-store";
+import useRegisterStore from "@/store/register-store";
+import {useAuthStore} from "@/store/auth-store";
+
 
 export default function DOBScreen() {
-  const [date, setDate] = useState<Date | null>(null);
-  const [showPicker, setShowPicker] = useState(false);
-  const router = useRouter();
+      const { setUser } = useAuthStore();
+      const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
+      const [showPicker, setShowPicker] = useState(false);
+      const router = useRouter();
 
-  const handleDateChange = (_event: any, selectedDate?: Date) => {
-    setShowPicker(Platform.OS === "ios");
-    if (selectedDate) {
-      setDate(selectedDate);
-    }
-  };
+      const handleDateChange = (_event: any, selectedDate?: Date) => {
+        setShowPicker(Platform.OS === "ios");
+        if (selectedDate) {
+          setDateOfBirth(selectedDate);
+        }
+      };
+
+      const API = new AuthEndpoints();
+      const { data, updateData } = useRegisterStore();
+
+      // Register User mutation
+      const { isPending, mutate } = useDataMutation({
+        mutationFn: (payload: Omit<typeof data, "dateOfBirth"> & { dateOfBirth: string }) => API.registerUser(payload),
+        mutationKey: ["register user"],
+      });
 
 
-    // const { data, updateData } = useRegisterStore();
-    // const mutation = useMutation({
-    //   mutationFn: (payload: typeof data) =>
-    //     new AuthEndpoints().registerUser(payload),
-    //   onSuccess: (res) => {
-    //     console.log("Registered ✅", res.data);
-    //     // navigate to dashboard or OTP screen
-    //   },
-    //   onError: (err) => {
-    //     console.log("Registration error ❌", err);
-    //   },
-    // });
 
+    const finishUp = () => {
+      if (!dateOfBirth) return;
+
+      const parsed = dateSchema.safeParse({ dateOfBirth });
+      if (!parsed.success) {
+        alert(parsed.error.errors[0].message);
+        return;
+      }
+
+      // build payload from current store data + latest date
+      const payload = {
+        ...data,
+        dateOfBirth: dateOfBirth.toISOString(),
+      };
+
+      // also keep store in sync (optional but clean)
+      updateData({ dateOfBirth: dateOfBirth });
+
+      console.log("Final registration payload:", payload);
+
+      mutate(payload, {
+        onSuccess: async (res) => {
+        const user = res?.data?.data;
+        const token = user?.token;
+        if (token) {
+          await SecureStore.setItemAsync("accessToken", token);
+          setUser(user);
+          router.push("/Registration/ProfileType");
+        }
+          alert(res?.message || "Registration successful!");
+        },
+        onError: (err: any) => {
+          console.log("Registration error", err);
+          const msg = err?.response?.data?.message || err.message || "Failed to register user. Please try again.";
+          alert(msg);
+        },
+      });
+    };
   return (
     <SafeAreaView className="flex-1 bg-black px-6">
       <CreateAccountHeader />
@@ -49,13 +92,13 @@ export default function DOBScreen() {
           className="bg-[#1A1A1A] rounded-xl py-4 px-4 mb-10"
         >
           <Text className="text-boarderColor/45 text-2xl">
-            {date ? date.toDateString() : "September 17, 2021"}
+            {dateOfBirth ? dateOfBirth.toDateString() : "September 17, 2021"}
           </Text>
         </TouchableOpacity>
 
         {showPicker && (
           <DateTimePicker
-            value={date ?? new Date(2000, 0, 1)}
+            value={dateOfBirth ?? new Date(2000, 0, 1)}
             mode="date"
             display="spinner"
             onChange={handleDateChange}
@@ -63,20 +106,14 @@ export default function DOBScreen() {
           />
         )}
 
-        {/* <TouchableOpacity
-          onPress={() => router.push("./Profiletype")}
-          disabled={!date}
-          className={`py-3 rounded-xl ${date ? "bg-white" : "bg-gray-600"}`}
-        >
-          <Text className="text-center text-black font-semibold text-base">
-            Finish
-          </Text>
-        </TouchableOpacity> */}
         <View className="items-center">
           <TouchableOpacity
-            onPress={() => router.push("./ProfileType")}
+            onPress={finishUp}
+            disabled={!dateOfBirth || isPending}
             // className="bg-white py-4 px-12 rounded-xl items-center"
-            className={`py-4 px-12  rounded-xl ${date ? "bg-white" : ""}`}
+            className={`py-4 px-12  rounded-xl ${
+              dateOfBirth ? "bg-white" : "bg-gray-600"
+            }`}
           >
             <Text className="text-center text-2xl text-black font-semibold">
               Finish up

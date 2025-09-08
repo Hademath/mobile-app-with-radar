@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "expo-router";
 import CreateAccountHeader from "@/app/components/CreateAccountHeader";
 import StyledPicker from "@/app/components/StyledPicker";
+import { addressSchema } from "@/schemas/registerSchema";
+import useRegisterStore from "@/store/register-store";
 
 export default function LocationScreen() {
   const router = useRouter();
@@ -12,8 +14,25 @@ export default function LocationScreen() {
   const [state, setState] = useState("");
   const [city, setCity] = useState("");
 
+  const resident = {
+    country: country,
+    state: state,
+    city: city,
+}
+      const { data, setData, updateData } = useRegisterStore();
+      const handleNext = (val: string) => {
+        const parsed = addressSchema.safeParse({ country: resident.country, state: resident.state, city: resident.city });
+        if (!parsed.success) {
+          alert(parsed.error.errors[0].message);
+          return;
+        }
+        // console.log(parsed);
+        router.push("/Registration/Gender");
+        updateData({ country: resident.country, state: resident.state, city: resident.city });
+      };
+
   return (
-    <SafeAreaView className="flex-1 bg-black px-6">
+    <SafeAreaView className="flex-1 bg-primary px-6">
       <CreateAccountHeader />
       <View className="flex-1 relative mb-4 py-10">
         <View>
@@ -110,7 +129,7 @@ export default function LocationScreen() {
           />
           <View className="items-center mt-3 ">
             <TouchableOpacity
-              onPress={() => router.push("./Gender")}
+              onPress={() => handleNext(city)}
               className="bg-white py-3 px-12 rounded-xl items-center"
             >
               <Text className="text-center text-2xl text-black font-semibold">

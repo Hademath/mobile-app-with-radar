@@ -13,16 +13,27 @@ interface ICreatePassword {
   payload: ICreatePasswordData;
 }
 export default class AuthEndpoints {
-  async requestOtp(email: string): Promise<AxiosResponse<any>> {
+  async requestOtp(reason: string, email: string): Promise<AxiosResponse<any>> {
     try {
-      return await baseInstance.put(`/auth/request-otp?reason=${email}`);
+      const response = await baseInstance.post( `/auth/request-otp?reason=${reason}`, { email } );
+      return response;
     } catch (error) {
+      // console.log("error", error);
+      return Promise.reject(error);
+    }
+  }
+
+  async verifyEmail(data: {otp:string, email:string}): Promise<AxiosResponse<any>> {
+    try {
+      return await baseInstance.put(`/auth/submit-otp`, data);
+    } catch (error) {
+      //  console.log("❌ Request failed:", JSON.stringify(error, null, 2));
       return Promise.reject(error);
     }
   }
   async registerUser(data: registerType): Promise<AxiosResponse<any>> {
     try {
-      const response = await baseInstance.post("/register", data);
+      const response = await baseInstance.post("auth/register", data);
       return response;
     } catch (error) {
       return Promise.reject(error);
@@ -73,13 +84,6 @@ export default class AuthEndpoints {
         `/password/reset/${data.token}?email=${data.email}`,
         data.payload
       );
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-  async verifyEmail(otp: string): Promise<AxiosResponse<any>> {
-    try {
-      return await baseInstance.put(`/verify_otp?token=${otp}`);
     } catch (error) {
       return Promise.reject(error);
     }

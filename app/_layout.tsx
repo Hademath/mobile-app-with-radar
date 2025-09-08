@@ -4,6 +4,8 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useFonts } from "expo-font";
 import { Text } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import ReactQueryProvider from "@/providers/ReactQuery";
+import { AuthenticationProvider } from "@/providers/AuthContext";
 
 
 export default function RootLayout() {
@@ -28,21 +30,25 @@ export default function RootLayout() {
 
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView className="flex-1 bg-primary">
-          <StatusBar style="light" />
-        <Stack>
-          <Stack.Screen name="launch" options={{ headerShown: false }} />
-          <Stack.Screen name="(auth)/Registration" options={{ headerShown: false }} />
-          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="(auth)/Login" options={{ headerShown: false }} />
-          <Stack.Screen name="(menu)" options={{ headerShown: false }} />
-          <Stack.Screen name="(music)" options={{ headerShown: false }} />
-        </Stack>
-        
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <ReactQueryProvider>
+      <AuthenticationProvider>
+        <SafeAreaProvider>
+          <SafeAreaView className="flex-1 bg-primary">
+              <StatusBar style="light" />
+            <Stack>
+              <Stack.Screen name="launch" options={{ headerShown: false }} />
+              <Stack.Screen name="(auth)/Registration" options={{ headerShown: false }} />
+              <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="(auth)/Login" options={{ headerShown: false }} />
+              <Stack.Screen name="(menu)" options={{ headerShown: false }} />
+              <Stack.Screen name="(music)" options={{ headerShown: false }} />
+            </Stack>
+            
+          </SafeAreaView>
+        </SafeAreaProvider>
+      </AuthenticationProvider>
+    </ReactQueryProvider>
   );
 }
  

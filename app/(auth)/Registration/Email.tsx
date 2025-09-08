@@ -5,37 +5,51 @@ import { emailSchema } from "@/schemas/registerSchema";
 import AuthEndpoints from "@/endpoints/authEndpoints";
 import useDataMutation from "@/hooks/useEndpointMutation";
 
-export default function EmailScreen({ setSteps }: { setSteps: (val: number) => void }) {
-  const { updateData } = useRegisterStore();
-  const API = new AuthEndpoints();
+export default function EmailScreen() {
 
-  
+  const {updateData } = useRegisterStore();
+  const API = new AuthEndpoints();
+  const router = useRouter();
+
+
+  //  OTP request mutation
+  const reason = "register";
   const { isPending, mutate } = useDataMutation({
-    mutationFn: API.verifyEmail,
+    mutationFn: (email: string) => API.requestOtp(reason, email),
     mutationKey: ["verify email"],
   });
 
-
+  // console.log("Current registration data:", data);
+  
   const handleNext = (val: string) => {
     const parsed = emailSchema.safeParse({ email: val });
     if (!parsed.success) {
       alert(parsed.error.errors[0].message);
       return;
     }
-    console.log(updateData);
-    router.push("/Registration/VerifyCode");
-    updateData({ email: val });
-    setSteps(4);
-  };
 
-  const router = useRouter();
+    mutate(val,
+      {
+        
+        onSuccess: (res) => {
+          updateData({ email: val });
+          alert(res.data.message);
+          router.push("/Registration/VerifyCode");
+        },
+        onError: (err: any) => {
+          console.log("OTP send error ❌", err);
+          alert("Failed to send OTP. Please try again: " + err?.response?.data?.message || err.message || err);
+        },
+      }
+    );
+  };
   return (
     <>
       <RegistrationStepProps
         title="What's your email"
         description="Please enter your email address."
         placeholder="Email"
-        nextLabel="Next"
+        nextLabel={isPending ? "Sending..." : "Next"}
         onNext={handleNext}
       />
     </>

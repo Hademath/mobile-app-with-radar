@@ -10,11 +10,35 @@ export const lastNameSchema = z.object({
 });
 
 export const emailSchema = z.object({
-  input: z.string().email("Invalid email address"),
+  email: z.string().email("Invalid email address"),
 });
 
+export const passwordSchema = z.object({
+  password: z.string().min(6, "Password must be at least 6 characters").regex (/[A-Z]/, "Password must contain at least one uppercase letter").regex (/[a-z]/, "Password must contain at least one lowercase letter").regex (/[0-9]/, "Password must contain at least one number").regex (/[\W_]/, "Password must contain at least one special character"),
+});
 
+export const addressSchema = z.object({
+  country: z.string().min(2, "Country is too short"),
+  state: z.string().min(2, "State is too short"),
+  city: z.string().min(2, "City is too short"),
+});
 
+export const genderSchema = z.object({
+  gender: z.enum(["Male", "Female", "Other"], {
+    errorMap: () => ({ message: "Invalid gender" }),
+  }),
+});
+
+export const dateSchema = z.object({
+  dateOfBirth: z.date({
+      invalid_type_error: "Invalid date",
+    })
+    .max(new Date(), "Date of birth cannot be in the future")
+    .refine((date) => {
+      const age = new Date().getFullYear() - date.getFullYear();
+      return age >= 16;
+    }, "You must be at least 16 years old"),
+});
 export const registerSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
@@ -24,6 +48,7 @@ export const registerSchema = z.object({
   dateOfBirth: z.string().refine((date) => !isNaN(Date.parse(date)), { message: "Invalid date format" }),
   country: z.string().min(2),
   state: z.string().min(2),
+  city: z.string().min(2),
   avatar: z.string().url().optional(),
 });
 

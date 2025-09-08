@@ -48,7 +48,9 @@ export function AuthenticationProvider({ children }: PropsWithChildren) {
       setIsLoggedIn(false);
       setUser(null);
       setIsProcessing(false);
+
       // router.replace("/");
+      router.replace("/(auth)/Login/LoginScreen"); 
     }
   }
   useEffect(() => {
@@ -56,7 +58,7 @@ export function AuthenticationProvider({ children }: PropsWithChildren) {
   }, []);
 
   const { mutate, isPending } = useDataMutation({
-    mutationKey: ["login user"],
+    mutationKey: ["user login"],
     mutationFn: API.login,
   });
 
