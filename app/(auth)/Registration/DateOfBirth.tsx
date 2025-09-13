@@ -34,8 +34,6 @@ export default function DOBScreen() {
         mutationKey: ["register user"],
       });
 
-
-
     const finishUp = () => {
       if (!dateOfBirth) return;
 
@@ -45,30 +43,28 @@ export default function DOBScreen() {
         return;
       }
 
-      // build payload from current store data + latest date
+      //payload from current store data + latest date
       const payload = {
         ...data,
         dateOfBirth: dateOfBirth.toISOString(),
       };
 
-      // also keep store in sync (optional but clean)
+      // keep store in sync (optional)
       updateData({ dateOfBirth: dateOfBirth });
-
-      console.log("Final registration payload:", payload);
 
       mutate(payload, {
         onSuccess: async (res) => {
         const user = res?.data?.data;
         const token = user?.token;
         if (token) {
-          await SecureStore.setItemAsync("accessToken", token);
+          await SecureStore.setItemAsync("user", user);
           setUser(user);
           router.push("/Registration/ProfileType");
         }
-          alert(res?.message || "Registration successful!");
+          alert(res?.data.message || "Registration successful!");
         },
         onError: (err: any) => {
-          console.log("Registration error", err);
+          // console.log("Registration error", err);
           const msg = err?.response?.data?.message || err.message || "Failed to register user. Please try again.";
           alert(msg);
         },

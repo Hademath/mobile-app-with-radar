@@ -22,7 +22,7 @@ type ContextStore = {
   isLoggedIn: boolean;
   isProcessing: boolean;
 };
-
+ 
 const AuthContext = createContext({} as ContextStore);
 
 export function useAuth() {
@@ -70,20 +70,24 @@ export function AuthenticationProvider({ children }: PropsWithChildren) {
   async function logout() {
     queryClient.clear();
     await AsyncStorage.removeItem("user");
+    await AsyncStorage.removeItem("account-exists");
     checkIfLoggedIn();
   }
 
   async function login(val: loginType) {
     mutate(val, {
       onSuccess: (res) => {
-        console.log(res);
-        if (res?.data?.data?.access_token) {
+        console.log(res.data.message,  res?.data?.data);
+        if (res?.data?.data.token) {
           setUserOnLogin(res?.data?.data);
           checkIfLoggedIn();
+          alert(res.data.message);
         }
       },
-      onError: (err) => {
-        console.log(err);
+      onError: (err:any) => {
+        // console.log("❌ Login error:", err.response?.data || err.message);
+          const msg = err?.response?.data?.message || err.message || "Failed to register user. Please try again.";
+          alert(msg);
       },
     });
   }

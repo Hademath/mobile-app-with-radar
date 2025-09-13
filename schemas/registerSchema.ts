@@ -53,4 +53,24 @@ export const registerSchema = z.object({
 });
 
 
+// Onboarding schema for additional profile setup
+export const profileNameSchema = z.object({
+  role: z.string(),
+});
+export const usernameSchema = z.object({
+  username: z.string().min(2, "Username is too short"),
+});
+
+
+export const onboardingSchema = z.object({
+  role: z.string(),
+  username: z.string().min(3),
+  avatarType: z.string().min(3),
+  avatar: z.string().url().optional(),
+  genres: z.string().url().optional(),
+});
+
+
+
+
 export type registerType = z.infer<typeof registerSchema>;

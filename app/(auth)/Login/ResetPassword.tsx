@@ -42,7 +42,7 @@ export default function PasswordScreen() {
     }
 
   return (
-    <SafeAreaView className="flex-1 bg-black px-6">
+    <SafeAreaView className="flex-1 bg-primary px-6">
       <CreateAccountHeader />
       <View className="flex-1 py-20">
         <Text className="text-white text-2xl font-bold mb-1">

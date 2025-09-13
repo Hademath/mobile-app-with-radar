@@ -37,7 +37,6 @@ export default function EmailScreen() {
           router.push("/Registration/VerifyCode");
         },
         onError: (err: any) => {
-          console.log("OTP send error ❌", err);
           alert("Failed to send OTP. Please try again: " + err?.response?.data?.message || err.message || err);
         },
       }

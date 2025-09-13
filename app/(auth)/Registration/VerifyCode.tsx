@@ -35,7 +35,7 @@ export default function OTPVerifyScreen() {
   });
 
   
-  console.log("Current registration data:", data);
+  // console.log("Current registration data:", data);
 
   const handleChange = (text: string, index: number) => {
     if (/^\d$/.test(text)) {

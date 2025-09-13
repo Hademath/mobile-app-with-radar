@@ -1,14 +1,11 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
-  Dimensions,
-} from "react-native";
+import { View, Text, TouchableOpacity, FlatList, Dimensions, } from "react-native";
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import ProgressHeader from "../../components/ProgressHeader";
+import AuthEndpoints from "@/endpoints/authEndpoints";
+import useEndpointQuery from "@/hooks/useEndpointQuery";
+import { useAuth } from "@/providers/AuthContext";
 import images from "@/constants/images";
 
 const genres = [
@@ -30,18 +27,28 @@ export default function GenresScreen() {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const router = useRouter();
 
-  const toggleGenre = (id: string) => {
+  const toggleGenre = (uuid: string) => {
     setSelectedGenres((prev) => {
-      const alreadySelected = prev.includes(id);
+      const alreadySelected = prev.includes(uuid);
       if (alreadySelected) {
-        return prev.filter((g) => g !== id);
+        return prev.filter((item) => item !== uuid);
       } else {
-        if (prev.length >= 5) return prev; // disable selecting more than 5
-        return [...prev, id];
+        if (prev.length >= 5) return prev;
+        return [...prev, uuid];
       }
     });
   };
+  const { user } = useAuth();
+  console.log("Current User in Genres Screen:", user);
+  
+  const API = new AuthEndpoints();
+  const { data } = useEndpointQuery({
+    queryFn: API.getGenres,
+    queryKey: ["fetch genres"],
+  });
 
+
+  
   return (
     <SafeAreaView className="flex-1 bg-black px-6">
       <ProgressHeader step={3} total={5} type={"onboardingBar"} />
@@ -51,7 +58,7 @@ export default function GenresScreen() {
         </Text>
 
         <FlatList
-          data={genres}
+          data={genres || []}
           keyExtractor={(item) => item.id}
           numColumns={3}
           columnWrapperStyle={{ justifyContent: "space-between" }}

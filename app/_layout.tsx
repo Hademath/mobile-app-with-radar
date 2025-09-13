@@ -7,6 +7,9 @@ import { StatusBar } from "expo-status-bar";
 import ReactQueryProvider from "@/providers/ReactQuery";
 import { AuthenticationProvider } from "@/providers/AuthContext";
 
+  import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect } from "react";
+
 
 export default function RootLayout() {
   // const MyTheme = {
@@ -27,6 +30,17 @@ export default function RootLayout() {
   //     </SafeAreaView>
   //   );
   // }
+
+
+  // async function clearLoginData() {
+  //   await AsyncStorage.removeItem("user");
+  //   await AsyncStorage.removeItem("account-exists");
+  //   console.log("🔑 Cleared saved login data!");
+  // }
+
+  // useEffect(() => {
+  //   clearLoginData();  
+  // }, []);  
 
 
   return (

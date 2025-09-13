@@ -13,7 +13,7 @@ export default function PasswordScreen() {
   const [visible, setVisible] = useState(false);
   const router = useRouter();
 
-    const { data, setData, updateData } = useRegisterStore();
+    const { updateData } = useRegisterStore();
     const handleNext = (val: string) => {
       const parsed = passwordSchema.safeParse({ password: val });
       if (!parsed.success) {

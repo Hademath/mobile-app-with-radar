@@ -2,10 +2,9 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-// import ProgressHeader from "../../components/ProgressHeader";
 import ArtisteLogo3 from "../../../assets/images/svgs/ArtisteLogo3";
-import icons from "@/constants/icons";
-
+import { profileNameSchema } from "@/schemas/registerSchema";
+import useProfileSetupStore from "@/store/profilesetup-store";
 interface profilePop {
   id: string,
   label:string
@@ -44,6 +43,25 @@ export default function ProfileTypeScreen( { step = 1, total = 5 }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
   const router = useRouter();
   const progress = (step / total) * 100;
+
+  const { updateData } = useProfileSetupStore();
+  const handleNext = (val: string) => {
+    const parsed = profileNameSchema.safeParse({ role: val });
+    if (!parsed.success) {
+      alert(parsed.error.errors[0].message);
+      return;
+    }
+    console.log(parsed);
+    if (selected === "listener") {
+      router.push("./Username");
+    } else if (selected === "artiste") {
+      router.push("./ArtistName");
+    } else if (selected === "music-pro") {
+      router.push("./MusicProUniqueName");
+    }
+    updateData({ role: val });
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-primary px-6">
       {/* <ProgressHeader step={1} total={5} /> */}
@@ -103,15 +121,7 @@ export default function ProfileTypeScreen( { step = 1, total = 5 }: Props) {
 
         <View className="items-center">
           <TouchableOpacity
-            onPress={() => {
-              if (selected === "listener") {
-                router.push("./Username");
-              } else if (selected === "artiste") {
-                router.push("./ArtistName");
-              } else if (selected === "music-pro") {
-                router.push("./MusicProUniqueName");
-              }
-            }}
+            onPress={() => selected && handleNext(selected)}
             disabled={!selected}
             className={`py-4 rounded-xl px-12 items-center ${selected ? "bg-white" : ""}`}
           >

@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import { baseInstance } from "@/utils/apiService";
+import { authInstance, baseInstance } from "@/utils/apiService";
 import { registerType } from "@/schemas/registerSchema";
 import { loginType } from "@/schemas/login";
 
@@ -15,7 +15,10 @@ interface ICreatePassword {
 export default class AuthEndpoints {
   async requestOtp(reason: string, email: string): Promise<AxiosResponse<any>> {
     try {
-      const response = await baseInstance.post( `/auth/request-otp?reason=${reason}`, { email } );
+      const response = await baseInstance.post(
+        `/auth/request-otp?reason=${reason}`,
+        { email }
+      );
       return response;
     } catch (error) {
       // console.log("error", error);
@@ -23,7 +26,7 @@ export default class AuthEndpoints {
     }
   }
 
-  async verifyEmail(data: {otp:string, email:string}): Promise<AxiosResponse<any>> {
+  async verifyEmail(data: { otp: string; email: string; }): Promise<AxiosResponse<any>> {
     try {
       return await baseInstance.put(`/auth/submit-otp`, data);
     } catch (error) {
@@ -39,27 +42,46 @@ export default class AuthEndpoints {
       return Promise.reject(error);
     }
   }
-
+  
+  async profileSetup(data: ICreatePassword): Promise<AxiosResponse<any>> {
+    try {
+      const response = await authInstance.put(`/user/profile_setup`, data);
+      return response;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+  async verifyUsername(data: {username: string; }): Promise<AxiosResponse<any>> {
+    try {
+      return await baseInstance.put(`/auth/validate-username`, data);
+    } catch (error) {
+      //  console.log("❌ validation failed:", JSON.stringify(error, null, 2));
+      return Promise.reject(error);
+    }
+  }
   async login(data: loginType): Promise<AxiosResponse<any>> {
     try {
-      const response = await baseInstance.post("/login", data);
+      const response = await baseInstance.post("/auth/login", data);
       return response;
     } catch (error) {
+      console.log(error);
       return Promise.reject(error);
     }
   }
-  async getCommunities(): Promise<AxiosResponse<any>> {
+  
+  async getGenres(): Promise<AxiosResponse<any>> {
     try {
-      const response = await baseInstance.get("/all_community");
+      const response = await authInstance.get("/user/genres");
       return response;
     } catch (error) {
       return Promise.reject(error);
     }
   }
+  
   async createPassword(data: ICreatePassword): Promise<AxiosResponse<any>> {
     try {
       const response = await baseInstance.put(
-        `/create_password?${data.params}`,
+        `/auth/create_password?${data.params}`,
         data.payload
       );
       return response;
@@ -67,9 +89,18 @@ export default class AuthEndpoints {
       return Promise.reject(error);
     }
   }
+  async verifyForgotPassOtp(data: { token: string; }): Promise<AxiosResponse<any>> {
+    try {
+      return await baseInstance.put(`/auth/varify-resetpass-otp`, data);
+    } catch (error) {
+       console.log("❌ Request failed:", JSON.stringify(error, null, 2));
+      return Promise.reject(error);
+    }
+  }
+  
   async forgotPassword(data: { email: string }): Promise<AxiosResponse<any>> {
     try {
-      return await baseInstance.post("/forgot_password", data);
+      return await baseInstance.post("/auth/forgot-password", data);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -81,7 +112,7 @@ export default class AuthEndpoints {
   }): Promise<AxiosResponse<any>> {
     try {
       return await baseInstance.post(
-        `/password/reset/${data.token}?email=${data.email}`,
+        `/auth/password/reset/${data.token}?email=${data.email}`,
         data.payload
       );
     } catch (error) {

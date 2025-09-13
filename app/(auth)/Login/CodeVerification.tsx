@@ -1,14 +1,20 @@
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import CreateAccountHeader from "@/app/components/CreateAccountHeader";
 import { LoaderCircle } from "lucide-react-native";
+import useResetPassStore from "@/store/reset-password-store";
+import useDataMutation from "@/hooks/useEndpointMutation";
+import AuthEndpoints from "@/endpoints/authEndpoints";
 
 export default function CodeVerification() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputs = useRef<(TextInput | null)[]>([]);
   const router = useRouter();
+    const [timer, setTimer] = useState(60);
+    const [startTimer, setStartTimer] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
 
   const handleChange = (text: string, index: number) => {
     if (/^\d$/.test(text)) {
@@ -21,6 +27,88 @@ export default function CodeVerification() {
       }
     }
   };
+
+  const { data, setData, updateData } = useResetPassStore();
+  const API = new AuthEndpoints();
+
+  // Verify OTP mutation
+  const { isPending, mutate } = useDataMutation({
+    mutationFn: (data: { token: string; }) => API.verifyForgotPassOtp(data),
+    mutationKey: ["verify otp"],
+  });
+
+  // Resend OTP
+  const { mutate: resendOtpMutation } = useDataMutation({
+    mutationFn: (email: string) => API.forgotPassword({email}),
+    mutationKey: ["request otp"],
+  });
+
+
+  // Auto-submit when 6 digits are filled
+  useEffect(() => {
+    const code = otp.join("");
+    if (code.length === 6 && !otp.includes("")) {
+      onSubmit(code);
+    }
+  }, [otp]);
+
+  function onSubmit(code: string) {
+    if (isPending) return;
+    setErrorMsg("");
+
+    mutate(
+      { token: code, },
+      {
+        onSuccess: (res) => {
+          alert(res.data.message);
+          updateData({ token: code });
+          setOtp(["", "", "", "", "", ""]);
+          router.push("./ResetPassword");
+        },
+        onError: (err: any) => {
+          const msg = err?.response?.data?.message || err.message || "Invalid OTP. Please try again"; setErrorMsg(msg);
+          setOtp(["", "", "", "", "", ""]);
+          inputs.current[0]?.focus();
+        },
+      }
+    );
+  }
+
+  //  Resend OTP
+  function resendOtp() {
+    if (startTimer) return; // block spamming
+    setErrorMsg("");
+
+    resendOtpMutation(data.email, {
+      onSuccess: (res) => {
+        // console.log("OTP resent ");
+        setTimer(60);
+        setStartTimer(true);
+        alert("A new OTP has been sent to your email.");
+      },
+      onError: (err: any) => {
+        // console.log("Resend OTP failed:", err);
+        const msg =
+          err?.response?.data?.message ||
+          err.message ||
+          "Failed to resend OTP. Please try again.";
+        setErrorMsg(msg);
+      },
+    });
+  }
+
+  // 🔹 Countdown timer
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (startTimer && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
+    } else if (timer === 0) {
+      setStartTimer(false);
+    }
+    return () => clearInterval(interval);
+  }, [startTimer, timer]);
 
   return (
     <SafeAreaView className="flex-1 bg-black ">
@@ -84,3 +172,4 @@ export default function CodeVerification() {
     </SafeAreaView>
   );
 }
+

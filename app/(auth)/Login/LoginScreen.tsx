@@ -5,12 +5,43 @@ import icons from "@/constants/icons";
 import ArtisteSecondaryLogo from "../../../assets/images/svgs/ArtisteSecondaryLogo";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react-native";
+import { useAuth } from "@/providers/AuthContext";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, loginType } from "@/schemas/login";
 
 export default function LoginScreen() {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [visible, setVisible] = useState(false);
+  const [error, setError] = useState("");
+
+    const { login, isPending } = useAuth();
+
+    const { handleSubmit, setValue, formState: { errors }, } = useForm<loginType>({
+      resolver: zodResolver(loginSchema),
+      defaultValues: {
+        email: "",
+        password: "",
+        remember_me: false,
+      },
+    });
+
+  function onLogin(val: loginType) {
+      login(val);
+    }
+
+    // sync state with form so zod can validate
+  const handleEmailChange = (text: string) => {
+      setEmail(text);
+      setValue("email", text, { shouldValidate: true });
+    };
+
+    const handlePasswordChange = (text: string) => {
+      setPassword(text);
+      setValue("password", text, { shouldValidate: true });
+    };
 
   return (
     <ImageBackground
@@ -33,22 +64,33 @@ export default function LoginScreen() {
           <View className="mb-4">
             <TextInput
               value={email}
-              onChangeText={setEmail}
+              onChangeText={handleEmailChange}
               placeholder="Email"
               placeholderTextColor="#888"
               className="bg-boarderColor/30 text-white px-4 py-5 rounded-xl"
             />
+
+            {errors.email && (
+              <Text className="text-red-500 text-[10px]">
+                {errors.email.message}
+              </Text>
+            )}
           </View>
           <View className="relative ">
             <TextInput
               value={password}
-              onChangeText={setPassword}
+              onChangeText={handlePasswordChange}
               placeholder="Password"
               placeholderTextColor="#888"
               secureTextEntry={!visible}
               autoCapitalize="none"
               className="bg-boarderColor/30 text-white px-4 py-5 rounded-xl mb-2"
             />
+            {errors.password && (
+              <Text className="text-red-500 text-[10px] ">
+                {errors.password.message}
+              </Text>
+            )}
             <TouchableOpacity
               onPress={() => setVisible(!visible)}
               className="absolute right-5 top-3"
@@ -66,12 +108,16 @@ export default function LoginScreen() {
               <Text className=" text-white underline">Forgot Password?</Text>
             </TouchableOpacity>
           </View>
+          {error ? (
+              <Text className="text-red-500 text-[10px] ">{error}</Text>
+            ) : null}
           <TouchableOpacity
-            onPress={() => router.push("/Index")}
+            onPress={() => handleSubmit(onLogin)()}
+            disabled={isPending}
             className="bg-secondary py-3 rounded-xl mb-3"
           >
             <Text className="text-center text-black font-semibold text-base">
-              Login
+              {isPending ? "Logging in..." : "Login"}
             </Text>
           </TouchableOpacity>
           <Text className="text-white text-center text-base mb-4">Or</Text>
@@ -81,7 +127,10 @@ export default function LoginScreen() {
           />
           <SocialButton Icon={icons.AppleMusic} text="Login with Apple Music" />
           <SocialButton Icon={icons.SpotifyIcon} text="Login with Spotify" />
-          <TouchableOpacity onPress={() => router.push("/Registration/GetStarted") } className="mt-6">
+          <TouchableOpacity
+            onPress={() => router.push("/Registration/GetStarted")}
+            className="mt-6"
+          >
             <Text className="text-center text-white  text-xl">
               Sign up free
             </Text>
