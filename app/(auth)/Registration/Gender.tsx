@@ -17,7 +17,7 @@ export default function GenderScreen() {
       alert(parsed.error.errors[0].message);
       return;
     }
-    console.log(parsed);
+    // console.log(parsed);
     router.push("/Registration/DateOfBirth");
     updateData({ gender: val });
   };

@@ -1,22 +1,9 @@
 import AuthEndpoints from "@/endpoints/authEndpoints";
 import useDataMutation from "@/hooks/useEndpointMutation";
+import { IUser } from "@/utils/types";
 import { create } from "zustand";
 
-interface IUser {
-  access_token: string;
-  token_type: string;
-  expires_in: number;
-  data: {
-    id: number;
-    uuid: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    status: string;
-    createdAt: string;
-    updatedAt: string;
-  };
-}
+
 type Store = {
   user: IUser | null;
   loading: boolean;

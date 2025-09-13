@@ -42,14 +42,12 @@ export const dateSchema = z.object({
 export const registerSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
-  username: z.string().min(3),
   email: z.string().email(),
   password: z.string().min(6),
   dateOfBirth: z.string().refine((date) => !isNaN(Date.parse(date)), { message: "Invalid date format" }),
   country: z.string().min(2),
   state: z.string().min(2),
   city: z.string().min(2),
-  avatar: z.string().url().optional(),
 });
 
 

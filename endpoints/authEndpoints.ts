@@ -39,6 +39,7 @@ export default class AuthEndpoints {
       const response = await baseInstance.post("auth/register", data);
       return response;
     } catch (error) {
+       console.log("❌ validation failed:", JSON.stringify(error, null, 2));
       return Promise.reject(error);
     }
   }
@@ -53,7 +54,7 @@ export default class AuthEndpoints {
   }
   async verifyUsername(data: {username: string; }): Promise<AxiosResponse<any>> {
     try {
-      return await baseInstance.put(`/auth/validate-username`, data);
+      return await baseInstance.post(`/auth/validate-username`, data);
     } catch (error) {
       //  console.log("❌ validation failed:", JSON.stringify(error, null, 2));
       return Promise.reject(error);
@@ -64,7 +65,7 @@ export default class AuthEndpoints {
       const response = await baseInstance.post("/auth/login", data);
       return response;
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       return Promise.reject(error);
     }
   }
@@ -80,10 +81,7 @@ export default class AuthEndpoints {
   
   async createPassword(data: ICreatePassword): Promise<AxiosResponse<any>> {
     try {
-      const response = await baseInstance.put(
-        `/auth/create_password?${data.params}`,
-        data.payload
-      );
+      const response = await baseInstance.put( `/auth/create_password?${data.params}`, data.payload );
       return response;
     } catch (error) {
       return Promise.reject(error);
@@ -93,11 +91,10 @@ export default class AuthEndpoints {
     try {
       return await baseInstance.put(`/auth/varify-resetpass-otp`, data);
     } catch (error) {
-       console.log("❌ Request failed:", JSON.stringify(error, null, 2));
       return Promise.reject(error);
     }
   }
-  
+
   async forgotPassword(data: { email: string }): Promise<AxiosResponse<any>> {
     try {
       return await baseInstance.post("/auth/forgot-password", data);
@@ -105,17 +102,11 @@ export default class AuthEndpoints {
       return Promise.reject(error);
     }
   }
-  async resetPassword(data: {
-    email: string;
-    token: string;
-    payload: { new_password: string; confirm_password: string };
-  }): Promise<AxiosResponse<any>> {
+  async resetPassword(data: { email: string; token: string;  newPassword: string; confirmPassword: string  }): Promise<AxiosResponse<any>> {
     try {
-      return await baseInstance.post(
-        `/auth/password/reset/${data.token}?email=${data.email}`,
-        data.payload
-      );
+      return await baseInstance.put(`/auth/reset-password`, data );
     } catch (error) {
+
       return Promise.reject(error);
     }
   }

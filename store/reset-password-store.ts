@@ -2,9 +2,10 @@ import { create } from "zustand";
 
 interface resetPassData {
   data: {
-      email: string;
-      token: string;
-      newpassword: string;
+    email: string;
+    token: string;
+    newpassword: string;
+      confirmPassword: string;
   };
 }
 
@@ -18,9 +19,10 @@ type setStore = resetPassData & resetFunc;
 
 const useResetPassStore = create<setStore>()((set) => ({
   data: {
-        email: "",
-        token: "",
-        newpassword: "",
+    email: "",
+    token: "",
+    newpassword: "",
+    confirmPassword: "",
   },
   setData: (val) => set({ data: val }),
   updateData: (val) =>
@@ -28,7 +30,6 @@ const useResetPassStore = create<setStore>()((set) => ({
       ...state,
       data: { ...state.data, ...val },
     })),
- 
 }));
 
 export default useResetPassStore;

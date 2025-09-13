@@ -33,14 +33,17 @@ export default function RootLayout() {
 
 
   // async function clearLoginData() {
-  //   await AsyncStorage.removeItem("user");
-  //   await AsyncStorage.removeItem("account-exists");
+  //   // await AsyncStorage.removeItem("user");
+  //   // await AsyncStorage.removeItem("account-exists");
+
+  //     // const storedData = await AsyncStorage.getItem("user");
+  //     // console.log("user_t", storedData);
   //   console.log("🔑 Cleared saved login data!");
   // }
-
+    
   // useEffect(() => {
-  //   clearLoginData();  
-  // }, []);  
+  //   clearLoginData();   
+  // }, []);          
 
 
   return (

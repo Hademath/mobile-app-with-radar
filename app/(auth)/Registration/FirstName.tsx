@@ -16,7 +16,7 @@ export default function FirstNameScreen({ setSteps }: { setSteps: (val: number) 
       alert(parsed.error.errors[0].message);
       return;
     }
-    console.log(parsed);
+    // console.log(parsed);
     router.push("/Registration/Lastname");
     updateData({ firstName: val });
     setSteps(2);

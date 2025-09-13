@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import icons from "@/constants/icons";
 import ArtisteSecondaryLogo from "../../../assets/images/svgs/ArtisteSecondaryLogo";
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react-native";
+import { Check, Eye, EyeOff } from "lucide-react-native";
 import { useAuth } from "@/providers/AuthContext";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,6 +16,7 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [visible, setVisible] = useState(false);
   const [error, setError] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
 
     const { login, isPending } = useAuth();
 
@@ -49,8 +50,8 @@ export default function LoginScreen() {
       className="flex-1"
       resizeMode="cover"
     >
-      <SafeAreaView className="flex-1 justify-end p-6 bg-black/40">
-        <View className="bg-black/70 p-6 rounded-3xl">
+      <SafeAreaView className="flex-1 justify-end px-6  bg-black/40">
+        <View className="bg-black/70 p-6  rounded-3xl">
           <ArtisteSecondaryLogo />
           <View>
             <Text className="text-white font-clash text-3xl  font-bold  mb-2 mt-4">
@@ -103,14 +104,33 @@ export default function LoginScreen() {
             </TouchableOpacity>
           </View>
           <View className="flex-row justify-between items-center mb-6">
-            <Text className="text-white"> Remember Me</Text>
+            <View className="flex-row items-center">
+              <TouchableOpacity
+                onPress={() => {
+                  const newValue = !rememberMe;
+                  setRememberMe(newValue);
+                  setValue("remember_me", newValue, { shouldValidate: true });
+                }}
+                className={`w-4 h-4 border rounded mr-2 items-center justify-center ${
+                  rememberMe
+                    ? "border-secondary bg-secondary"
+                    : "border-gray-400"
+                }`}
+              >
+                {rememberMe && (
+                  <Check size={12} color="white" strokeWidth={2} />
+                )}
+              </TouchableOpacity>
+
+              <Text className="text-white">Remember Me</Text>
+            </View>
             <TouchableOpacity onPress={() => router.push("./ForgotPassword")}>
               <Text className=" text-white underline">Forgot Password?</Text>
             </TouchableOpacity>
           </View>
           {error ? (
-              <Text className="text-red-500 text-[10px] ">{error}</Text>
-            ) : null}
+            <Text className="text-red-500 text-[10px] ">{error}</Text>
+          ) : null}
           <TouchableOpacity
             onPress={() => handleSubmit(onLogin)()}
             disabled={isPending}
@@ -137,7 +157,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
         <View className="justify-center items-center mt-3 px-6">
-          {/* <Text className="text-white font-light text-lg text-center leading-6">
+          <Text className="text-white font-light text-lg text-center leading-6">
             By signing up, you are creating a Radar account and agree to Radar’s{" "}
             <Text
               className="text-secondary"
@@ -153,7 +173,7 @@ export default function LoginScreen() {
               Privacy Policy
             </Text>
             .
-          </Text> */}
+          </Text>
         </View>
       </SafeAreaView>
     </ImageBackground>

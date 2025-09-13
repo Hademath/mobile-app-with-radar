@@ -5,14 +5,12 @@ interface registerData {
   data: {
       firstName: string;
       lastName: string;
-      username: string;
       email: string;
       password: string;
       dateOfBirth: Date;
       country: string;
       city: string;
       state: string;
-      avatar: string;
       gender: string;
       role?: string;
       otp?: string;
@@ -31,7 +29,6 @@ const useRegisterStore = create<registerStore>()((set) => ({
   data: {
       email: "",
       firstName: "",
-      username: "",
       password: "",
       dateOfBirth: new Date(),
       country: "",
@@ -39,7 +36,6 @@ const useRegisterStore = create<registerStore>()((set) => ({
       city: "",
       lastName: "",
       gender: "",
-      avatar: "",
   },
   setData: (val) => set({ data: val }),
   updateData: (val) =>

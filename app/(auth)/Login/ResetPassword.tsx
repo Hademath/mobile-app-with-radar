@@ -5,46 +5,73 @@ import { useState } from "react";
 import { useRouter } from "expo-router";
 import { Eye, EyeOff } from "lucide-react-native";
 import CreateAccountHeader from "@/app/components/CreateAccountHeader";
-import { z } from "zod";
+import AuthEndpoints from "@/endpoints/authEndpoints";
+import useResetPassStore from "@/store/reset-password-store";
+import useDataMutation from "@/hooks/useEndpointMutation";
+import { resetpasswordSchema } from "@/schemas/login";
 
-const passwordSchema = z.object({
-    password: z .string() .min(8, { message: "Password must be at least 8 characters long" }),
-    confirmpassword: z.string().min(1, { message: "Confirm password is required" }),
-}).refine((data) => data.password === data.confirmpassword, {
-    message: "Passwords do not match",
-    path: ["confirmpassword"],
-})
+
 
 export default function PasswordScreen() {
-  const [password, setPassword] = useState("");
-  const [confirmpassword, setConfirmPassword] = useState("");
-  const [visible, setVisible] = useState(false);
-    
-  const [errors, setErrors] = useState<{ password?: string; confirmPassword?: string }>({});
-    const router = useRouter();
-    
-    const handleSubmit = () => {
-        const result = passwordSchema.safeParse({ password, confirmpassword });
-        if (!result.success) {
-            const fieldErrors: { password?: string; confirmPassword?: string } = {};
-            result.error.errors.forEach((error) => {
-                if (error.path.includes("password")) {
-                    fieldErrors.password = error.message;
-                } else if (error.path.includes("confirmpassword")) {
-                    fieldErrors.confirmPassword = error.message;
-                }
-            });
-            setErrors(fieldErrors);
-        } else {
-            setErrors({});
-            router.push("./Residential");
+      const [newPassword, setNewPassword] = useState("");
+      const [confirmPassword, setConfirmPassword] = useState("");
+      const [visible, setVisible] = useState(false);
+      const [conVisible, setConVisible] = useState(false);
+      const [errors, setErrors] = useState<{ newPassword?: string; confirmPassword?: string; }>({});
+
+      const router = useRouter();
+      const API = new AuthEndpoints();
+      const { data, updateData } = useResetPassStore();
+
+      const { isPending, mutate } = useDataMutation({
+        mutationFn: ( payload: typeof data & { newPassword: string; confirmPassword: string } ) => API.resetPassword(payload),
+        mutationKey: ["reset-password"],
+      });
+
+      const handleSubmit = () => {
+        let validationErrors: { newPassword?: string; confirmPassword?: string } =
+          {};
+
+        // Validate with schema
+        const parsed = resetpasswordSchema.safeParse({ newPassword });
+        if (!parsed.success) {
+           setErrors({ newPassword: parsed.error.errors[0].message });
         }
-    }
+
+        if (Object.keys(validationErrors).length > 0) {
+          setErrors(validationErrors);
+          return;
+        }
+
+        setErrors({}); // clear old errors
+
+        // payload with store data + new password
+        const payload = {
+          ...data,
+          newPassword,
+          confirmPassword,
+        };
+
+        updateData({ newpassword: newPassword }); // keep store in sync
+
+        mutate(payload, {
+          onSuccess: async (res) => {
+            router.push("/Login/LoginScreen");
+            alert(res?.data?.message || "Password reset successful!");
+          },
+          onError: (err: any) => {
+            const msg =
+              err?.response?.data?.message || err.message || "Failed to reset password. Please try again.";
+            alert(msg);
+          },
+        });
+      };
+        
 
   return (
     <SafeAreaView className="flex-1 bg-primary px-6">
       <CreateAccountHeader />
-      <View className="flex-1 py-20">
+      <View className="flex-1 py-10">
         <Text className="text-white text-2xl font-bold mb-1">
           Create new password
         </Text>
@@ -54,8 +81,8 @@ export default function PasswordScreen() {
 
         <View className="mb-2">
           <TextInput
-            value={password}
-            onChangeText={setPassword}
+            value={newPassword}
+            onChangeText={setNewPassword}
             placeholder="Password"
             placeholderTextColor="#888"
             secureTextEntry={!visible}
@@ -74,45 +101,38 @@ export default function PasswordScreen() {
           </TouchableOpacity>
         </View>
 
-        {errors.password && (
-          <Text className="text-red-500 mb-1">{errors.password}</Text>
+        {errors.newPassword && (
+          <Text className="text-tertiary mb-2">{errors.newPassword}</Text>
         )}
 
         <View className=" mb-2">
           <TextInput
-            value={confirmpassword}
+            value={confirmPassword}
             onChangeText={setConfirmPassword}
             placeholder="Confrim Password"
             placeholderTextColor="#888"
-            secureTextEntry={!visible}
+            secureTextEntry={!conVisible}
             autoCapitalize="none"
             className="bg-[#1A1A1A] text-white px-4 py-5 rounded-xl mb-4"
           />
           <TouchableOpacity
-            onPress={() => setVisible(!visible)}
+            onPress={() => setConVisible(!conVisible)}
             className="absolute right-5 top-3"
           >
-            {visible ? (
-              <EyeOff size={26} color="gray" />
-            ) : (
-              <Eye size={26} color="gray" />
-            )}
+            {conVisible ? ( <EyeOff size={26} color="gray" /> ) : ( <Eye size={26} color="gray" /> )}
           </TouchableOpacity>
         </View>
         {errors.confirmPassword && (
-          <Text className="text-red-500 text-sm mb-1">
-            {errors.confirmPassword}
-          </Text>
+          <Text className="text-tertiary mb-2">{errors.confirmPassword}</Text>
         )}
 
         <View className="items-center">
           <TouchableOpacity
-            // onPress={() => router.push("./Residential")}
             onPress={handleSubmit}
             className="bg-white py-4 px-12 rounded-xl items-center"
           >
             <Text className="text-center text-2xl text-black font-semibold">
-              Reset Password
+              {isPending ? "Resetting..." : "Reset Password"}
             </Text>
           </TouchableOpacity>
         </View>

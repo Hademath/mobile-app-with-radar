@@ -31,7 +31,7 @@ export default function ConfirmProfileTypeScreen() {
           onPress={() => router.push("./Username")}
           className="bg-white py-3 px-10 rounded-xl"
         >
-          <Text className="text-center text-black font-semibold text-base">
+          <Text className="text-center text-primary font-semibold text-base">
             Continue
           </Text>
         </TouchableOpacity>

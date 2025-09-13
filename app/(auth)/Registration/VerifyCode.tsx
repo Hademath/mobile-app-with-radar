@@ -18,7 +18,7 @@ export default function OTPVerifyScreen() {
   const inputs = useRef<(TextInput | null)[]>([]);
   const router = useRouter();
 
-  const { data, setData, updateData } = useRegisterStore();
+  const { data } = useRegisterStore();
   const API = new AuthEndpoints();
 
   // Verify OTP mutation
@@ -55,8 +55,9 @@ export default function OTPVerifyScreen() {
     if (code.length === 6 && !otp.includes("")) {
       onSubmit(code);
     }
-  }, [otp]);
+  }, [onSubmit, otp]);
 
+ // eslint-disable-next-line react-hooks/exhaustive-deps
  function onSubmit(code: string) {
    if (isPending) return;
    setErrorMsg("");
@@ -149,10 +150,7 @@ function resendOtp() {
           <Text className="text-red-500 mb-4">{errorMsg}</Text>
         ) : null}
 
-        {/* Loader */}
-        {isPending && (
-          <ActivityIndicator size="small" color="white" className="mb-4" />
-        )}
+
 
         <View className="flex gap-4 mb-7">
           <View className="flex flex-row w-full justify-between">
@@ -170,6 +168,10 @@ function resendOtp() {
                   {isPending ? "Resending..." : "Resend code"}
                 </Text>
               </TouchableOpacity>
+            )}
+                    {/* Loader */}
+            {isPending && (
+              <ActivityIndicator size="small" color="white" className="mb-4" />
             )}
           </View>
 

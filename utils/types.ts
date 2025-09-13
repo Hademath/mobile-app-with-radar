@@ -1,5 +1,5 @@
 export interface IUser {
-  access_token: string;
+  token: string;
   token_type: string;
   expires_in: number;
   data: {

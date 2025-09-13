@@ -10,6 +10,8 @@ import { dateSchema } from "@/schemas/registerSchema";
 import * as SecureStore from "expo-secure-store";
 import useRegisterStore from "@/store/register-store";
 import {useAuthStore} from "@/store/auth-store";
+import { IUser } from "@/utils/types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 export default function DOBScreen() {
@@ -54,14 +56,15 @@ export default function DOBScreen() {
 
       mutate(payload, {
         onSuccess: async (res) => {
-        const user = res?.data?.data;
-        const token = user?.token;
-        if (token) {
-          await SecureStore.setItemAsync("user", user);
-          setUser(user);
-          router.push("/Registration/ProfileType");
-        }
-          alert(res?.data.message || "Registration successful!");
+        const user = res?.data?.data as IUser;
+
+          if (res.data.status_code === 201 && user?.token) {
+            await AsyncStorage.setItem("user", JSON.stringify(res?.data?.data));
+            await AsyncStorage.setItem("account-exists", JSON.stringify(true));
+            setUser(user);
+            alert(res?.data.message || "Registration successful!");
+            router.push("/Registration/ProfileType");
+          }
         },
         onError: (err: any) => {
           // console.log("Registration error", err);
@@ -112,7 +115,7 @@ export default function DOBScreen() {
             }`}
           >
             <Text className="text-center text-2xl text-black font-semibold">
-              Finish up
+             {isPending? "Registering.." :"Finish up"}
             </Text>
           </TouchableOpacity>
         </View>

@@ -77,7 +77,7 @@ export function AuthenticationProvider({ children }: PropsWithChildren) {
   async function login(val: loginType) {
     mutate(val, {
       onSuccess: (res) => {
-        console.log(res.data.message,  res?.data?.data);
+        // console.log(res.data.message,  res?.data?.data);
         if (res?.data?.data.token) {
           setUserOnLogin(res?.data?.data);
           checkIfLoggedIn();

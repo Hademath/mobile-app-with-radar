@@ -39,7 +39,7 @@ export default function GenresScreen() {
     });
   };
   const { user } = useAuth();
-  console.log("Current User in Genres Screen:", user);
+  // console.log("Current User in Genres Screen:", user);
   
   const API = new AuthEndpoints();
   const { data } = useEndpointQuery({

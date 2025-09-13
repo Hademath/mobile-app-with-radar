@@ -11,15 +11,16 @@ import useResetPassStore from "@/store/reset-password-store";
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
   const router = useRouter();
-  
+
   const API = new AuthEndpoints();
   const { updateData } = useResetPassStore();
+  
   //  OTP request mutation
   const { isPending, mutate } = useDataMutation({
-    mutationFn: (email: string) => API.forgotPassword({email}),
+    mutationFn: (email: string) => API.forgotPassword({ email }),
     mutationKey: ["forgot password"],
   });
-
+  // console.log("Current forgot datakkkk:", data);
   const handleNext = (val: string) => {
     const parsed = emailSchema.safeParse({ email: val });
     if (!parsed.success) {
@@ -34,7 +35,11 @@ export default function ForgotPasswordScreen() {
         router.push("./CodeVerification");
       },
       onError: (err: any) => {
-        alert( "Failed to send OTP: " + err?.response?.data?.message || err.message || err );
+        alert(
+          "Failed to send OTP: " + err?.response?.data?.message ||
+            err.message ||
+            err
+        );
       },
     });
   };
@@ -42,7 +47,7 @@ export default function ForgotPasswordScreen() {
   return (
     <SafeAreaView className="flex-1 bg-primary px-6">
       <CreateAccountHeader headerTitle="Reset Password" />
-      <View className="flex-1 py-20">
+      <View className="flex-1 py-10">
         <Text className="text-white text-2xl font-bold mb-1">
           What’s your email?
         </Text>
@@ -60,7 +65,7 @@ export default function ForgotPasswordScreen() {
         <View className="items-center">
           <TouchableOpacity
             disabled={isPending}
-            onPress={()=>handleNext(email)}
+            onPress={() => handleNext(email)}
             className="bg-white py-4 px-12 rounded-xl items-center"
           >
             <Text className="text-center text-2xl text-black font-semibold">

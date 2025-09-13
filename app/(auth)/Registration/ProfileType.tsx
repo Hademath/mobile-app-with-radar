@@ -125,7 +125,7 @@ export default function ProfileTypeScreen( { step = 1, total = 5 }: Props) {
             disabled={!selected}
             className={`py-4 rounded-xl px-12 items-center ${selected ? "bg-white" : ""}`}
           >
-            <Text className="text-center text-2xl text-black font-semibold">
+            <Text className="text-center text-2xl text-primary font-semibold">
               Next
             </Text>
           </TouchableOpacity>
