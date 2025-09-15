@@ -1,29 +1,13 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  FlatList,
-  Dimensions,
-  Alert,
-} from "react-native";
-import { useState } from "react";
+import { View, Text, TouchableOpacity, Image, FlatList, Dimensions, Alert, } from "react-native";
+import { useEffect, useMemo, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import ProgressHeader from "../../components/ProgressHeader";
-import ProfileSelect from "@/assets/images/ProviileSelect"; // Make sure this name is correct!
-
-const avatars = [
-  { id: "1", Icon: require("@/assets/images/avatars/avatar1.png") },
-  { id: "2", Icon: require("@/assets/images/avatars/avatar2.png") },
-  { id: "3", Icon: require("@/assets/images/avatars/avatar3.png") },
-  { id: "4", Icon: require("@/assets/images/avatars/avatar4.png") },
-  { id: "5", Icon: require("@/assets/images/avatars/avatar3.png") },
-  { id: "6", Icon: require("@/assets/images/avatars/avatar5.png") },
-  { id: "7", Icon: require("@/assets/images/avatars/avatar1.png") },
-  { id: "8", Icon: require("@/assets/images/avatars/avatar2.png") },
-];
+import ProfileSelect from "@/assets/images/ProviileSelect";
+import AuthEndpoints from "@/endpoints/authEndpoints";
+import useEndpointQuery from "@/hooks/useEndpointQuery";
+import useProfileSetupStore from "@/store/profilesetup-store";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = (width - 48 - 16) / 4;
@@ -31,7 +15,20 @@ const CARD_WIDTH = (width - 48 - 16) / 4;
 export default function ProfilePictureScreen() {
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
   const router = useRouter();
+  const { updateData } = useProfileSetupStore();
+
+  const API = new AuthEndpoints();
+  const { data } = useEndpointQuery({
+    queryFn: API.getAvatars,
+    queryKey: ["fetch avatars"],
+  });
+
+  const avatars = useMemo(() => data?.data?.data || [], [data]); 
+  useEffect(() => {
+  }, [avatars]); 
+
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -41,7 +38,7 @@ export default function ProfilePictureScreen() {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
     });
 
@@ -52,10 +49,33 @@ export default function ProfilePictureScreen() {
     }
   };
 
+  const handleNext = async () => {
+    if (selectedImage) {
+      updateData({
+        profile: {
+          uri: selectedImage,
+          name: "profile.jpg",
+          type: "image/jpeg",
+        },
+        avatarType: "upload",
+      });
+    } else if (selectedAvatar) {
+      const avatarUrl = avatars.find( (a: any) => a.uuid === selectedAvatar )?.url;
+      updateData({
+        profile: avatarUrl,
+        avatarType: "avatar",
+      });
+    }
+
+    router.push("./notificationsEnabled");
+  };
+
   return (
-    <SafeAreaView className="flex-1 bg-black px-6">
+    <SafeAreaView className="flex-1 bg-primary px-6">
       <ProgressHeader step={13} total={14} type={"onboardingBar"} />
+
       <View className="flex-1 py-6">
+        {/* Title */}
         <View className="mb-6">
           <Text className="text-white text-3xl font-bold uppercase mb-2">
             Choose a profile picture
@@ -69,7 +89,7 @@ export default function ProfilePictureScreen() {
         <View className="items-center mb-10">
           <TouchableOpacity
             onPress={pickImage}
-            className="w-[200px] h-[201px] rounded-full "
+            className="w-[200px] h-[200px] rounded-full"
           >
             {selectedImage ? (
               <Image
@@ -78,7 +98,9 @@ export default function ProfilePictureScreen() {
               />
             ) : selectedAvatar ? (
               <Image
-                source={avatars.find((a) => a.id === selectedAvatar)?.Icon}
+                source={{
+                  uri: avatars.find((a: any) => a.uuid === selectedAvatar) ?.url,
+                }}
                 className="w-full h-full rounded-full"
               />
             ) : (
@@ -94,16 +116,16 @@ export default function ProfilePictureScreen() {
 
         <FlatList
           data={avatars}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.uuid}
           numColumns={4}
           columnWrapperStyle={{ justifyContent: "space-between" }}
           contentContainerStyle={{ paddingBottom: 20 }}
           renderItem={({ item }) => {
-            const isSelected = selectedAvatar === item.id;
+            const isSelected = selectedAvatar === item.uuid;
             return (
               <TouchableOpacity
                 onPress={() => {
-                  setSelectedAvatar(item.id);
+                  setSelectedAvatar(item.uuid);
                   setSelectedImage(null);
                 }}
                 style={{
@@ -114,12 +136,10 @@ export default function ProfilePictureScreen() {
                   borderWidth: 2,
                   borderColor: isSelected ? "#fff" : "transparent",
                   overflow: "hidden",
-                  justifyContent: "center",
-                  alignItems: "center",
                 }}
               >
                 <Image
-                  source={item.Icon}
+                  source={{ uri: item.url }}
                   style={{ width: "100%", height: "100%" }}
                   resizeMode="cover"
                 />
@@ -131,10 +151,10 @@ export default function ProfilePictureScreen() {
         {/* Continue */}
         <View className="items-center">
           <TouchableOpacity
-            onPress={() => router.push("./notificationsEnabled")}
+            onPress={handleNext}
             disabled={!selectedAvatar && !selectedImage}
-            className={`py-4 px-20  rounded-xl ${
-              selectedAvatar || selectedImage ? "bg-white" : "bg-white"
+            className={`py-4 px-20 rounded-xl ${
+              selectedAvatar || selectedImage ? "bg-white" : "bg-gray-600"
             }`}
           >
             <Text className="text-center text-2xl text-black font-semibold">

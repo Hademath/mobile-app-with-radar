@@ -5,7 +5,7 @@ import { router } from "expo-router";
 
 export default function Success() {
   return (
-    <View className="flex-1 bg-black px-5 pt-6">
+    <View className="flex-1 bg-primary px-5 pt-6">
       <View className="flex-row justify-between items-center mb-6">
         <TouchableOpacity
           onPress={() => router.back()}

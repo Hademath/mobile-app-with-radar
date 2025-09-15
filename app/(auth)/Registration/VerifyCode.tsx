@@ -165,7 +165,7 @@ function resendOtp() {
                 disabled={isPending} 
               >
                 <Text className="text-boarderColor/45">
-                  {isPending ? "Resending..." : "Resend code"}
+                  {isPending ? "Verifying..." : "Resend code"}
                 </Text>
               </TouchableOpacity>
             )}

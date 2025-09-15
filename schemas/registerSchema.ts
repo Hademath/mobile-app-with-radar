@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { no } from "zod/v4/locales";
 
 
 export const firstNameSchema = z.object({
@@ -55,6 +56,10 @@ export const registerSchema = z.object({
 export const profileNameSchema = z.object({
   role: z.string(),
 });
+export const notificationSchema = z.object({
+  notification: z.boolean(),
+});
+
 export const usernameSchema = z.object({
   username: z.string().min(2, "Username is too short"),
 });
@@ -63,9 +68,10 @@ export const usernameSchema = z.object({
 export const onboardingSchema = z.object({
   role: z.string(),
   username: z.string().min(3),
-  avatarType: z.string().min(3),
+  avatarType: z.string().min(2),
   avatar: z.string().url().optional(),
   genres: z.string().url().optional(),
+  notification: z.boolean().optional(),
 });
 
 

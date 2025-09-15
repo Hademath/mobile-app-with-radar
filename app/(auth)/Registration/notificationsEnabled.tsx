@@ -1,40 +1,81 @@
-import {
-  Image,
-  Dimensions,
-  Alert,
-  View,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-} from "react-native";
-import { useState } from "react";
+import { Image, Dimensions, Alert, View, Text, TouchableOpacity, TouchableWithoutFeedback, } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ProgressHeader from "../../components/ProgressHeader";
-
 import { useRouter } from "expo-router";
-import * as ImagePicker from "expo-image-picker";
+import AuthEndpoints from "@/endpoints/authEndpoints";
+import useProfileSetupStore from "@/store/profilesetup-store";
+import useDataMutation from "@/hooks/useEndpointMutation";
+import { notificationSchema, onboardingSchema } from "@/schemas/registerSchema";
+// import { ICreateProfile } from "@/utils/types";
 
-const noticeImge = require("@/assets/images/avatars/noticeimage.png");
 
-
-const { width } = Dimensions.get("window");
-const CARD_WIDTH = (width - 48 - 16) / 4;
+// const { width } = Dimensions.get("window");
+// const CARD_WIDTH = (width - 48 - 16) / 4;
 
 export default function NotificationScreen() {
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const router = useRouter();
+  const API = new AuthEndpoints();
+  const { data, updateData } = useProfileSetupStore();
 
-  
-    const pickImage = async () => {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert("Permission required", "We need access to your photos.");
-        return;
-      }
+  // setup mutation
+  // mutation setup
+  const { isPending, mutate } = useDataMutation({
+    mutationFn: (payload: typeof data & { notification: boolean } | any) => API.profileSetup(payload),
+    mutationKey: ["profile-setup"],
+  });
+
+  const finishUp = (notification: boolean) => {
+    const parsed = notificationSchema.safeParse({
+      notification: notification,
+    });
+    if (!parsed.success) {
+      Alert.alert("Validation error", parsed.error.errors[0].message);
+      return;
+    }
+
+    // payload from current store data + notification
+    const payload = {
+      ...data,
+      notification,
     };
+    // build FormData
+    let formData = new FormData();
 
+    Object.entries(payload).forEach(([key, value]) => {
+      if (key === "profile") {
+        if (payload.avatarType === "upload" && typeof value === "string") {
+          formData.append("profile", {
+            uri: value,
+            name: "profile.jpg",
+            type: "image/jpeg",
+          } as any);
+        } else {
+          formData.append("profile", value as any);
+        }
+      } else if (Array.isArray(value)) {
+        value.forEach((v) => {
+          formData.append(`${key}[]`, v);
+        });
+      } else if (typeof value === "boolean") {
+        formData.append(key, value ? "1" : "0");
+      } else if (value !== undefined && value !== null) {
+        formData.append(key, String(value));
+      }
+    });
+
+    mutate(formData, {
+      onSuccess: async (res) => {
+        Alert.alert("Success", res?.data?.message || "Registration successful!");
+        router.push("/(tabs)/Index");
+      },
+      onError: (err: any) => {
+        const msg = err?.response?.data?.message || err.message || "Failed to update user profile. Please try again.";
+        Alert.alert("Error", msg);
+      },
+    });
+  };
   return (
-    <SafeAreaView className="flex-1 bg-black px-6">
+    <SafeAreaView className="flex-1 bg-primary px-6">
       <ProgressHeader step={14} total={14} type={"onboardingBar"} />
       <View className="flex-1 justify-between py-6">
         <View className="mb-6">
@@ -63,7 +104,7 @@ export default function NotificationScreen() {
         {/* Continue */}
         <View className="items-center flex-row justify-between ">
           <TouchableOpacity
-            onPress={() => router.push("/Index")}
+            onPress={() => finishUp(false)}
             className=" py-4 px-14 rounded-xl items-center"
           >
             <Text className="text-center text-2xl text-white font-normal">
@@ -71,58 +112,15 @@ export default function NotificationScreen() {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => router.push("/(tabs)/Index")}
+            onPress={() => finishUp(true)}
             className="bg-white py-4 px-14 rounded-xl items-center"
           >
             <Text className="text-center text-2xl text-black font-normal">
-             Turn On
+              {isPending ? "finalizing..." : "Turn on"}
             </Text>
           </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
-    // <SafeAreaView className="flex-1 bg-black px-6">
-    //   <ProgressHeader step={14} total={14} type="onboardingBar" />
-    //   <View className="flex-1 px-6 justify-center">
-    //     <View>
-    //       <Text className="text-white text-3xl font-bold mb-1">
-    //         Set notification to stay tuned
-    //       </Text>
-    //       <Text className="text-boarderColor mb-4">
-    //         Enable push notifications to stay updated on new campaigns and other
-    //         exciting news.
-    //       </Text>
-    //     </View>
-
-    //     <View className="flex-row items-center justify-between bg-[#1A1A1A] rounded-xl px-4 py-4 mb-10">
-    //       <Text className="text-white text-base">Push Notifications</Text>
-    //       <Switch
-    //         value={notificationsEnabled}
-    //         onValueChange={setNotificationsEnabled}
-    //         trackColor={{ false: "#555", true: "#fff" }}
-    //         thumbColor={notificationsEnabled ? "#000" : "#888"}
-    //       />
-    //     </View>
-
-    //     <View className="items-center">
-    //       <TouchableOpacity
-    //         onPress={handleFinish}
-    //         className="bg-white py-3 rounded-xl"
-    //       >
-    //         <Text className="text-center text-black font-semibold text-base">
-    //           Skip
-    //         </Text>
-    //       </TouchableOpacity>
-    //       <TouchableOpacity
-    //         onPress={handleFinish}
-    //         className="bg-white py-3 rounded-xl"
-    //       >
-    //         <Text className="text-center text-2xl text-black font-semibold">
-    //           Turn On
-    //         </Text>
-    //       </TouchableOpacity>
-    //     </View>
-    //   </View>
-    // </SafeAreaView>
   );
 }

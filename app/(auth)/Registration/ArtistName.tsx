@@ -79,17 +79,17 @@ export default function ArtistName() {
           placeholder="Artiste name"
           placeholderTextColor="#888"
           autoCapitalize="none"
-          className="bg-[#1A1A1A] text-white px-6 py-4 rounded-xl mb-20"
+          className="bg-[#1A1A1A] text-white px-6 py-4 rounded-xl"
         />
         {error ? (
-          <Text className="text-red-500 mt-2">{error}</Text>
+          <Text className="text-red-500">{error}</Text>
         ) : (
           username.length > 0 && (
-            <Text className="text-green-500 mt-2">Username available ✅</Text>
+            <Text className="text-green-500">Username available</Text>
           )
         )}
 
-        <View className="items-center">
+        <View className="items-center  mt-16">
           <TouchableOpacity
             disabled={!!error || !username}
             onPress={handleNext}

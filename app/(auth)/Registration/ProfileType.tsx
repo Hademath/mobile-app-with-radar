@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import ArtisteLogo3 from "../../../assets/images/svgs/ArtisteLogo3";
 import { profileNameSchema } from "@/schemas/registerSchema";
 import useProfileSetupStore from "@/store/profilesetup-store";
+
 interface profilePop {
   id: string,
   label:string

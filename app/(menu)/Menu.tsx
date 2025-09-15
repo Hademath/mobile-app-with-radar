@@ -1,23 +1,60 @@
 
 import { View, Text, TouchableOpacity, ScrollView, Image } from "react-native";
 import { useRouter } from "expo-router";
-import { Zap, Clock3, Settings, User, UserPlus } from "lucide-react-native";
+import { Zap, Clock3, Settings, User, UserPlus, LogOutIcon } from "lucide-react-native";
+import { useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Profile() {
   const router = useRouter();
 
   const menuItems = [
-    { icon: <User size={26} color="white" />, label: "Profile",  route: "/Referrals" },
-    { icon: <Zap size={26} color="white" />, label: "What's New", route:"/New" },
-    { icon: <Clock3 size={26} color="white" />, label: "Listening History", route: "/ListeningHistory" },
     {
-      icon: <UserPlus size={26} color="white" />, label: "Invite Friends",
+      icon: <User size={26} color="white" />,
+      label: "Profile",
+      route: "/Referrals",
+    },
+    {
+      icon: <Zap size={26} color="white" />,
+      label: "What's New",
+      route: "/New",
+    },
+    {
+      icon: <Clock3 size={26} color="white" />,
+      label: "update profile....",
+      route: "(auth)/Registration/ProfileType",
+    },
+    {
+      icon: <Clock3 size={26} color="white" />,
+      label: "Listening History",
+      route: "/ListeningHistory",
+    },
+    {
+      icon: <UserPlus size={26} color="white" />,
+      label: "Invite Friends",
       otherItem: "20",
-      image: <Image className="w-4 h-4 rounded-full" source={require("@/assets/images/ArtisteRadarLogo.png")} />,
-      route: "/Referrals"
+      image: (
+        <Image
+          className="w-4 h-4 rounded-full"
+          source={require("@/assets/images/ArtisteRadarLogo.png")}
+        />
+      ),
+      route: "/Referrals",
     },
     { icon: <Settings size={26} color="white" />, label: "Settings" },
+    {
+      icon: <LogOutIcon size={26} color="white" />,
+      route: "/(auth)/Login",
+      label: "Logout",
+      isLogout: true,
+    },
   ];
+
+  async function clearLoginData() {
+    await AsyncStorage.removeItem("user");
+    await AsyncStorage.removeItem("account-exists");
+    console.log("🔑 Cleared saved login data!");
+  }
 
   return (
     <ScrollView className="flex-1 bg-primary px-6 pt-14">
@@ -49,27 +86,49 @@ export default function Profile() {
           <Text className="text-white font-semibold">5000.00</Text>
         </TouchableOpacity>
       </View>
- 
+
       <View className=" w-full border-b border-accent"></View>
-  
       {menuItems.map((item, index) => (
-        <TouchableOpacity
-          key={index}
-          onPress={() => item.route && router.push(item.route as any)}
-          className="flex-row items-center justify-between mt-8 "
-        >
-          <View className="flex-row items-center size-8 w-full ">
-            {item.icon}
-            <Text className="text-white text-base font-bold pl-6">{item.label} </Text>
+        item.isLogout ? (
+          <TouchableOpacity
+            key={index}
+            onPress={async () => {
+              await clearLoginData();
+              item.route && router.push(item.route as any);
+            }}
+            className="flex-row items-center justify-between mt-8 "
+          >
+            <View className="flex-row items-center size-8 w-full ">
+              {item.icon}
+              <Text className="text-white text-base font-bold pl-6">
+                {item.label}{" "}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            key={index}
+            onPress={() => item.route && router.push(item.route as any)}
+            className="flex-row items-center justify-between mt-8 "
+          >
+            <View className="flex-row items-center size-8 w-full ">
+              {item.icon}
+              <Text className="text-white text-base font-bold pl-6">
+                {item.label}{" "}
+              </Text>
               {item.otherItem && item.image && (
-              <View className="flex-row bg-secondary/20 rounded-xl p-3 ml-4">
-              {item.image}
-               <Text className="text-secondary text-base font-bold pl-2">{item.otherItem}</Text>
+                <View className="flex-row bg-secondary/20 rounded-xl p-3 ml-4">
+                  {item.image}
+                  <Text className="text-secondary text-base font-bold pl-2">
+                    {item.otherItem}
+                  </Text>
                 </View>
-               )}
-          </View>
-        </TouchableOpacity>
+              )}
+            </View>
+          </TouchableOpacity>
+        )
       ))}
+
     </ScrollView>
   );
 }

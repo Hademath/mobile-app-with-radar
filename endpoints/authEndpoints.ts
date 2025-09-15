@@ -2,17 +2,12 @@ import { AxiosResponse } from "axios";
 import { authInstance, baseInstance } from "@/utils/apiService";
 import { registerType } from "@/schemas/registerSchema";
 import { loginType } from "@/schemas/login";
+import { ICreatePassword, ICreateProfile } from "@/utils/types";
 
-interface ICreatePasswordData {
-  password: string;
-  confirm_password: string;
-}
 
-interface ICreatePassword {
-  params: string;
-  payload: ICreatePasswordData;
-}
 export default class AuthEndpoints {
+
+
   async requestOtp(reason: string, email: string): Promise<AxiosResponse<any>> {
     try {
       const response = await baseInstance.post(
@@ -26,7 +21,10 @@ export default class AuthEndpoints {
     }
   }
 
-  async verifyEmail(data: { otp: string; email: string; }): Promise<AxiosResponse<any>> {
+  async verifyEmail(data: {
+    otp: string;
+    email: string;
+  }): Promise<AxiosResponse<any>> {
     try {
       return await baseInstance.put(`/auth/submit-otp`, data);
     } catch (error) {
@@ -34,25 +32,31 @@ export default class AuthEndpoints {
       return Promise.reject(error);
     }
   }
+
   async registerUser(data: registerType): Promise<AxiosResponse<any>> {
     try {
       const response = await baseInstance.post("auth/register", data);
       return response;
     } catch (error) {
-       console.log("❌ validation failed:", JSON.stringify(error, null, 2));
+      // console.log("❌ validation failed:", JSON.stringify(error, null, 2));
       return Promise.reject(error);
     }
   }
-  
-  async profileSetup(data: ICreatePassword): Promise<AxiosResponse<any>> {
+
+  async profileSetup(data: ICreateProfile): Promise<AxiosResponse<any>> {
     try {
-      const response = await authInstance.put(`/user/profile_setup`, data);
+      const response = await authInstance.put(`/user/profile_setup`, data, {
+				headers: {
+					"Content-Type": "multipart/form-data",
+				},
+			});
       return response;
     } catch (error) {
       return Promise.reject(error);
     }
   }
-  async verifyUsername(data: {username: string; }): Promise<AxiosResponse<any>> {
+
+  async verifyUsername(data: { username: string; }): Promise<AxiosResponse<any>> {
     try {
       return await baseInstance.post(`/auth/validate-username`, data);
     } catch (error) {
@@ -60,6 +64,7 @@ export default class AuthEndpoints {
       return Promise.reject(error);
     }
   }
+
   async login(data: loginType): Promise<AxiosResponse<any>> {
     try {
       const response = await baseInstance.post("/auth/login", data);
@@ -69,7 +74,7 @@ export default class AuthEndpoints {
       return Promise.reject(error);
     }
   }
-  
+
   async getGenres(): Promise<AxiosResponse<any>> {
     try {
       const response = await authInstance.get("/user/genres");
@@ -78,22 +83,38 @@ export default class AuthEndpoints {
       return Promise.reject(error);
     }
   }
-  
+  async getAvatars(): Promise<AxiosResponse<any>> {
+    try {
+      const response = await authInstance.get("/user/avatars");
+      return response;
+    } catch (error) {
+       console.log("❌ Request failed:", JSON.stringify(error, null, 2));
+      return Promise.reject(error);
+    }
+  }
+
   async createPassword(data: ICreatePassword): Promise<AxiosResponse<any>> {
     try {
-      const response = await baseInstance.put( `/auth/create_password?${data.params}`, data.payload );
+      const response = await baseInstance.put(
+        `/auth/create_password?${data.params}`,
+        data.payload
+      );
       return response;
     } catch (error) {
       return Promise.reject(error);
     }
   }
-  async verifyForgotPassOtp(data: { token: string; }): Promise<AxiosResponse<any>> {
+
+  async verifyForgotPassOtp(data: {
+    token: string;
+  }): Promise<AxiosResponse<any>> {
     try {
       return await baseInstance.put(`/auth/varify-resetpass-otp`, data);
     } catch (error) {
       return Promise.reject(error);
     }
   }
+
 
   async forgotPassword(data: { email: string }): Promise<AxiosResponse<any>> {
     try {
@@ -102,11 +123,15 @@ export default class AuthEndpoints {
       return Promise.reject(error);
     }
   }
-  async resetPassword(data: { email: string; token: string;  newPassword: string; confirmPassword: string  }): Promise<AxiosResponse<any>> {
+  async resetPassword(data: {
+    email: string;
+    token: string;
+    newPassword: string;
+    confirmPassword: string;
+  }): Promise<AxiosResponse<any>> {
     try {
-      return await baseInstance.put(`/auth/reset-password`, data );
+      return await baseInstance.put(`/auth/reset-password`, data);
     } catch (error) {
-
       return Promise.reject(error);
     }
   }

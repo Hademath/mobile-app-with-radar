@@ -5,10 +5,10 @@ interface setupData {
   data: {
       username: string;
       genres : string[];
-      avatarType?: string;
-      avatar: string;
-      role?: string;
-      notifications?: boolean;
+      avatarType: string;
+      profile: string | { uri: string; name: string; type: string };
+      role: string;
+      notification?: boolean;
   };
 }
 
@@ -25,9 +25,9 @@ const useProfileSetupStore = create<setStore>()((set) => ({
         username: "",
         genres: [],
         avatarType: "",
-        avatar: "",
+        profile: "",
         role: "",
-        notifications: true,
+        notification: false,
   },
   setData: (val) => set({ data: val }),
   updateData: (val) =>

@@ -16,6 +16,7 @@ import { z } from "zod";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import CreateAccountHeader from "@/app/components/CreateAccountHeader";
+import { tr } from "zod/v4/locales";
 
 // General Zod schema for input steps
 export const inputSchema = z.object({
@@ -40,6 +41,7 @@ interface RegistrationStepProps {
   variant?: "text" | "otp" | "dropdown" | "avatar";
   options?: string[]; // for dropdown
   defaultValue?: string;
+   disabled?: boolean;
   // schema?: any; 
 }
 
@@ -57,6 +59,7 @@ export default function RegistrationStep({
   options = [],
   defaultValue = "",
   // schema,
+   disabled = false,
 }: RegistrationStepProps) {
   const [image, setImage] = useState<string | null>(null);
   const [dropdownValue, setDropdownValue] = useState<string>("");

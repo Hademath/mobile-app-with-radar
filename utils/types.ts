@@ -16,3 +16,23 @@ export interface IUser {
     updated_at: string;
   };
 }
+
+
+export interface ICreateProfile {
+  avatarType: string; // "upload" | "avatar";
+  profile: string | { uri: string; name: string; type: string };
+  username: string;
+  genres: string[];
+  role: string; // "artist" | "listener" | "music-pro";
+  notification: boolean;
+}
+
+export interface ICreatePasswordData {
+  password: string;
+  confirm_password: string;
+}
+
+export interface ICreatePassword {
+  params: string;
+  payload: ICreatePasswordData;
+}

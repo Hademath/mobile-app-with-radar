@@ -14,7 +14,7 @@ export default function UsernameScreen() {
       const router = useRouter();
 
       const API = new AuthEndpoints();
-      const { updateData } = useProfileSetupStore();
+      const { data,updateData } = useProfileSetupStore();
 
       // mutation for backend username validation
       const { isPending, mutate } = useDataMutation({
@@ -54,7 +54,7 @@ export default function UsernameScreen() {
       }, [mutate, username]);
 
       const handleNext = () => {
-        if (error) return; // block navigation if invalid
+        if (error) return;
 
         updateData({ username });
         router.push("./Genres");
@@ -81,16 +81,15 @@ export default function UsernameScreen() {
           autoCapitalize="none"
           className="bg-[#1A1A1A] text-white px-6 py-4 rounded-xl"
         />
-
         {error ? (
-          <Text className="text-red-500 mt-2">{error}</Text>
+          <Text className="text-red-500">{error}</Text>
         ) : (
           username.length > 0 && (
-            <Text className="text-green-500 mt-2">Username available ✅</Text>
+            <Text className="text-green-500">Username available</Text>
           )
         )}
 
-        <View className="items-center mt-10">
+        <View className="items-center  mt-16">
           <TouchableOpacity
             disabled={!!error || !username}
             onPress={handleNext}

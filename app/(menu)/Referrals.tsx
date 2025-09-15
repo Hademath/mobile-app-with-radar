@@ -8,7 +8,7 @@ export default function Referrals() {
 
 
   return (
-    <ScrollView className="flex-1 bg-black px-4 pt-14">
+    <ScrollView className="flex-1 bg-primary px-4 pt-14">
       <View className="flex-row justify-between items-center mb-6">
         <TouchableOpacity
           onPress={() => router.back()}
@@ -81,10 +81,7 @@ export default function Referrals() {
       </View>
       <View>
         <View className="flex-row justify-between items-center mb-4 px-1">
-          <Text className="text-white font-bold text-xl">
-            
-            Referral History
-          </Text>
+          <Text className="text-white font-bold text-xl">Referral History</Text>
           <TouchableOpacity>
             <FontAwesome6 name="circle-arrow-right" size={24} color="white" />
           </TouchableOpacity>

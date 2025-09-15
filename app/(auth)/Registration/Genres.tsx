@@ -1,24 +1,12 @@
-import { View, Text, TouchableOpacity, FlatList, Dimensions, } from "react-native";
-import { useState } from "react";
+import { View, Text, TouchableOpacity, FlatList, Dimensions,Image } from "react-native";
+import { useMemo, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import ProgressHeader from "../../components/ProgressHeader";
 import AuthEndpoints from "@/endpoints/authEndpoints";
 import useEndpointQuery from "@/hooks/useEndpointQuery";
-import { useAuth } from "@/providers/AuthContext";
-import images from "@/constants/images";
-
-const genres = [
-  { id: "1", name: "Afrobeat", Icon: images.Afrobeat },
-  { id: "2", name: "Hip-Hop", Icon: images.HipHop },
-  { id: "3", name: "R&B", Icon: images.RandB },
-  { id: "4", name: "Kpop", Icon: images.HipHop },
-  { id: "5", name: "Alternative", Icon: images.RandB },
-  { id: "6", name: "Amapiano", Icon: images.Afrobeat },
-  { id: "7", name: "Classical", Icon: images.RandB },
-  { id: "8", name: "Latin", Icon: images.Afrobeat },
-  { id: "9", name: "Pop", Icon: images.HipHop },
-];
+// import { useAuth } from "@/providers/AuthContext";
+import useProfileSetupStore from "@/store/profilesetup-store";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = (width - 48 - 16) / 3;
@@ -27,6 +15,8 @@ export default function GenresScreen() {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const router = useRouter();
 
+  const { data: profileData , updateData } = useProfileSetupStore();
+  
   const toggleGenre = (uuid: string) => {
     setSelectedGenres((prev) => {
       const alreadySelected = prev.includes(uuid);
@@ -38,8 +28,9 @@ export default function GenresScreen() {
       }
     });
   };
-  const { user } = useAuth();
-  // console.log("Current User in Genres Screen:", user);
+
+  // const { user } = useAuth();
+ const role = profileData?.role;
   
   const API = new AuthEndpoints();
   const { data } = useEndpointQuery({
@@ -47,10 +38,25 @@ export default function GenresScreen() {
     queryKey: ["fetch genres"],
   });
 
-
+  // const genres = data?.data?.data || [];
+  const genres = useMemo(() => data?.data?.data || [], [data]);
+  
+    const handleNext = () => {
+      if (selectedGenres.length < 5) {
+        alert("Please select 5 genres");
+        return;
+      }
+      updateData({ genres: selectedGenres });
+      if (role === "artiste") {
+        router.push("./ArtisteProfilePicture");
+      } else {
+        router.push("./ProfilePicture");
+      }
+      
+    };
   
   return (
-    <SafeAreaView className="flex-1 bg-black px-6">
+    <SafeAreaView className="flex-1 bg-primary px-6">
       <ProgressHeader step={3} total={5} type={"onboardingBar"} />
       <View className="flex-1 py-10 pb-2">
         <Text className="text-white text-3xl font-bold mb-4 font-clash uppercase">
@@ -58,38 +64,33 @@ export default function GenresScreen() {
         </Text>
 
         <FlatList
-          data={genres || []}
-          keyExtractor={(item) => item.id}
+          data={genres}
+          keyExtractor={(item) => item.uuid}
           numColumns={3}
           columnWrapperStyle={{ justifyContent: "space-between" }}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 24 }}
           renderItem={({ item }) => {
-            const selected = selectedGenres.includes(item.id);
-            const disabled = selectedGenres.length >= 5 && !selected; // disable if max reached & not already selected
-            const GenreIcon = item.Icon;
+            const selected = selectedGenres.includes(item.uuid);
+            const disabled = selectedGenres.length >= 5 && !selected;
 
             return (
               <View style={{ width: CARD_WIDTH }} className="mb-4">
                 <TouchableOpacity
                   onPress={() => {
-                    if (!disabled) toggleGenre(item.id);
+                    if (!disabled) toggleGenre(item.uuid);
                   }}
                   disabled={disabled}
                   className={`
-                    aspect-square rounded-full overflow-hidden justify-center items-center 
-                    ${
-                      selected
-                        ? "border-2 border-white"
-                        : "border border-gray-700"
-                    } 
-                    ${disabled ? "opacity-40" : ""}
-                  `}
+            aspect-square rounded-full overflow-hidden justify-center items-center 
+            ${selected ? "border-2 border-white" : "border border-gray-700"} 
+            ${disabled ? "opacity-40" : ""}
+          `}
                 >
-                  <GenreIcon
-                    width="100%"
-                    height="100%"
-                    preserveAspectRatio="xMidYMid meet"
+                  <Image
+                    source={{ uri: item.representive_picture }}
+                    style={{ width: "100%", height: "100%" }}
+                    resizeMode="cover"
                   />
                 </TouchableOpacity>
                 <View className="py-2 items-center">
@@ -98,7 +99,7 @@ export default function GenresScreen() {
                       selected ? "text-white" : "text-gray-400"
                     }`}
                   >
-                    {item.name}
+                    {item.genres_name}
                   </Text>
                 </View>
               </View>
@@ -119,7 +120,8 @@ export default function GenresScreen() {
         </TouchableOpacity> */}
         <View className="items-center">
           <TouchableOpacity
-            onPress={() => router.push("./ProfilePicture")}
+            onPress={handleNext}
+            disabled={selectedGenres.length < 5}
             className="bg-white py-4 px-12 rounded-xl items-center"
           >
             <Text className="text-center text-2xl text-black font-semibold">

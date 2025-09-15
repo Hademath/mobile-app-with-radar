@@ -43,7 +43,7 @@ export default function ArtisteGenres() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-black px-6">
+    <SafeAreaView className="flex-1 bg-primary px-6">
       <ProgressHeader step={3} total={5} type={"onboardingBar"} />
       <View className="flex-1 py-10 pb-2">
         <View>

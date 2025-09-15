@@ -74,7 +74,7 @@ export default function DOBScreen() {
       });
     };
   return (
-    <SafeAreaView className="flex-1 bg-black px-6">
+    <SafeAreaView className="flex-1 bg-primary px-6">
       <CreateAccountHeader />
       <View className="flex-1 py-20">
         <View>

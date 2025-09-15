@@ -14,7 +14,7 @@ export default function ConfirmProfileTypeScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
+    <SafeAreaView className="flex-1 bg-primary">
       <ProgressHeader step={10} total={14} type={"onboardingBar"} />
       <View className="flex-1 px-6 justify-center items-center">
         <Text className="text-white text-2xl font-semibold mb-4">

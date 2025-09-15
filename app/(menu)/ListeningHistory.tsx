@@ -68,7 +68,7 @@ export default function ListeningHistory() {
   ];
 
   return (
-    <ScrollView className="flex-1 bg-black px-4 pt-14">
+    <ScrollView className="flex-1 bg-primary px-4 pt-14">
       <View className="flex-row justify-between items-center mb-6">
         <TouchableOpacity
           onPress={() => router.back()}

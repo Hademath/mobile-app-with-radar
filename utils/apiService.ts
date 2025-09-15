@@ -39,7 +39,7 @@ authInstance.interceptors.request.use(
   async (config) => {
     let authToken;
     const storedData = await AsyncStorage.getItem("user");
-    console.log("user_t",storedData)
+    // console.log("work data",storedData)
     if (storedData) {
       authToken = JSON.parse(storedData).token;
     }

@@ -48,7 +48,10 @@ export default function EmailScreen() {
         title="What's your email"
         description="Please enter your email address."
         placeholder="Email"
-        nextLabel={isPending ? "Sending..." : "Next"}
+        disabled={isPending}
+        keyboardType="email-address"
+        secureTextEntry={false}
+        nextLabel={isPending ? "Verifying..." : "Next"}
         onNext={handleNext}
       />
     </>
