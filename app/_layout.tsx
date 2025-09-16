@@ -32,15 +32,15 @@ export default function RootLayout() {
   // }
 
 
-  async function clearLoginData() {
+  // async function clearLoginData() {
 
-      const storedData = await AsyncStorage.getItem("user");
-    console.log("🔑usert_data!:", storedData);
-  }
+  //     const storedData = await AsyncStorage.getItem("user");
+  //   // console.log("🔑usert_data!:", storedData);
+  // }
      
-  useEffect(() => {
-    clearLoginData();   
-  }, []);          
+  // useEffect(() => {
+  //   clearLoginData();   
+  // }, []);          
 
 
   return (

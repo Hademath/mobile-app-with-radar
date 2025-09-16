@@ -2,6 +2,7 @@ import {Text, View,  TouchableOpacity } from 'react-native'
 import React from 'react'
 import {  router, Tabs } from 'expo-router'
 import icons from '@/constants/icons';
+import { useAuth } from '@/providers/AuthContext';
 
 
 const TabIcons = ({ focused, title, icon: IconComponent }: any) => {
@@ -25,17 +26,23 @@ const TabIcons = ({ focused, title, icon: IconComponent }: any) => {
 
 
 
-export default function _layout() {
+
+export default function Layout() {
+  const { user } = useAuth();
+  console.log("User in layout:", user);
+
+
   return (
     <>
-      <TouchableOpacity
-        className="absolute  z-10 bottom-28 right-6 w-16 h-16 bg-primary rounded-full items-center justify-center shadow-lg"
-        onPress={() => router.push("/MusicType")}
-      >
-        <Text className="text-4xl text-secondary  -mt-1"> + </Text>
-      </TouchableOpacity>
+      {user?.data?.role !== "listener" && (
+        <TouchableOpacity
+          className="absolute  z-10 bottom-28 right-6 w-16 h-16 bg-primary rounded-full items-center justify-center shadow-lg"
+          onPress={() => router.push("/MusicType")}
+        >
+          <Text className="text-4xl text-secondary  -mt-1"> + </Text>
+        </TouchableOpacity>
+      )}
       <Tabs
-        
         screenOptions={{
           tabBarShowLabel: false,
           tabBarStyle: {
@@ -44,8 +51,8 @@ export default function _layout() {
             left: 20,
             right: 20,
             height: 70,
-            marginLeft:12,
-            marginRight:12,
+            marginLeft: 12,
+            marginRight: 12,
             borderRadius: 35,
             backgroundColor: "#121212",
             shadowColor: "#000",

@@ -36,7 +36,7 @@ export function AuthenticationProvider({ children }: PropsWithChildren) {
   const queryClient = useQueryClient();
 
   const API = new AuthEndpoints();
-  async function checkIfLoggedIn() {
+  async function checkIfLoggedIn() { 
     const user = await AsyncStorage.getItem("user");
 
     if (user) {
@@ -47,7 +47,7 @@ export function AuthenticationProvider({ children }: PropsWithChildren) {
     } else {
       setIsLoggedIn(false);
       setUser(null);
-      setIsProcessing(false);
+      setIsProcessing(false); 
 
       // router.replace("/");
       router.replace("/(auth)/Login/LoginScreen"); 

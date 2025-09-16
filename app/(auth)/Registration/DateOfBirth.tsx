@@ -7,7 +7,6 @@ import CreateAccountHeader from "@/app/components/CreateAccountHeader";
 import AuthEndpoints from "@/endpoints/authEndpoints";
 import useDataMutation from "@/hooks/useEndpointMutation";
 import { dateSchema } from "@/schemas/registerSchema";
-import * as SecureStore from "expo-secure-store";
 import useRegisterStore from "@/store/register-store";
 import {useAuthStore} from "@/store/auth-store";
 import { IUser } from "@/utils/types";

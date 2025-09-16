@@ -14,7 +14,7 @@ export default function UsernameScreen() {
       const router = useRouter();
 
       const API = new AuthEndpoints();
-      const { data,updateData } = useProfileSetupStore();
+      const { updateData } = useProfileSetupStore();
 
       // mutation for backend username validation
       const { isPending, mutate } = useDataMutation({

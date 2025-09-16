@@ -19,7 +19,7 @@ export default function LocationScreen() {
     state: state,
     city: city,
 }
-      const { data, setData, updateData } = useRegisterStore();
+      const {  updateData } = useRegisterStore();
       const handleNext = (val: string) => {
         const parsed = addressSchema.safeParse({ country: resident.country, state: resident.state, city: resident.city });
         if (!parsed.success) {
@@ -144,32 +144,32 @@ export default function LocationScreen() {
 }
 
 
-const pickerStyles = {
-  inputIOS: {
-    backgroundColor: "#1A1A1A",
-    color: "#fff",
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    fontSize: 16,
-  },
-  inputAndroid: {
-    backgroundColor: "#1A1A1A",
-    color: "#888",
-    paddingVertical: 18,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    fontSize: 16,
-  },
-  placeholder: {
-    color: "#888",
-  },
-  iconContainer: {
-    top: 20,
-    right: 16,
-  },
-  inputAndroidContainer: {
-    backgroundColor: "#1A1A1A",
-    borderRadius: 8,
-  },
-};
+// const pickerStyles = {
+//   inputIOS: {
+//     backgroundColor: "#1A1A1A",
+//     color: "#fff",
+//     paddingVertical: 16,
+//     paddingHorizontal: 16,
+//     borderRadius: 12,
+//     fontSize: 16,
+//   },
+//   inputAndroid: {
+//     backgroundColor: "#1A1A1A",
+//     color: "#888",
+//     paddingVertical: 18,
+//     paddingHorizontal: 16,
+//     borderRadius: 12,
+//     fontSize: 16,
+//   },
+//   placeholder: {
+//     color: "#888",
+//   },
+//   iconContainer: {
+//     top: 20,
+//     right: 16,
+//   },
+//   inputAndroidContainer: {
+//     backgroundColor: "#1A1A1A",
+//     borderRadius: 8,
+//   },
+// };

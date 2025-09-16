@@ -10,7 +10,7 @@ const genders = ["Male", "Female"];
 export default function GenderScreen() {
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
   const router = useRouter();
-  const { data, setData, updateData } = useRegisterStore();
+  const {  updateData } = useRegisterStore();
   const handleNext = (val: string) => {
     const parsed = genderSchema.safeParse({ gender: val });
     if (!parsed.success) {

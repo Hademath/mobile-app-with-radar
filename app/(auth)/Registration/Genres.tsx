@@ -42,8 +42,8 @@ export default function GenresScreen() {
   const genres = useMemo(() => data?.data?.data || [], [data]);
   
     const handleNext = () => {
-      if (selectedGenres.length < 5) {
-        alert("Please select 5 genres");
+      if (selectedGenres.length === 0) {
+        alert("Please select at least 1 genre");
         return;
       }
       updateData({ genres: selectedGenres });
@@ -121,10 +121,16 @@ export default function GenresScreen() {
         <View className="items-center">
           <TouchableOpacity
             onPress={handleNext}
-            disabled={selectedGenres.length < 5}
-            className="bg-white py-4 px-12 rounded-xl items-center"
+            disabled={selectedGenres.length === 0} 
+            className={`py-4 px-12 rounded-xl items-center ${
+              selectedGenres.length === 0 ? "bg-gray-600" : "bg-white"
+            }`}
           >
-            <Text className="text-center text-2xl text-black font-semibold">
+            <Text
+              className={`text-center text-2xl font-semibold ${
+                selectedGenres.length === 0 ? "text-gray-300" : "text-black"
+              }`}
+            >
               Next
             </Text>
           </TouchableOpacity>

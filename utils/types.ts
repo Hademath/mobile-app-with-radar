@@ -14,6 +14,12 @@ export interface IUser {
     status: string;
     created_at: string;
     updated_at: string;
+    role?: string; // "artist" | "listener" | "music-pro"
+    profile: string | null;
+    username: string | null;
+    genres: string[] | null;
+    artiste_type: string | null;
+    notification: boolean;
   };
 }
 
