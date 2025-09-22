@@ -1,14 +1,25 @@
 import {  router } from "expo-router";
-import { Text, TouchableOpacity, View, Image, ScrollView } from "react-native";
+import { Text, TouchableOpacity, View, Image, ScrollView, RefreshControl } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-// import ArtisteLogo3 from "@/assets/images/svgs/ArtisteLogo3";
-
-// import {} from "@expo/vector-icons"; // For play and volume icons
 import {  FontAwesome6, Ionicons, Entypo } from "@expo/vector-icons";
 import ProgressHeader from "../components/ProgressHeader";
-// import ArtisteLogo3 from "";
+import { useAuth } from "@/providers/AuthContext";
+import { useCallback, useState } from "react";
 
 export default function Index() {
+  
+  const { user, refreshUser } = useAuth();
+  const [refreshing, setRefreshing] = useState(false);
+
+  // console.log("user", user)
+  // Proper pull-to-refresh handler
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await refreshUser();
+    setRefreshing(false); 
+  }, [refreshUser]);
+
+
   return (
     <LinearGradient
       colors={["#0f1e1d", "#000000", "#242424"]}
@@ -16,14 +27,24 @@ export default function Index() {
       end={{ x: 0.5, y: 1 }}
       className="flex-1"
     >
-      <ScrollView className="flex-1 px-4 pt-14">
+      <ScrollView
+        className="flex-1 px-4 pt-14"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         {/* Top Row: Avatar - Days - Balance */}
         <View className="flex-row justify-between items-center mb-6">
           <View className="flex-row items-center space-x-4">
             <TouchableOpacity onPress={() => router.push("/Menu")}>
               <Image
                 className="w-12 h-12 rounded-full"
-                source={require("@/assets/images/avatars/avatar1.png")}
+                // source={require("@/assets/images/avatars/avatar1.png")}
+                source={
+                  user?.avatar
+                    ? { uri: user.avatar as string }
+                    : require("@/assets/images/avatars/avatar1.png")
+                }
               />
             </TouchableOpacity>
 
@@ -44,7 +65,7 @@ export default function Index() {
               source={require("@/assets/images/ArtisteRadarLogo.png")}
               className="w-5 h-5"
             />
-            <Text className="text-white font-semibold">5000.00</Text>
+            <Text className="text-white font-semibold">{user?.radar}</Text>
           </TouchableOpacity>
         </View>
         {/* Logo + Title */}

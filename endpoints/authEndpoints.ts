@@ -1,13 +1,11 @@
 import { AxiosResponse } from "axios";
 import { authInstance, baseInstance } from "@/utils/apiService";
 import { registerType } from "@/schemas/registerSchema";
-import { loginType } from "@/schemas/login";
+import { loginType } from "@/schemas/loginSchema";
 import { ICreatePassword, ICreateProfile } from "@/utils/types";
 
 
 export default class AuthEndpoints {
-
-
   async requestOtp(reason: string, email: string): Promise<AxiosResponse<any>> {
     try {
       const response = await baseInstance.post(
@@ -46,17 +44,19 @@ export default class AuthEndpoints {
   async profileSetup(data: ICreateProfile): Promise<AxiosResponse<any>> {
     try {
       const response = await authInstance.put(`/user/profile_setup`, data, {
-				headers: {
-					"Content-Type": "multipart/form-data",
-				},
-			});
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return response;
     } catch (error) {
       return Promise.reject(error);
     }
   }
 
-  async verifyUsername(data: { username: string; }): Promise<AxiosResponse<any>> {
+  async verifyUsername(data: {
+    username: string;
+  }): Promise<AxiosResponse<any>> {
     try {
       return await baseInstance.post(`/auth/validate-username`, data);
     } catch (error) {
@@ -88,7 +88,7 @@ export default class AuthEndpoints {
       const response = await authInstance.get("/user/avatars");
       return response;
     } catch (error) {
-       console.log("❌ Request failed:", JSON.stringify(error, null, 2));
+      console.log("❌ Request failed:", JSON.stringify(error, null, 2));
       return Promise.reject(error);
     }
   }
@@ -115,7 +115,6 @@ export default class AuthEndpoints {
     }
   }
 
-
   async forgotPassword(data: { email: string }): Promise<AxiosResponse<any>> {
     try {
       return await baseInstance.post("/auth/forgot-password", data);
@@ -132,6 +131,17 @@ export default class AuthEndpoints {
     try {
       return await baseInstance.put(`/auth/reset-password`, data);
     } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  async getUserProfile(): Promise<AxiosResponse<any>> {
+    try {
+      const response = await authInstance.get("/user/profile");
+      console.log("User profile response FRom API:", response);
+      return response;
+    } catch (error) {
+      console.log("Api error",error)
       return Promise.reject(error);
     }
   }

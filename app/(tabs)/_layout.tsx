@@ -29,12 +29,12 @@ const TabIcons = ({ focused, title, icon: IconComponent }: any) => {
 
 export default function Layout() {
   const { user } = useAuth();
-  console.log("User in layout:", user);
+  // console.log("User in layout:", user);
 
 
   return (
     <>
-      {user?.data?.role !== "listener" && (
+      {user?.role !== "listener" && (
         <TouchableOpacity
           className="absolute  z-10 bottom-28 right-6 w-16 h-16 bg-primary rounded-full items-center justify-center shadow-lg"
           onPress={() => router.push("/MusicType")}

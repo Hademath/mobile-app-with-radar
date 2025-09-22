@@ -8,7 +8,7 @@ import CreateAccountHeader from "@/app/components/CreateAccountHeader";
 import AuthEndpoints from "@/endpoints/authEndpoints";
 import useResetPassStore from "@/store/reset-password-store";
 import useDataMutation from "@/hooks/useEndpointMutation";
-import { resetpasswordSchema } from "@/schemas/login";
+import { resetpasswordSchema } from "@/schemas/loginSchema";
 
 
 

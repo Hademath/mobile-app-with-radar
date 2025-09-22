@@ -1,6 +1,4 @@
 import { z } from "zod";
-import { no } from "zod/v4/locales";
-
 
 export const firstNameSchema = z.object({
   firstName: z.string().min(2, "First name is too short"),

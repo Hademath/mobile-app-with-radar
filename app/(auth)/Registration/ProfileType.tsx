@@ -52,7 +52,7 @@ export default function ProfileTypeScreen( { step = 1, total = 5 }: Props) {
       alert(parsed.error.errors[0].message);
       return;
     }
-    console.log(parsed);
+    // console.log(parsed);
     if (selected === "listener") {
       router.push("./Username");
     } else if (selected === "artiste") {

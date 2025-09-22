@@ -35,23 +35,48 @@ const authInstance = axios.create({
   },
 });
 
+// authInstance.interceptors.request.use(
+//   async (config) => {
+//     let authToken;
+//     const storedData = await AsyncStorage.getItem("user");
+//     // console.log("Store Data:", storedData);
+   
+//     if (storedData) {
+//       authToken = JSON.parse(storedData).token;
+//       console.log(authToken);
+//     }
+//     if (authToken) {
+//       // console.log("🔑Using token:", authToken );
+//       config.headers.Authorization = "Bearer " + authToken;
+//     }
+//     return config;
+//   }, 
+//   (error) => {
+//     return Promise.reject(error);
+//   }
+// );
+
 authInstance.interceptors.request.use(
   async (config) => {
-    let authToken;
     const storedData = await AsyncStorage.getItem("user");
-    // console.log("work data",storedData)
+
     if (storedData) {
-      authToken = JSON.parse(storedData).token;
+      const parsed = JSON.parse(storedData);
+      const authToken = parsed?.token;
+
+      if (authToken) {
+        // console.log("🔑 Using token:", authToken);
+        config.headers.Authorization = "Bearer " + authToken;
+      }
     }
-    if (authToken) {
-      config.headers.Authorization = "Bearer " + authToken;
-    }
+
     return config;
   },
   (error) => {
     return Promise.reject(error);
   }
 );
+
 
 export const useResponseInterceptor = (logout: VoidFunction) => {
   const queryClient = useQueryClient();

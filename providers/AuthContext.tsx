@@ -1,7 +1,7 @@
 import AuthEndpoints from "@/endpoints/authEndpoints";
 import useDataMutation from "@/hooks/useEndpointMutation";
-import { loginType } from "@/schemas/login";
-import { IUser } from "@/utils/types";
+import { loginType } from "@/schemas/loginSchema";
+import { IUserData } from "@/utils/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -14,10 +14,11 @@ import {
 } from "react";
 
 type ContextStore = {
-  user: IUser | null;
-  setUser: React.Dispatch<React.SetStateAction<IUser | null>>;
+  user: IUserData | null;
+  setUser: React.Dispatch<React.SetStateAction<IUserData | null>>;
   logout: () => void;
   login: (val: loginType) => void;
+  refreshUser: () => Promise<void>; //
   isPending: boolean;
   isLoggedIn: boolean;
   isProcessing: boolean;
@@ -32,27 +33,49 @@ export function useAuth() {
 export function AuthenticationProvider({ children }: PropsWithChildren) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isProcessing, setIsProcessing] = useState(true);
-  const [user, setUser] = useState<IUser | null>(null);
+  const [user, setUser] = useState<IUserData | null>(null);
   const queryClient = useQueryClient();
 
   const API = new AuthEndpoints();
-  async function checkIfLoggedIn() { 
-    const user = await AsyncStorage.getItem("user");
 
-    if (user) {
+async function checkIfLoggedIn() {
+  const stored = await AsyncStorage.getItem("user");
+
+  if (stored) {
+    const parsed: IUserData = JSON.parse(stored);
       setIsLoggedIn(true);
-      setUser(JSON.parse(user));
+      setUser(parsed);
       setIsProcessing(false);
+
+      // optional: you can refresh silently in background
+      refreshUser();
       router.replace("/(tabs)/Index");
-    } else {
+  } else {
       setIsLoggedIn(false);
       setUser(null);
-      setIsProcessing(false); 
-
-      // router.replace("/");
-      router.replace("/(auth)/Login/LoginScreen"); 
-    }
+      setIsProcessing(false);
+      router.replace("/(auth)/Login/LoginScreen");
   }
+}
+
+  // refresh User function
+async function refreshUser() {
+  try {
+    const res = await API.getUserProfile();
+    const freshUser: IUserData = res.data.user;
+    // console.log("Refreshed user:", freshUser);
+
+    if (freshUser) {
+      setUser(freshUser);
+      await AsyncStorage.setItem("user", JSON.stringify(freshUser));
+    }
+  } catch (err: any) {
+    console.error(
+      "❌ Failed to refresh user",
+      err.response?.data || err.message
+    );
+  }
+}
   useEffect(() => {
     checkIfLoggedIn();
   }, []);
@@ -62,11 +85,12 @@ export function AuthenticationProvider({ children }: PropsWithChildren) {
     mutationFn: API.login,
   });
 
-  async function setUserOnLogin(val: IUser) {
+async function setUserOnLogin(val: IUserData) {
     await AsyncStorage.setItem("user", JSON.stringify(val));
     await AsyncStorage.setItem("account-exists", JSON.stringify(true));
-  }
-
+    setUser(val);
+    setIsLoggedIn(true);
+}
   async function logout() {
     queryClient.clear();
     await AsyncStorage.removeItem("user");
@@ -74,23 +98,25 @@ export function AuthenticationProvider({ children }: PropsWithChildren) {
     checkIfLoggedIn();
   }
 
-  async function login(val: loginType) {
+async function login(val: loginType) {
     mutate(val, {
       onSuccess: (res) => {
-        // console.log(res.data.message,  res?.data?.data);
-        if (res?.data?.data.token) {
-          setUserOnLogin(res?.data?.data);
-          checkIfLoggedIn();
+        const loginData: IUserData = res.data.data;
+        if (loginData.token) {
+          setUserOnLogin(loginData);
+          router.replace("/(tabs)/Index"); 
           alert(res.data.message);
         }
       },
-      onError: (err:any) => {
-        // console.log("❌ Login error:", err.response?.data || err.message);
-          const msg = err?.response?.data?.message || err.message || "Failed to register user. Please try again.";
-          alert(msg);
+      onError: (err: any) => {
+        const msg =
+          err?.response?.data?.message ||
+          err.message ||
+          "Failed to register user. Please try again.";
+        alert(msg);
       },
     });
-  }
+}
 
   // useEffect(() => {
   // 	if (response) {
@@ -111,6 +137,7 @@ export function AuthenticationProvider({ children }: PropsWithChildren) {
         login,
         logout,
         isProcessing,
+        refreshUser, // 
       }}
     >
       {children}

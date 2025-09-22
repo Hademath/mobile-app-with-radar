@@ -8,7 +8,7 @@ import { Check, Eye, EyeOff } from "lucide-react-native";
 import { useAuth } from "@/providers/AuthContext";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema, loginType } from "@/schemas/login";
+import { loginSchema, loginType } from "@/schemas/loginSchema";
 
 export default function LoginScreen() {
   const router = useRouter();
