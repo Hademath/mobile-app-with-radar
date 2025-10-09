@@ -12,6 +12,7 @@ import { CampaignPrompt } from "@/types/musicTypes";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import TextTicker from "react-native-text-ticker";
+import icons from "@/constants/icons";
 
 
 export default function MusicPlayerWithPrompts() {
@@ -172,11 +173,7 @@ useEffect(() => {
       textAnswers: textAnswers,
       campaignId: campaignPrompts[0]?.campaignId || null,
     };
-
     console.log("Survey responses:", surveyResponses);
-
-    // TODO: Send to your backend API
-    // await API.submitCampaignResponses(surveyResponses);
 
     player.pause();
     router.back();
@@ -187,9 +184,9 @@ useEffect(() => {
     const hasOptions = prompt.options && prompt.options.length > 0;
 
     return (
-      <View key={prompt.uuid} className="bg-neutral-900 rounded-3xl p-5 mb-4">
+      <View key={prompt.uuid} className="bg-primary  rounded-3xl p-5 mb-4">
         <Text className="text-white font-semibold text-base mb-4">
-          {prompt.question} <Text className="text-red-500">*</Text>
+          {prompt.question} <Text className="text-red-500"> *</Text>
         </Text>
 
         {!hasOptions ? (
@@ -224,7 +221,7 @@ useEffect(() => {
                     } border-2 mr-3 items-center justify-center ${
                       isSelected
                         ? "border-secondary bg-secondary"
-                        : "border-gray-500"
+                        : "border-black bg-black"
                     }`}
                   >
                     {isSelected && (
@@ -301,7 +298,7 @@ useEffect(() => {
         className="flex-1"
       >
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-          <View className="flex-row  gap-3 px-5 pt-12 py-20 bg-primary">
+          <View className="flex-row  gap-2 px-5 pt-12 py-20 bg-primary">
             <TouchableOpacity
               onPress={() => {
                 player.pause();
@@ -312,9 +309,9 @@ useEffect(() => {
               <Ionicons name="arrow-back" size={20} color="black" />
             </TouchableOpacity>
 
-            <View className="flex-1 justify-center">
+            <View className="flex-1 justify-center items-center">
               <Text className="text-white font-[400px] text-base">
-                {song.title.length > 10 ? (
+                {song.title.length > 15 ? (
                   <TextTicker
                     style={{ color: "white", fontWeight: "400" }}
                     duration={5000}
@@ -326,7 +323,7 @@ useEffect(() => {
                     {song.title}
                   </TextTicker>
                 ) : (
-                  <Text className="text-white font-semibold text-base">
+                  <Text className="text-white  font-semibold text-base">
                     {song.title}
                   </Text>
                 )}
@@ -366,14 +363,14 @@ useEffect(() => {
             </View>
           )}
 
-          <View className="w-full mb-8">
+          <View className="w-full items-center mb-10">
             <Image
               source={
                 song.artworkUrl
                   ? { uri: song.artworkUrl }
                   : require("@/assets/images/content/rema1.jpg")
               }
-              className="w-full h-[210px] aspect-square"
+              className="w-full h-[210px] "
               resizeMode="cover"
             />
           </View>
@@ -403,7 +400,7 @@ useEffect(() => {
               </View>
             </View>
 
-            <View className="mb-2">
+            <View className="mb-2 mt-4">
               <View className="h-1 bg-accent rounded-full overflow-hidden">
                 <View
                   className="h-full bg-white rounded-full"
@@ -414,11 +411,11 @@ useEffect(() => {
                   }}
                 />
               </View>
-              <View className="flex-row justify-between mt-1">
-                <Text className="text-gray-400 text-xs">
+              <View className="flex-row justify-between mt-2">
+                <Text className="text-icongray text-xs">
                   {formatTime(currentTime)}
                 </Text>
-                <Text className="text-gray-400 text-xs">
+                <Text className="text-icongray text-xs">
                   {formatTime(duration)}
                 </Text>
               </View>
@@ -432,7 +429,7 @@ useEffect(() => {
                 <Ionicons
                   name="play-back"
                   size={32}
-                  color={!processedUrl || streamError ? "#666" : "white"}
+                  color={!processedUrl || streamError ? "#666" : "#D9D9D9"}
                 />
               </TouchableOpacity>
 
@@ -458,14 +455,14 @@ useEffect(() => {
                 <Ionicons
                   name="play-forward"
                   size={32}
-                  color={!processedUrl || streamError ? "#666" : "white"}
+                  color={!processedUrl || streamError ? "#666" : "#D9D9D9"}
                 />
               </TouchableOpacity>
             </View>
 
             <View className="flex-row justify-between items-center">
-              <Ionicons name="volume-high" size={24} color="white" />
-              <Ionicons name="share-social" size={24} color="white" />
+              <icons.loudPlayIcon width={24} height={24} />
+              <icons.shareIcon width={24} height={24} />
             </View>
           </View>
 

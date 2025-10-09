@@ -12,6 +12,8 @@ import ArtisteLogo3 from "@/assets/images/svgs/ArtisteLogo3";
 import fireIcon from "@/assets/icons/fireIcon";
 import sadIcon from "@/assets/icons/sadIcon";
 import smileIcon from "@/assets/icons/smileIcon";
+import shareIcon from "@/assets/icons/shareIcon";
+import loudPlayIcon from "@/assets/icons/loudPlayIcon";
 
 
 
@@ -29,6 +31,8 @@ export type IconType = {
   ArtisteLogo3: typeof ArtisteLogo3;
   sadIcon: typeof sadIcon;
   smileIcon: typeof smileIcon;
+  shareIcon: typeof shareIcon;
+  loudPlayIcon: typeof loudPlayIcon;
 };
 
 const icons: IconType = {
@@ -44,7 +48,9 @@ const icons: IconType = {
     ArtisteLogo3,
     fireIcon,
     sadIcon,
-    smileIcon
+    smileIcon,
+    shareIcon,
+    loudPlayIcon
 
 };
 export default icons;
