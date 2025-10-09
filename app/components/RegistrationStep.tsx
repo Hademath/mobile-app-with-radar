@@ -13,10 +13,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import CreateAccountHeader from "@/app/components/CreateAccountHeader";
-import { tr } from "zod/v4/locales";
 
 // General Zod schema for input steps
 export const inputSchema = z.object({

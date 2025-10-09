@@ -1,13 +1,13 @@
 import AuthEndpoints from "@/endpoints/authEndpoints";
 import useDataMutation from "@/hooks/useEndpointMutation";
-import { IUser } from "@/utils/types";
+import { IUserData } from "@/types/userTypes";
 import { create } from "zustand";
 
 
 type Store = {
-  user: IUser | null;
+  user: IUserData | null;
   loading: boolean;
-  setUser: (user: IUser) => void;
+  setUser: (user: IUserData) => void;
   setLoading: (state: boolean) => void;
 };
 

@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, Image, Dimensions, SafeAreaView } from "react-native";
+import { View, Text, Image, Dimensions } from "react-native";
 import WalkthroughIcon from "../../assets/images/svgs/WalkthroughIcon";
 import ArtisteSecondaryLogo from "../../assets/images/svgs/ArtisteSecondaryLogo";
 import ProgressHeader from "./ProgressHeader";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface Props {
   item: {

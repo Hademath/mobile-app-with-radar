@@ -4,12 +4,12 @@ import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import CreateAccountHeader from "@/app/components/CreateAccountHeader";
-import AuthEndpoints from "@/endpoints/authEndpoints";
+import * as AuthEndpoints from "@/endpoints/authEndpoints";
 import useDataMutation from "@/hooks/useEndpointMutation";
 import { dateSchema } from "@/schemas/registerSchema";
 import useRegisterStore from "@/store/register-store";
 import {useAuthStore} from "@/store/auth-store";
-import { IUser } from "@/utils/types";
+import { IUserData } from "@/types/userTypes";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
@@ -26,12 +26,12 @@ export default function DOBScreen() {
         }
       };
 
-      const API = new AuthEndpoints();
+      // const API = new AuthEndpoints();
       const { data, updateData } = useRegisterStore();
 
       // Register User mutation
       const { isPending, mutate } = useDataMutation({
-        mutationFn: (payload: Omit<typeof data, "dateOfBirth"> & { dateOfBirth: string }) => API.registerUser(payload),
+        mutationFn: (payload: Omit<typeof data, "dateOfBirth"> & { dateOfBirth: string }) => AuthEndpoints.registerUser(payload),
         mutationKey: ["register user"],
       });
 
@@ -55,7 +55,7 @@ export default function DOBScreen() {
 
       mutate(payload, {
         onSuccess: async (res) => {
-        const user = res?.data?.data as IUser;
+        const user = res?.data?.data as IUserData;
 
           if (res.data.status_code === 201 && user?.token) {
             await AsyncStorage.setItem("user", JSON.stringify(res?.data?.data));

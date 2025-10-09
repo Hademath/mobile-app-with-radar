@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useRouter } from "expo-router";
 import { Eye, EyeOff } from "lucide-react-native";
 import CreateAccountHeader from "@/app/components/CreateAccountHeader";
-import AuthEndpoints from "@/endpoints/authEndpoints";
+import * as AuthEndpoints from "@/endpoints/authEndpoints";
 import useResetPassStore from "@/store/reset-password-store";
 import useDataMutation from "@/hooks/useEndpointMutation";
 import { resetpasswordSchema } from "@/schemas/loginSchema";
@@ -20,11 +20,11 @@ export default function PasswordScreen() {
       const [errors, setErrors] = useState<{ newPassword?: string; confirmPassword?: string; }>({});
 
       const router = useRouter();
-      const API = new AuthEndpoints();
+      // const API = new AuthEndpoints();
       const { data, updateData } = useResetPassStore();
 
       const { isPending, mutate } = useDataMutation({
-        mutationFn: ( payload: typeof data & { newPassword: string; confirmPassword: string } ) => API.resetPassword(payload),
+        mutationFn: ( payload: typeof data & { newPassword: string; confirmPassword: string } ) => AuthEndpoints.resetPassword(payload),
         mutationKey: ["reset-password"],
       });
 

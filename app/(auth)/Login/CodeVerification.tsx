@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import CreateAccountHeader from "@/app/components/CreateAccountHeader";
 import useResetPassStore from "@/store/reset-password-store";
 import useDataMutation from "@/hooks/useEndpointMutation";
-import AuthEndpoints from "@/endpoints/authEndpoints";
+import * as AuthEndpoints from "@/endpoints/authEndpoints";
 
 export default function CodeVerification() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -28,17 +28,17 @@ export default function CodeVerification() {
   };
 
   const { data, updateData } = useResetPassStore();
-  const API = new AuthEndpoints();
+  // const API = new AuthEndpoints();
 
   // Verify OTP mutation
   const { isPending, mutate } = useDataMutation({
-    mutationFn: (data: { token: string; }) => API.verifyForgotPassOtp(data),
+    mutationFn: (data: { token: string; }) => AuthEndpoints.verifyForgotPassOtp(data),
     mutationKey: ["verify otp"],
   });
 
   // Resend OTP
   const { mutate: resendOtpMutation } = useDataMutation({
-    mutationFn: (email: string) => API.forgotPassword({email}),
+    mutationFn: (email: string) => AuthEndpoints.forgotPassword({email}),
     mutationKey: ["request otp"],
   });
 

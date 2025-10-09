@@ -5,6 +5,7 @@ import { router } from "expo-router";
 import Constants from "expo-constants";
 
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
+let cachedToken: string | null = null;
 
 function getBaseUrl() {
   if (__DEV__) {
@@ -35,42 +36,56 @@ const authInstance = axios.create({
   },
 });
 
-// authInstance.interceptors.request.use(
-//   async (config) => {
-//     let authToken;
-//     const storedData = await AsyncStorage.getItem("user");
-//     // console.log("Store Data:", storedData);
-   
-//     if (storedData) {
-//       authToken = JSON.parse(storedData).token;
-//       console.log(authToken);
-//     }
-//     if (authToken) {
-//       // console.log("🔑Using token:", authToken );
-//       config.headers.Authorization = "Bearer " + authToken;
-//     }
-//     return config;
-//   }, 
-//   (error) => {
-//     return Promise.reject(error);
-//   }
-// );
+
+export const setAuthToken = (token: string | null) => {
+  cachedToken = token;
+  console.log(
+    "🔑 Token cached:",
+    token ? token.substring(0, 20) + "..." : "null"
+  );
+};
+
+// ✅ Function to clear token (call this on logout)
+export const clearAuthToken = () => {
+  cachedToken = null;
+  console.log("🔓 Token cleared");
+};
+
+
 
 authInstance.interceptors.request.use(
   async (config) => {
-    const storedData = await AsyncStorage.getItem("user");
-
-    if (storedData) {
-      const parsed = JSON.parse(storedData);
-      const authToken = parsed?.token;
-
-      if (authToken) {
-        // console.log("🔑 Using token:", authToken);
-        config.headers.Authorization = "Bearer " + authToken;
+    try {
+      // ✅ First, try to use cached token
+      if (cachedToken) {
+        config.headers.Authorization = `Bearer ${cachedToken}`;
+        console.log("✅ Using cached token");
+        return config;
       }
-    }
 
-    return config;
+      // ✅ If no cached token, read from AsyncStorage
+      const storedData = await AsyncStorage.getItem("user");
+
+      if (storedData) {
+        const parsed = JSON.parse(storedData);
+        const authToken = parsed?.token;
+
+        if (authToken) {
+          cachedToken = authToken; // Cache it for future requests
+          config.headers.Authorization = `Bearer ${authToken}`;
+          console.log("✅ Token loaded from AsyncStorage and cached");
+        } else {
+          console.log("⚠️ No token found in parsed data"); 
+        }
+      } else {
+        console.log("⚠️ No user data in AsyncStorage");
+      }
+
+      return config;
+    } catch (error) {
+      console.error("❌ Error reading token from storage:", error);
+      return config;
+    }
   },
   (error) => {
     return Promise.reject(error);
@@ -83,7 +98,8 @@ export const useResponseInterceptor = (logout: VoidFunction) => {
   authInstance.interceptors.response.use(
     async (response) => response,
     async (error) => {
-      if (error.response?.status === 401) {
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        clearAuthToken(); // Clear cached token
         queryClient.clear();
         logout();
         router.replace("/(auth)/Login/LoginScreen");

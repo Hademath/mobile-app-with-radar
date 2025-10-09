@@ -13,7 +13,7 @@ import { useRouter } from "expo-router";
 import ProgressHeader from "../../components/ProgressHeader";
 import ProfileSelect from "@/assets/images/ProviileSelect"; // Make sure this name is correct!
 import useProfileSetupStore from "@/store/profilesetup-store";
-import AuthEndpoints from "@/endpoints/authEndpoints";
+import * as AuthEndpoints from "@/endpoints/authEndpoints";
 import useEndpointQuery from "@/hooks/useEndpointQuery";
 
 
@@ -24,9 +24,9 @@ export default function ArtisteProfilePicture() {
   const router = useRouter();
   const { updateData } = useProfileSetupStore();
 
-  const API = new AuthEndpoints();
+  // const API = new AuthEndpoints();
   const { data } = useEndpointQuery({
-    queryFn: API.getAvatars,
+    queryFn: AuthEndpoints.getAvatars,
     queryKey: ["fetch avatars"],
   });
 

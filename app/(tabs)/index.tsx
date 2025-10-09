@@ -1,24 +1,56 @@
-import {  router } from "expo-router";
-import { Text, TouchableOpacity, View, Image, ScrollView, RefreshControl } from "react-native";
+import { router } from "expo-router";
+import  {
+  Text,
+  TouchableOpacity,
+  View,
+  Image,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import {  FontAwesome6, Ionicons, Entypo } from "@expo/vector-icons";
+import { FontAwesome6, Ionicons, Entypo } from "@expo/vector-icons";
 import ProgressHeader from "../components/ProgressHeader";
 import { useAuth } from "@/providers/AuthContext";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+// import musicEndpoints from "@/endpoints/musicEndpoints";
+import * as musicAPI from "../../endpoints/musicEndpoints";
+import useEndpointQuery from "@/hooks/useEndpointQuery";
+
+// Type for song
+    interface Song {
+      uuid: string;
+      title: string;
+      artist: {
+        name: string;
+        uuid: string;
+      };
+      artworkUrl: string | null;
+      streamUrl: string;
+      externalPlatform: string | null;
+      releaseDate: string | null;
+    }
 
 export default function Index() {
-  
-  const { user, refreshUser } = useAuth();
+  const { user, isLoggedIn, refreshUser } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
 
-  // console.log("user", user)
-  // Proper pull-to-refresh handler
   const onRefresh = useCallback(async () => {
+    if (!isLoggedIn || !user?.token) {
+      setRefreshing(false);
+      return;
+    }
     setRefreshing(true);
     await refreshUser();
-    setRefreshing(false); 
-  }, [refreshUser]);
+    setRefreshing(false);
+  }, [refreshUser, isLoggedIn, user]);
 
+  // const API = new musicEndpoints();
+  const { data } = useEndpointQuery({
+    queryFn: musicAPI.getAllSongs,
+    queryKey: ["fetch songs"],
+  });
+
+  const songs: Song[] = useMemo(() => data?.data?.data || [], [data]); 
 
   return (
     <LinearGradient
@@ -39,7 +71,6 @@ export default function Index() {
             <TouchableOpacity onPress={() => router.push("/Menu")}>
               <Image
                 className="w-12 h-12 rounded-full"
-                // source={require("@/assets/images/avatars/avatar1.png")}
                 source={
                   user?.avatar
                     ? { uri: user.avatar as string }
@@ -59,7 +90,7 @@ export default function Index() {
 
           <TouchableOpacity
             onPress={() => router.push("/Registration/GetStarted")}
-            className="flex-row  gap-3 items-center space-x-2 bg-accent px-6 py-4 rounded-3xl"
+            className="flex-row gap-3 items-center space-x-2 bg-accent px-6 py-4 rounded-3xl"
           >
             <Image
               source={require("@/assets/images/ArtisteRadarLogo.png")}
@@ -68,10 +99,9 @@ export default function Index() {
             <Text className="text-white font-semibold">{user?.radar}</Text>
           </TouchableOpacity>
         </View>
-        {/* Logo + Title */}
 
+        {/* Top Artiste Rank Section */}
         <View className="mb-8">
-          {/* Header */}
           <View className="flex-row justify-between items-center mb-4 px-1">
             <Text className="text-white font-bold text-xl">
               Top Artiste Rank
@@ -81,85 +111,90 @@ export default function Index() {
             </TouchableOpacity>
           </View>
 
-          {/* Scrollable Cards */}
-          <ScrollView
-            style={{}}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-          >
-            {[1, 2, 3, 4, 5, 6, 7].map((rank, index) => (
-              <View key={rank} className="flex-row items-start space-x-2 ">
-                <View className="flex-row  items-center justify-end  px-1">
-                  <Text className="text-white text-2xl font-bold">{rank}</Text>
-                  {rank === 1 ? (
-                    <Entypo name="triangle-up" size={30} color="green" />
-                  ) : (
-                    <Entypo name="triangle-down" size={30} color="red" />
-                  )}
-                </View>
+          {/* Horizontal Scrollable Cards with actual songs */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {songs.slice(0, 10).map((song, index) => {
+              const rank = index + 1;
+              return (
                 <View
-                  className={`mr-4 ${
-                    index === 0 ? "ml-1" : ""
-                  } flex-col w-44  rounded-2xl overflow-hidden`}
+                  key={song.uuid}
+                  className="flex-row items-start space-x-2"
                 >
-                  {/* Rank & Movement */}
+                  <View className="flex-row items-center justify-end px-1">
+                    <Text className="text-white text-2xl font-bold">
+                      {rank}
+                    </Text>
+                    {rank === 1 ? (
+                      <Entypo name="triangle-up" size={30} color="green" />
+                    ) : (
+                      <Entypo name="triangle-down" size={30} color="red" />
+                    )}
+                  </View>
+                  <View
+                    className={`mr-4 ${
+                      index === 0 ? "ml-1" : ""
+                    } flex-col w-44 rounded-2xl overflow-hidden`}
+                  >
+                    <View className="relative">
+                      <Image
+                        className="w-full h-64 rounded-lg"
+                        resizeMode="cover"
+                        source={
+                          song.artworkUrl
+                            ? { uri: song.artworkUrl }
+                            : require("@/assets/images/content/rema1.jpg")
+                        }
+                      />
 
-                  {/* Song Block */}
-                  <View className="relative">
-                    <Image
-                      className="w-full h-64 rounded-lg"
-                      resizeMode="cover"
-                      source={
-                        rank === 1
-                          ? require("@/assets/images/content/rema1.jpg")
-                          : require("@/assets/images/content/secondrank.jpg") // Swap this out as needed
-                      }
-                    />
-
-                    {/* Volume Icon (Top Right) */}
-                    <View className="absolute m-2 w-full gap-4">
-                      <View className="flex-row justify-between">
-                        <Text className="text-white">Rema - Ravage</Text>
-                        <View className="absolute  right-2 bg-black/40 p-1 mr-3 rounded-full">
-                          <Ionicons
-                            name="volume-medium"
-                            size={14}
-                            color="white"
+                      <View className="absolute m-2 w-full gap-4">
+                        <View className="flex-row justify-between">
+                          <Text className="text-white" numberOfLines={1}>
+                            {song.title}
+                          </Text>
+                          <View className="absolute right-2 bg-black/40 p-1 mr-3 rounded-full">
+                            <Ionicons
+                              name="volume-medium"
+                              size={14}
+                              color="white"
+                            />
+                          </View>
+                        </View>
+                        <View>
+                          <ProgressHeader
+                            step={3}
+                            total={5}
+                            type={"onboardingBar"}
+                            showBackArrow={false}
                           />
                         </View>
                       </View>
-                      <View>
-                        <ProgressHeader
-                          step={3}
-                          total={5}
-                          type={"onboardingBar"}
-                          showBackArrow={false}
-                        />
-                      </View>
-                    </View>
 
-                    {/* Play count (Bottom Left) */}
-                    <View className="absolute bottom-2 left-2 bg-black/60 px-2 py-1 rounded-full flex-row items-center">
-                      <Ionicons name="play" size={14} color="white" />
-                      <Text className="text-white text-xs ml-1">20.4k</Text>
+                      <View className="absolute bottom-2 left-2 bg-black/60 px-2 py-1 rounded-full flex-row items-center">
+                        <Ionicons name="play" size={14} color="white" />
+                        <Text className="text-white text-xs ml-1">20.4k</Text>
+                      </View>
                     </View>
                   </View>
                 </View>
-              </View>
-            ))}
+              );
+            })}
           </ScrollView>
         </View>
 
-        {/* Music Card */}
-        {[1, 2, 3, 4].map((_, index) => (
-          <View key={index} className=" rounded-3xl mb-6 overflow-hidden">
+        {/* Songs Recommendation Cards */}
+        {songs.map((song, index) => (
+          <View key={song.uuid} className="rounded-3xl mb-6 overflow-hidden">
             <View className="flex-row gap-3 items-center space-x-2 mb-4">
               <Image
-                source={require("@/assets/images/content/moreafro.jpg")}
+                source={
+                  song.artworkUrl
+                    ? { uri: song.artworkUrl }
+                    : require("@/assets/images/content/moreafro.jpg")
+                }
                 className="w-10 h-10 rounded-full"
               />
               <Text className="text-white font-semibold">
-                More of <Text className="font-bold">Afrobeat</Text>
+                More from <Text className="font-bold">{song.artist.name}</Text>
               </Text>
             </View>
 
@@ -167,15 +202,17 @@ export default function Index() {
               <Image
                 className="w-full h-56"
                 resizeMode="cover"
-                source={require("@/assets/images/content/rema1.jpg")}
+                source={
+                  song.artworkUrl
+                    ? { uri: song.artworkUrl }
+                    : require("@/assets/images/content/rema1.jpg")
+                }
               />
 
-              <View
-                className="absolute top-3 right-2 mr-3
-               bg-black/40 p-2 rounded-full"
-              >
+              <View className="absolute top-3 right-2 mr-3 bg-black/40 p-2 rounded-full">
                 <Ionicons name="volume-high" size={16} color="white" />
               </View>
+
               <View className="p-4 space-y-1">
                 <View className="flex-row items-center gap-2 space-x-2 mb-2">
                   <Image
@@ -183,19 +220,39 @@ export default function Index() {
                     className="w-5 h-5"
                   />
                   <Text className="text-xs text-gray-400 font-semibold">
-                    Genre
+                    {song.externalPlatform || "Original"}
                   </Text>
                 </View>
 
-                <Text className="text-2xl text-white font-bold">Ravage</Text>
-                <Text className="text-sm text-tertiary mt-2">
-                  EP • Rema • 5 songs • 2023
+                <Text className="text-2xl text-white font-bold">
+                  {song.title}
                 </Text>
-                <Text className="text-sm text-tertiary mt-2 ">
+                <Text className="text-sm text-tertiary mt-2">
+                  {song.artist.name} •{" "}
+                  {song.releaseDate
+                    ? new Date(song.releaseDate).getFullYear()
+                    : "Unreleased"}
+                </Text>
+                <Text className="text-sm text-tertiary mt-2">
                   Because you listen to pop music
                 </Text>
+
                 <View className="flex-row justify-between mt-4 gap-4 space-x-4">
-                  <TouchableOpacity className="flex-1 h-10 bg-white items-center justify-center rounded-xl">
+                  <TouchableOpacity
+                    onPress={() =>
+                      router.push({
+                        pathname: "/(music)/MusicPlayerWithPrompts",
+                        params: {
+                          songId: song.uuid,
+                          title: song.title,
+                          artist: song.artist.name,
+                          artworkUrl: song.artworkUrl,
+                          streamUrl: song.streamUrl,
+                        },
+                      })
+                    }
+                    className="flex-1 h-10 bg-white items-center justify-center rounded-xl"
+                  >
                     <Text className="text-black font-semibold">
                       Give feedback
                     </Text>
@@ -209,12 +266,6 @@ export default function Index() {
             </View>
           </View>
         ))}
-        {/* FAB (Floating Action Button) */}
-        {/* <Link href="/(tabs)/Create" asChild>
-          <TouchableOpacity className="absolute bottom-12 right-6 w-16 h-16 bg-black rounded-full items-center justify-center shadow-lg">
-            <Text className="text-4xl text-cyan-400 -mt-1">＋</Text>
-          </TouchableOpacity>
-        </Link> */}
       </ScrollView>
     </LinearGradient>
   );

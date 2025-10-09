@@ -1,9 +1,10 @@
 import { useRouter } from "expo-router";
-import { View, Text, FlatList, SafeAreaView, TouchableOpacity, } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, } from "react-native";
 import { onboardingData } from "../data/onboardingData";
 import  OnboardingItem  from "./components/OnboardingItem";
 import { useRef, useState } from "react";
 import Button from "./components/Button";
+import { SafeAreaView } from "react-native-safe-area-context";
 // import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function OnboardingScreen() {
@@ -32,7 +33,7 @@ export default function OnboardingScreen() {
         ref={flatListRef}
         showsHorizontalScrollIndicator={false}
         onScroll={(e) =>
-          setCurrentIndex(
+          setCurrentIndex( 
             Math.round(
               e.nativeEvent.contentOffset.x /
                 e.nativeEvent.layoutMeasurement.width

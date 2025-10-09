@@ -45,21 +45,20 @@ const useEndpointQuery = <T extends Record<string, any>>({
     if (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.status && error.response?.status >= 400) {
-          console.error("48 request", error.response.config.url);
+          console.error(error.response.config.url);
           console.error(
-            "50 ####",
             JSON.stringify(error.response.data, null, 2)
           );
         } else {
-          console.log("error request 2", error.request);
-          console.error("### 52", error);
+          console.log(error.request);
+          console.error(error);
         }
       } else {
         // toast.show("An Error Occurred", {
         // 	data: error.message,
         // 	type: "danger",
         // });
-        console.error("### 62", error);
+        console.error( error);
       }
     }
   }, [error, isError]);
@@ -68,3 +67,4 @@ const useEndpointQuery = <T extends Record<string, any>>({
 };
 
 export default useEndpointQuery;
+

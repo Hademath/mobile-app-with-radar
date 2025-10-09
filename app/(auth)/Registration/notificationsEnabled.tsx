@@ -2,7 +2,7 @@ import { Image,  Alert, View, Text, TouchableOpacity, TouchableWithoutFeedback, 
 import { SafeAreaView } from "react-native-safe-area-context";
 import ProgressHeader from "../../components/ProgressHeader";
 import { useRouter } from "expo-router";
-import AuthEndpoints from "@/endpoints/authEndpoints";
+import * as AuthEndpoints from "@/endpoints/authEndpoints";
 import useProfileSetupStore from "@/store/profilesetup-store";
 import useDataMutation from "@/hooks/useEndpointMutation";
 import { notificationSchema, } from "@/schemas/registerSchema";
@@ -14,13 +14,13 @@ import { notificationSchema, } from "@/schemas/registerSchema";
 
 export default function NotificationScreen() {
   const router = useRouter();
-  const API = new AuthEndpoints();
+  // const API = new AuthEndpoints();
   const { data } = useProfileSetupStore();
 
   // setup mutation
   // mutation setup
   const { isPending, mutate } = useDataMutation({
-    mutationFn: (payload: typeof data & { notification: boolean } | any) => API.profileSetup(payload),
+    mutationFn: (payload: typeof data & { notification: boolean } | any) => AuthEndpoints.profileSetup(payload),
     mutationKey: ["profile-setup"],
   });
 

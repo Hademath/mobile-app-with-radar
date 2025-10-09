@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import ProgressHeader from "../../components/ProgressHeader";
 import ProfileSelect from "@/assets/images/ProviileSelect";
-import AuthEndpoints from "@/endpoints/authEndpoints";
+import * as AuthEndpoints from "@/endpoints/authEndpoints";
 import useEndpointQuery from "@/hooks/useEndpointQuery";
 import useProfileSetupStore from "@/store/profilesetup-store";
 
@@ -19,9 +19,9 @@ export default function ProfilePictureScreen() {
   const router = useRouter();
   const { updateData } = useProfileSetupStore();
 
-  const API = new AuthEndpoints();
+  // const API = new AuthEndpoints();
   const { data } = useEndpointQuery({
-    queryFn: API.getAvatars,
+    queryFn: AuthEndpoints.getAvatars,
     queryKey: ["fetch avatars"],
   });
 

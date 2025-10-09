@@ -6,7 +6,7 @@ import { useRouter } from "expo-router";
 import ProgressHeader from "../../components/ProgressHeader";
 import useProfileSetupStore from "@/store/profilesetup-store";
 import { usernameSchema } from "@/schemas/registerSchema";
-import AuthEndpoints from "@/endpoints/authEndpoints";
+import * as  AuthEndpoints from "@/endpoints/authEndpoints";
 import useDataMutation from "@/hooks/useEndpointMutation";
 
 export default function MusicProUniqueName() {
@@ -14,12 +14,12 @@ export default function MusicProUniqueName() {
       const [error, setError] = useState("");
       const router = useRouter();
 
-      const API = new AuthEndpoints();
+      // const API = new AuthEndpoints();
       const { updateData } = useProfileSetupStore();
 
       // mutation for backend username validation
       const { isPending, mutate } = useDataMutation({
-        mutationFn: (username: string) => API.verifyUsername({ username }),
+        mutationFn: (username: string) => AuthEndpoints.verifyUsername({ username }),
         mutationKey: ["verify username"],
       });
 

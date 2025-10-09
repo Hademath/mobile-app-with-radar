@@ -1,28 +1,9 @@
 import { AxiosResponse } from "axios";
 import { authInstance,  } from "@/utils/apiService";
-import { ICreateProfile } from "@/utils/types";
-
-
-export default class AuthEndpoints {
 
 
 
-  async profileSetup(data: ICreateProfile): Promise<AxiosResponse<any>> {
-    try {
-      const response = await authInstance.put(`/user/profile_setup`, data, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-      return response;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-
-
-  async getGenres(): Promise<AxiosResponse<any>> {
+  export const getGenres =  async () : Promise<AxiosResponse<any>> => {
     try {
       const response = await authInstance.get("/user/genres");
       return response;
@@ -30,14 +11,41 @@ export default class AuthEndpoints {
       return Promise.reject(error);
     }
   }
-  async getAvatars(): Promise<AxiosResponse<any>> {
+  export const getAvatars = async(): Promise<AxiosResponse<any>> => {
     try {
       const response = await authInstance.get("/user/avatars");
       return response;
     } catch (error) {
-       console.log("❌ Request failed:", JSON.stringify(error, null, 2));
+      console.log("❌ Request failed:", JSON.stringify(error, null, 2));
+      return Promise.reject(error);
+    }
+  }
+  export const getAllSongs = async(): Promise<AxiosResponse<any>> => {
+    try {
+      const response = await authInstance.get("/songs/all-songs");
+      return response;
+    } catch (error) {
+      console.log("❌ Request failed:", JSON.stringify(error, null, 2));
       return Promise.reject(error);
     }
   }
 
-}
+  export const getSongById = async(songId: string): Promise<AxiosResponse<any>> => {
+    try {
+      const response = await authInstance.get(`/songs/get-song/${songId}`);
+      return response;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+  export const getSongByIdIncludePrompts= async(songId: string): Promise<AxiosResponse<any>> => {
+    try {
+      const response = await authInstance.get(`/songs/song-campaign/${songId}`);
+      console.log("you", response);
+      
+      return response;
+    } catch (error) {
+      console.log("❌❌❌❌❌ Request failed:", JSON.stringify(error, null, 2));
+      return Promise.reject(error);
+    }
+  }

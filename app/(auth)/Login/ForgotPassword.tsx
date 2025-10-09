@@ -3,7 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import CreateAccountHeader from "@/app/components/CreateAccountHeader";
-import AuthEndpoints from "@/endpoints/authEndpoints";
+import * as AuthEndpoints from "@/endpoints/authEndpoints";
 import useDataMutation from "@/hooks/useEndpointMutation";
 import { emailSchema } from "@/schemas/registerSchema";
 import useResetPassStore from "@/store/reset-password-store";
@@ -12,12 +12,12 @@ export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
   const router = useRouter();
 
-  const API = new AuthEndpoints();
+  // const API = new AuthEndpoints();
   const { updateData } = useResetPassStore();
   
   //  OTP request mutation
   const { isPending, mutate } = useDataMutation({
-    mutationFn: (email: string) => API.forgotPassword({ email }),
+    mutationFn: (email: string) => AuthEndpoints.forgotPassword({ email }),
     mutationKey: ["forgot password"],
   });
   // console.log("Current forgot datakkkk:", data);

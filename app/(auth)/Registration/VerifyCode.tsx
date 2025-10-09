@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useState, useRef, useEffect } from "react";
 import CreateAccountHeader from "@/app/components/CreateAccountHeader";
-import AuthEndpoints from "@/endpoints/authEndpoints";
+import * as AuthEndpoints from "@/endpoints/authEndpoints";
 import useDataMutation from "@/hooks/useEndpointMutation";
 import useRegisterStore from "@/store/register-store";
 
@@ -19,18 +19,18 @@ export default function OTPVerifyScreen() {
   const router = useRouter();
 
   const { data } = useRegisterStore();
-  const API = new AuthEndpoints();
+  // const API = new AuthEndpoints();
 
   // Verify OTP mutation
   const { isPending, mutate } = useDataMutation({
-    mutationFn: (data: { otp: string; email: string }) => API.verifyEmail(data),
+    mutationFn: (data: { otp: string; email: string }) => AuthEndpoints.verifyEmail(data),
     mutationKey: ["verify email"],
   });
 
   // Resend OTP 
     const reason = "register";
   const { mutate: resendOtpMutation } = useDataMutation({
-    mutationFn: (email: string) => API.requestOtp(reason, email),
+    mutationFn: (email: string) => AuthEndpoints.requestOtp(reason, email),
     mutationKey: ["request otp"],
   });
 

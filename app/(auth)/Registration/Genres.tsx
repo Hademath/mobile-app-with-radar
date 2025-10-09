@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import ProgressHeader from "../../components/ProgressHeader";
-import AuthEndpoints from "@/endpoints/authEndpoints";
+import * as AuthEndpoints from "@/endpoints/authEndpoints";
 import useEndpointQuery from "@/hooks/useEndpointQuery";
 // import { useAuth } from "@/providers/AuthContext";
 import useProfileSetupStore from "@/store/profilesetup-store";
@@ -32,9 +32,9 @@ export default function GenresScreen() {
   // const { user } = useAuth();
  const role = profileData?.role;
   
-  const API = new AuthEndpoints();
+  // const API = new AuthEndpoints();
   const { data } = useEndpointQuery({
-    queryFn: API.getGenres,
+    queryFn: AuthEndpoints.getGenres,
     queryKey: ["fetch genres"],
   });
 

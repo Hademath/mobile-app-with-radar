@@ -1,11 +1,12 @@
-import AuthEndpoints from "@/endpoints/authEndpoints";
+import * as  AuthEndpoints from "@/endpoints/authEndpoints";
 import useDataMutation from "@/hooks/useEndpointMutation";
 import { loginType } from "@/schemas/loginSchema";
-import { IUserData } from "@/utils/types";
+import { IUserData } from "@/types/userTypes";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
-import {
+import { setAuthToken, clearAuthToken } from "@/utils/apiService";
+import React, {
   createContext,
   PropsWithChildren,
   useContext,
@@ -36,67 +37,97 @@ export function AuthenticationProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<IUserData | null>(null);
   const queryClient = useQueryClient();
 
-  const API = new AuthEndpoints();
+  async function setUserOnLogin(val: IUserData) {
+    console.log("Setting user on login, token:", val.token);
+    await AsyncStorage.setItem("user", JSON.stringify(val));
+    await AsyncStorage.setItem("account-exists", JSON.stringify(true));
+    setAuthToken(val.token); // ✅ Cache the token immediately
+    setUser(val);
+    setIsLoggedIn(true);
+  }
 
-async function checkIfLoggedIn() {
-  const stored = await AsyncStorage.getItem("user");
 
-  if (stored) {
-    const parsed: IUserData = JSON.parse(stored);
+  async function logout() {
+    clearAuthToken(); // ✅ Clear cached token
+    queryClient.clear();
+    await AsyncStorage.removeItem("user");
+    await AsyncStorage.removeItem("account-exists");
+    checkIfLoggedIn();
+  }
+
+  async function checkIfLoggedIn() {
+    const stored = await AsyncStorage.getItem("user");
+
+    if (stored) {
+      const parsed: IUserData = JSON.parse(stored);
+      setAuthToken(parsed.token); // ✅ Cache the token on app start
       setIsLoggedIn(true);
       setUser(parsed);
       setIsProcessing(false);
-
-      // optional: you can refresh silently in background
       refreshUser();
       router.replace("/(tabs)/Index");
-  } else {
+    } else {
+      clearAuthToken(); // ✅ Ensure token is cleared
       setIsLoggedIn(false);
       setUser(null);
       setIsProcessing(false);
       router.replace("/(auth)/Login/LoginScreen");
+    }
   }
-}
 
-  // refresh User function
 async function refreshUser() {
-  try {
-    const res = await API.getUserProfile();
-    const freshUser: IUserData = res.data.user;
-    // console.log("Refreshed user:", freshUser);
+  const stored = await AsyncStorage.getItem("user");
+  if (!stored) {
+    console.log("No user data found, skipping refresh");
+    return;
+  }
 
-    if (freshUser) {
-      setUser(freshUser);
-      await AsyncStorage.setItem("user", JSON.stringify(freshUser));
+  const userData: IUserData = JSON.parse(stored);
+  if (!userData.token) {
+    return;
+  }
+
+  try {
+    const res = await AuthEndpoints.getUserProfile();
+    const freshUserProfile = res.data.user; // This only has profile data, no token
+
+    if (freshUserProfile) {
+      // ✅ Merge the fresh profile data with the existing token
+      const updatedUser: IUserData = {
+        ...freshUserProfile,
+        token: userData.token, // Keep the existing token!
+      };
+
+      setUser(updatedUser);
+      await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
+      // ❌ Don't call setAuthToken here - the token is already cached from login
     }
   } catch (err: any) {
     console.error(
       "❌ Failed to refresh user",
       err.response?.data || err.message
     );
+
+    if (err.response?.status === 403 || err.response?.status === 401) {
+      await AsyncStorage.removeItem("user");
+      await AsyncStorage.removeItem("account-exists");
+      clearAuthToken(); // ✅ Clear token on auth failure
+      setUser(null);
+      setIsLoggedIn(false);
+      queryClient.clear();
+      router.replace("/(auth)/Login/LoginScreen");
+    }
   }
 }
+
   useEffect(() => {
     checkIfLoggedIn();
   }, []);
 
   const { mutate, isPending } = useDataMutation({
     mutationKey: ["user login"],
-    mutationFn: API.login,
+    mutationFn: AuthEndpoints.login,
   });
-
-async function setUserOnLogin(val: IUserData) {
-    await AsyncStorage.setItem("user", JSON.stringify(val));
-    await AsyncStorage.setItem("account-exists", JSON.stringify(true));
-    setUser(val);
-    setIsLoggedIn(true);
-}
-  async function logout() {
-    queryClient.clear();
-    await AsyncStorage.removeItem("user");
-    await AsyncStorage.removeItem("account-exists");
-    checkIfLoggedIn();
-  }
 
 async function login(val: loginType) {
     mutate(val, {

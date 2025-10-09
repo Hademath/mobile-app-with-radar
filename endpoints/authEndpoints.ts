@@ -2,11 +2,11 @@ import { AxiosResponse } from "axios";
 import { authInstance, baseInstance } from "@/utils/apiService";
 import { registerType } from "@/schemas/registerSchema";
 import { loginType } from "@/schemas/loginSchema";
-import { ICreatePassword, ICreateProfile } from "@/utils/types";
+import { ICreatePassword, ICreateProfile } from "@/types/userTypes";
 
 
-export default class AuthEndpoints {
-  async requestOtp(reason: string, email: string): Promise<AxiosResponse<any>> {
+
+ export const requestOtp = async(reason: string, email: string): Promise<AxiosResponse<any>> =>{
     try {
       const response = await baseInstance.post(
         `/auth/request-otp?reason=${reason}`,
@@ -19,10 +19,7 @@ export default class AuthEndpoints {
     }
   }
 
-  async verifyEmail(data: {
-    otp: string;
-    email: string;
-  }): Promise<AxiosResponse<any>> {
+ export const verifyEmail = async (data: { otp: string; email: string; }): Promise<AxiosResponse<any>> =>{
     try {
       return await baseInstance.put(`/auth/submit-otp`, data);
     } catch (error) {
@@ -31,7 +28,7 @@ export default class AuthEndpoints {
     }
   }
 
-  async registerUser(data: registerType): Promise<AxiosResponse<any>> {
+ export const registerUser  = async(data: registerType): Promise<AxiosResponse<any>> =>{
     try {
       const response = await baseInstance.post("auth/register", data);
       return response;
@@ -41,7 +38,7 @@ export default class AuthEndpoints {
     }
   }
 
-  async profileSetup(data: ICreateProfile): Promise<AxiosResponse<any>> {
+ export const profileSetup  = async(data: ICreateProfile): Promise<AxiosResponse<any>> =>{
     try {
       const response = await authInstance.put(`/user/profile_setup`, data, {
         headers: {
@@ -54,9 +51,7 @@ export default class AuthEndpoints {
     }
   }
 
-  async verifyUsername(data: {
-    username: string;
-  }): Promise<AxiosResponse<any>> {
+ export const verifyUsername  = async(data: { username: string; }): Promise<AxiosResponse<any>> =>{
     try {
       return await baseInstance.post(`/auth/validate-username`, data);
     } catch (error) {
@@ -65,7 +60,7 @@ export default class AuthEndpoints {
     }
   }
 
-  async login(data: loginType): Promise<AxiosResponse<any>> {
+ export const login  = async(data: loginType): Promise<AxiosResponse<any>> =>{
     try {
       const response = await baseInstance.post("/auth/login", data);
       return response;
@@ -75,7 +70,7 @@ export default class AuthEndpoints {
     }
   }
 
-  async getGenres(): Promise<AxiosResponse<any>> {
+ export const getGenres  = async(): Promise<AxiosResponse<any>> =>{
     try {
       const response = await authInstance.get("/user/genres");
       return response;
@@ -83,7 +78,7 @@ export default class AuthEndpoints {
       return Promise.reject(error);
     }
   }
-  async getAvatars(): Promise<AxiosResponse<any>> {
+ export const getAvatars  = async(): Promise<AxiosResponse<any>> =>{
     try {
       const response = await authInstance.get("/user/avatars");
       return response;
@@ -93,7 +88,7 @@ export default class AuthEndpoints {
     }
   }
 
-  async createPassword(data: ICreatePassword): Promise<AxiosResponse<any>> {
+ export const createPassword  = async(data: ICreatePassword): Promise<AxiosResponse<any>> =>{
     try {
       const response = await baseInstance.put(
         `/auth/create_password?${data.params}`,
@@ -105,9 +100,9 @@ export default class AuthEndpoints {
     }
   }
 
-  async verifyForgotPassOtp(data: {
+ export const verifyForgotPassOtp  = async(data: {
     token: string;
-  }): Promise<AxiosResponse<any>> {
+  }): Promise<AxiosResponse<any>> =>{
     try {
       return await baseInstance.put(`/auth/varify-resetpass-otp`, data);
     } catch (error) {
@@ -115,19 +110,20 @@ export default class AuthEndpoints {
     }
   }
 
-  async forgotPassword(data: { email: string }): Promise<AxiosResponse<any>> {
+ export const forgotPassword  = async(data: { email: string }): Promise<AxiosResponse<any>> =>{
     try {
       return await baseInstance.post("/auth/forgot-password", data);
     } catch (error) {
       return Promise.reject(error);
     }
-  }
-  async resetPassword(data: {
+ }
+  
+ export const resetPassword  = async(data: {
     email: string;
     token: string;
     newPassword: string;
     confirmPassword: string;
-  }): Promise<AxiosResponse<any>> {
+  }): Promise<AxiosResponse<any>> =>{
     try {
       return await baseInstance.put(`/auth/reset-password`, data);
     } catch (error) {
@@ -135,14 +131,13 @@ export default class AuthEndpoints {
     }
   }
 
-  async getUserProfile(): Promise<AxiosResponse<any>> {
+ export const getUserProfile  = async(): Promise<AxiosResponse<any>> =>{
     try {
       const response = await authInstance.get("/user/profile");
-      console.log("User profile response FRom API:", response);
       return response;
     } catch (error) {
       console.log("Api error",error)
       return Promise.reject(error);
     }
   }
-}
+

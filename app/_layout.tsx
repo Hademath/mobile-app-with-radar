@@ -1,14 +1,14 @@
 import { Stack } from "expo-router";
 import "./globals.css";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { useFonts } from "expo-font";
-import { Text } from "react-native";
+// import { useFonts } from "expo-font";
+// import { Text } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import ReactQueryProvider from "@/providers/ReactQuery";
 import { AuthenticationProvider } from "@/providers/AuthContext";
 
-  import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useEffect } from "react";
+  // import AsyncStorage from "@react-native-async-storage/async-storage";
+// import { useEffect } from "react";
 
 
 export default function RootLayout() {

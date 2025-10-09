@@ -2,20 +2,20 @@ import { useRouter } from "expo-router";
 import RegistrationStepProps from "../../components/RegistrationStep";
 import useRegisterStore from "@/store/register-store";
 import { emailSchema } from "@/schemas/registerSchema";
-import AuthEndpoints from "@/endpoints/authEndpoints";
+import * as AuthEndpoints from "@/endpoints/authEndpoints";
 import useDataMutation from "@/hooks/useEndpointMutation";
 
 export default function EmailScreen() {
 
   const {updateData } = useRegisterStore();
-  const API = new AuthEndpoints();
+  // const API = new AuthEndpoints();
   const router = useRouter();
 
 
   //  OTP request mutation
   const reason = "register";
   const { isPending, mutate } = useDataMutation({
-    mutationFn: (email: string) => API.requestOtp(reason, email),
+    mutationFn: (email: string) => AuthEndpoints.requestOtp(reason, email),
     mutationKey: ["verify email"],
   });
 
