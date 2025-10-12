@@ -1,25 +1,22 @@
 import { View, Text, TouchableOpacity, ScrollView, Image, ActivityIndicator, TextInput, } from "react-native";
-import { useState, useMemo, useEffect, } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import * as musicAPI from "../../endpoints/musicEndpoints";
-// import * as musicAPI from './musicEndpoints';
 import useEndpointQuery from "@/hooks/useEndpointQuery";
 import { useAudioPlayer } from "expo-audio";
-import { getSpotifyTrackId, getUrlType, getYouTubeVideoId, } from "@/helper/musicHelper";
 import { CampaignPrompt } from "@/types/musicTypes";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import TextTicker from "react-native-text-ticker";
 import icons from "@/constants/icons";
-
+import { authInstance } from "@/utils/apiService";
 
 export default function MusicPlayerWithPrompts() {
   const router = useRouter();
   const params = useLocalSearchParams();
 
-  // const API = new musicEndpoints();
   const { data, isLoading, error } = useEndpointQuery({
     queryFn: () => musicAPI.getSongByIdIncludePrompts(params.songId as string),
     queryKey: [`fetch song`],
@@ -32,74 +29,116 @@ export default function MusicPlayerWithPrompts() {
         title: "Loading...",
         artist: { name: "Loading..." },
         artworkUrl: null,
-        streamUrl: "",
+        audioEndpoint: null,
         duration: 195,
         campaigns: [],
       }
     );
   }, [data]);
-
+  
   const [processedUrl, setProcessedUrl] = useState<string>("");
-  const [urlType, setUrlType] = useState< "youtube" | "spotify" | "direct" | "unknown" >("unknown");
   const [streamError, setStreamError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Process URL based on type
-useEffect(() => {
-  const processUrl = async () => {
-    if (!song.streamUrl) return;
+  // Process audio URL based on platform
+  useEffect(() => {
+    const processUrl = async () => {
+      setStreamError(null);
+      setIsProcessing(true);
 
-    const type = getUrlType(song.streamUrl);
-    setUrlType(type);
-    setStreamError(null);
-    setIsProcessing(true);
-
-    try {
-      if (type === "youtube") {
-        const videoId = getYouTubeVideoId(song.streamUrl);
-        if (videoId) {
-          const response = await fetch(
-            `${process.env.EXPO_PUBLIC_API_URL}/api/music-streaming/youtube-audio?videoId=${videoId}`
-          );
-          const data = await response.json();
-
-          if (data.status && data.data.audioUrl) {
-            setProcessedUrl(data.data.audioUrl);
-          } else {
-            setStreamError(data.message || "Failed to extract YouTube audio");
-          }
+      try {
+        // Case 1: Direct Cloudinary upload - use streamUrl directly
+        if (song.streamUrl && !song.externalPlatform) {
+          console.log("✅ Using direct Cloudinary URL");
+          setProcessedUrl(song.streamUrl);
+          setIsProcessing(false);
+          return;
         }
-      } else if (type === "spotify") {
-        const trackId = getSpotifyTrackId(song.streamUrl);
-        if (trackId) {
-          const response = await fetch(
-            `${process.env.EXPO_PUBLIC_API_URL}/api/music-streaming/spotify-audio?trackId=${trackId}`
-          );
-          const data = await response.json();
 
-          if (data.status && data.data.audioUrl) {
-            setProcessedUrl(data.data.audioUrl);
-            // Show preview warning if needed
-            if (data.data.isPreview) {
-              console.log("Playing 30-second preview");
+        // Case 2: YouTube - fetch from API endpoint
+        if (song.externalPlatform === "youtube" && song.externalId) {
+          console.log("🎥 Fetching YouTube audio for:", song.externalId);
+
+          try {
+            const response = await authInstance.get(
+              `/youtube-audio?videoId=${song.externalId}`
+            );
+            console.log("YouTube response:", response);
+            const audioUrl = response.data?.data?.audioUrl;
+
+            if (audioUrl) {
+              console.log("✅ YouTube audio URL obtained");
+              setProcessedUrl(audioUrl);
+            } else {
+              setStreamError("Could not extract YouTube audio");
             }
-          } else {
-            setStreamError(data.message || "Failed to get Spotify track");
+          } catch (error: any) {
+            console.error("❌ YouTube fetch error:", error);
+            setStreamError(
+              "Failed to fetch YouTube audio. It may be restricted."
+            );
           }
         }
-      } else if (type === "direct") {
-        setProcessedUrl(song.streamUrl);
-      }
-    } catch (error) {
-      console.error("Error processing URL:", error);
-      setStreamError("Failed to process audio URL");
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+        // Case 3: Spotify - fetch from API endpoint
+        else if (song.externalPlatform === "spotify" && song.externalId) {
+          console.log("🎵 Fetching Spotify audio for:", song.externalId);
 
-  processUrl();
-}, [song.streamUrl]);
+          try {
+            const response = await authInstance.get(
+              `/spotify-audio?trackId=${song.externalId}`
+            );
+            const audioUrl = response.data?.data?.audioUrl;
+
+            if (audioUrl) {
+              console.log("✅ Spotify audio URL obtained (30-second preview)");
+              setProcessedUrl(audioUrl);
+            } else {
+              setStreamError("No preview available for this Spotify track");
+            }
+          } catch (error: any) {
+            console.error("❌ Spotify fetch error:", error);
+            setStreamError(
+              "Failed to fetch Spotify track. Requires Premium for full playback."
+            );
+          }
+        }
+        // Case 4: Use audioEndpoint if provided
+        else if (song.audioEndpoint) {
+          console.log("📡 Using audioEndpoint:", song.audioEndpoint);
+
+          try {
+            const response = await authInstance.get(song.audioEndpoint);
+            const audioUrl = response.data?.data?.audioUrl;
+
+            if (audioUrl) {
+              console.log("✅ Audio URL obtained from endpoint");
+              setProcessedUrl(audioUrl);
+            } else {
+              setStreamError("Could not extract audio URL from server");
+            }
+          } catch (error: any) {
+            console.error("❌ Endpoint fetch error:", error);
+            setStreamError("Failed to fetch audio from server");
+          }
+        } else {
+          setStreamError("No audio source available for this song");
+        }
+      } catch (error: any) {
+        console.error("❌ General processing error:", error);
+        setStreamError("Failed to process audio");
+      } finally {
+        setIsProcessing(false);
+      }
+    };
+
+    processUrl();
+  }, [
+    song.streamUrl,
+    song.externalPlatform,
+    song.externalId,
+    song.audioEndpoint,
+  ]);
+
   // Initialize audio player with processed URL
   const player = useAudioPlayer(processedUrl || "");
 
@@ -107,8 +146,6 @@ useEffect(() => {
   const [textAnswers, setTextAnswers] = useState<Record<string, string>>({});
 
   const campaignPrompts: CampaignPrompt[] = song.campaigns || [];
-  
-  // console.log("Campaign Prompts:", campaignPrompts);
 
   const playPauseAudio = () => {
     if (!processedUrl || streamError) return;
@@ -127,7 +164,7 @@ useEffect(() => {
 
   const skipBackward = () => {
     if (!processedUrl || streamError) return;
-    player.seekBy(-10);
+    player.seekBy(-10); 
   };
 
   const formatTime = (seconds: number) => {
@@ -136,11 +173,7 @@ useEffect(() => {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const handleAnswer = (
-    promptUuid: string,
-    optionUuid: string,
-    allowMultiple: boolean
-  ) => {
+  const handleAnswer = ( promptUuid: string, optionUuid: string, allowMultiple: boolean ) => {
     setAnswers((prev) => {
       const current = prev[promptUuid] || [];
       if (allowMultiple) {
@@ -166,7 +199,6 @@ useEffect(() => {
   };
 
   const handleSubmit = () => {
-    // Combine regular answers and text answers
     const surveyResponses = {
       songId: params.songId,
       answers: answers,
@@ -184,13 +216,12 @@ useEffect(() => {
     const hasOptions = prompt.options && prompt.options.length > 0;
 
     return (
-      <View key={prompt.uuid} className="bg-primary  rounded-3xl p-5 mb-4">
+      <View key={prompt.uuid} className="bg-primary rounded-3xl p-5 mb-4">
         <Text className="text-white font-semibold text-base mb-4">
           {prompt.question} <Text className="text-red-500"> *</Text>
         </Text>
 
         {!hasOptions ? (
-          // Text input for prompts without options
           <TextInput
             className="bg-neutral-800 rounded-2xl p-4 min-h-[100px] text-white text-sm"
             placeholder="Type your answer here..."
@@ -201,7 +232,6 @@ useEffect(() => {
             onChangeText={(text) => handleTextAnswer(prompt.uuid, text)}
           />
         ) : (
-          // Options for prompts with choices
           <>
             {prompt.options.map((option) => {
               const isSelected = selectedAnswers.includes(option.uuid);
@@ -252,42 +282,38 @@ useEffect(() => {
     );
   };
 
-    const duration = player.duration || song.duration || 195;
-  // state to trigger re-render
-    const [currentTime, setCurrentTime] = useState(player.currentTime || 0);
-    // Update currentTime every second
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setCurrentTime(player.currentTime || 0);
-      }, 1000);
-  
-      return () => clearInterval(interval);
-    }, [player]);
-    
-  
-    if (isLoading) {
-      return (
-        <View className="flex-1 bg-black items-center justify-center">
-          <ActivityIndicator size="large" color="#ffffff" />
-        </View>
-      );
-    }
-  
-    if (error) {
-      return (
-        <View className="flex-1 bg-black items-center justify-center px-6">
-          <Text className="text-white text-xl mb-6">Failed to load song</Text>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="bg-secondary px-6 py-3 rounded-xl"
-          >
-            <Text className="text-black font-semibold">Go Back</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    }
+  const duration = player.duration || song.duration || 195;
+  const [currentTime, setCurrentTime] = useState(player.currentTime || 0);
 
- 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(player.currentTime || 0);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [player]);
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 bg-black items-center justify-center">
+        <ActivityIndicator size="large" color="#ffffff" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View className="flex-1 bg-black items-center justify-center px-6">
+        <Text className="text-white text-xl mb-6">Failed to load song</Text>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          className="bg-secondary px-6 py-3 rounded-xl"
+        >
+          <Text className="text-black font-semibold">Go Back</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-primary">
@@ -298,7 +324,7 @@ useEffect(() => {
         className="flex-1"
       >
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-          <View className="flex-row  gap-2 px-5 pt-12 py-20 bg-primary">
+          <View className="flex-row gap-2 px-5 pt-12 py-20 bg-primary">
             <TouchableOpacity
               onPress={() => {
                 player.pause();
@@ -323,14 +349,14 @@ useEffect(() => {
                     {song.title}
                   </TextTicker>
                 ) : (
-                  <Text className="text-white  font-semibold text-base">
+                  <Text className="text-white font-semibold text-base">
                     {song.title}
                   </Text>
                 )}
               </Text>
             </View>
 
-            <TouchableOpacity className="px-4 py-3 flex-row justify-center gap-1  bg-accent rounded-lg">
+            <TouchableOpacity className="px-4 py-3 flex-row justify-center gap-1 bg-accent rounded-lg">
               <Text className="text-white font-semibold">Follow </Text>
               <FontAwesome name="plus-circle" size={18} color="white" />
             </TouchableOpacity>
@@ -357,7 +383,7 @@ useEffect(() => {
               <View className="flex-row items-center">
                 <ActivityIndicator size="small" color="#60A5FA" />
                 <Text className="text-blue-300 text-sm ml-3">
-                  Processing {urlType} URL...
+                  Fetching audio...
                 </Text>
               </View>
             </View>
@@ -370,7 +396,7 @@ useEffect(() => {
                   ? { uri: song.artworkUrl }
                   : require("@/assets/images/content/rema1.jpg")
               }
-              className="w-full h-[210px] "
+              className="w-full h-[210px]"
               resizeMode="cover"
             />
           </View>
@@ -435,7 +461,7 @@ useEffect(() => {
 
               <TouchableOpacity
                 onPress={playPauseAudio}
-                className="w-16 h-16  rounded-full items-center justify-center"
+                className="w-16 h-16 rounded-full items-center justify-center"
                 disabled={!processedUrl || !!streamError}
                 style={{
                   opacity: !processedUrl || streamError ? 0.5 : 1,
@@ -466,7 +492,6 @@ useEffect(() => {
             </View>
           </View>
 
-          {/* show empty state if no prompts */}
           {campaignPrompts.length === 0 && (
             <View className="px-5 mt-8 items-center justify-center">
               <Text className="text-white text-center mt-10 text-lg">
@@ -475,7 +500,6 @@ useEffect(() => {
             </View>
           )}
 
-          {/* Campaign Prompts Section */}
           {campaignPrompts.length > 0 && (
             <View className="px-5 pt-6">
               <Text className="text-white font-bold text-xl mb-4">

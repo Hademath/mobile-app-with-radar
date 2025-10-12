@@ -41,8 +41,6 @@ import { authInstance,  } from "@/utils/apiService";
   export const getSongByIdIncludePrompts= async(songId: string): Promise<AxiosResponse<any>> => {
     try {
       const response = await authInstance.get(`/songs/song-campaign/${songId}`);
-      console.log("you", response);
-      
       return response;
     } catch (error) {
       console.log("❌❌❌❌❌ Request failed:", JSON.stringify(error, null, 2));

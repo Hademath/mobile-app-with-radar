@@ -38,17 +38,17 @@ export function AuthenticationProvider({ children }: PropsWithChildren) {
   const queryClient = useQueryClient();
 
   async function setUserOnLogin(val: IUserData) {
-    console.log("Setting user on login, token:", val.token);
+    // console.log("Setting user on login, token:", val.token);
     await AsyncStorage.setItem("user", JSON.stringify(val));
     await AsyncStorage.setItem("account-exists", JSON.stringify(true));
-    setAuthToken(val.token); // ✅ Cache the token immediately
+    setAuthToken(val.token); 
     setUser(val);
     setIsLoggedIn(true);
   }
 
 
   async function logout() {
-    clearAuthToken(); // ✅ Clear cached token
+    clearAuthToken(); 
     queryClient.clear();
     await AsyncStorage.removeItem("user");
     await AsyncStorage.removeItem("account-exists");
@@ -60,7 +60,7 @@ export function AuthenticationProvider({ children }: PropsWithChildren) {
 
     if (stored) {
       const parsed: IUserData = JSON.parse(stored);
-      setAuthToken(parsed.token); // ✅ Cache the token on app start
+      setAuthToken(parsed.token); 
       setIsLoggedIn(true);
       setUser(parsed);
       setIsProcessing(false);
@@ -78,7 +78,7 @@ export function AuthenticationProvider({ children }: PropsWithChildren) {
 async function refreshUser() {
   const stored = await AsyncStorage.getItem("user");
   if (!stored) {
-    console.log("No user data found, skipping refresh");
+    // console.log("No user data found, skipping refresh");
     return;
   }
 
