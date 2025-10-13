@@ -17,15 +17,20 @@ export default function MusicPlayerWithPrompts() {
   const router = useRouter();
   const params = useLocalSearchParams();
 
+  // Song history for next/previous navigation
+  const [songHistory, setSongHistory] = useState<string[]>([]);
+  const [currentHistoryIndex, setCurrentHistoryIndex] = useState(-1);
+
   const { data, isLoading, error } = useEndpointQuery({
     queryFn: () => musicAPI.getSongByIdIncludePrompts(params.songId as string),
-    queryKey: [`fetch song`],
+    queryKey: [`fetch song, ${params.songId}`],
     enabled: !!params.songId,
   });
 
   const song = useMemo(() => {
     return (
       data?.data?.data || {
+        uuid: "",
         title: "Loading...",
         artist: { name: "Loading..." },
         artworkUrl: null,
@@ -35,12 +40,106 @@ export default function MusicPlayerWithPrompts() {
       }
     );
   }, [data]);
-  
+
+  // Track song history
+  useEffect(() => {
+    if (song.uuid && params.songId) {
+      setSongHistory((prev) => {
+        // Remove duplicates and keep only last 20 songs
+        const newHistory = prev.filter((id) => id !== params.songId);
+        newHistory.push(params.songId as string);
+        return newHistory.slice(-20);
+      });
+      setCurrentHistoryIndex((prev) => prev + 1);
+    }
+  }, [params.songId, song.uuid]);
+
+  // Like/Dislike state
+  const [likes, setLikes] = useState<Record<string, boolean>>({});
+  const [dislikes, setDislikes] = useState<Record<string, boolean>>({});
+  const [isSubmittingReaction, setIsSubmittingReaction] = useState(false);
+
+  // Load reactions from backend
+  useEffect(() => {
+    const loadReactions = async () => {
+      try {
+        const response = await authInstance.get(
+          `/songs/reactions/${song.uuid}`
+        );
+        if (response.data?.data) {
+          setLikes(response.data.data.liked ? { [song.uuid]: true } : {});
+          setDislikes(response.data.data.disliked ? { [song.uuid]: true } : {});
+        }
+      } catch (error:any) {
+        console.log("Could not load reactions");
+      }
+    };
+
+    if (song.uuid) {
+      loadReactions();
+    }
+  }, [song.uuid]);
+
+  const handleLike = async () => {
+    setIsSubmittingReaction(true);
+    try {
+      if (dislikes[song.uuid]) {
+        setDislikes((prev) => {
+          const newState = { ...prev };
+          delete newState[song.uuid];
+          return newState;
+        });
+      }
+
+      const isLiked = likes[song.uuid];
+      setLikes((prev) => ({
+        ...prev,
+        [song.uuid]: !isLiked,
+      }));
+
+      await authInstance.post(`/songs/reactions/${song.uuid}`, {
+        type: isLiked ? "remove" : "like",
+      });
+    } catch (error) {
+      console.error("Error saving reaction:", error);
+    } finally {
+      setIsSubmittingReaction(false);
+    }
+  };
+
+  const handleDislike = async () => {
+    setIsSubmittingReaction(true);
+    try {
+      if (likes[song.uuid]) {
+        setLikes((prev) => {
+          const newState = { ...prev };
+          delete newState[song.uuid];
+          return newState;
+        });
+      }
+
+      const isDisliked = dislikes[song.uuid];
+      setDislikes((prev) => ({
+        ...prev,
+        [song.uuid]: !isDisliked,
+      }));
+
+      await authInstance.post(`/songs/reactions/${song.uuid}`, {
+        type: isDisliked ? "remove" : "dislike",
+      });
+    } catch (error) {
+      console.error("Error saving reaction:", error);
+    } finally {
+      setIsSubmittingReaction(false);
+    }
+  };
+
   const [processedUrl, setProcessedUrl] = useState<string>("");
   const [streamError, setStreamError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isAudio, setIsAudio] = useState(true); // true for audio, false for video
 
-  // Process audio URL based on platform
+  // Process audio/video URL based on platform
   useEffect(() => {
     const processUrl = async () => {
       setStreamError(null);
@@ -51,47 +150,36 @@ export default function MusicPlayerWithPrompts() {
         if (song.streamUrl && !song.externalPlatform) {
           console.log("✅ Using direct Cloudinary URL");
           setProcessedUrl(song.streamUrl);
+          setIsAudio(true);
           setIsProcessing(false);
           return;
         }
 
-        // Case 2: YouTube - fetch from API endpoint
+        // Case 2: YouTube - can be audio or video
         if (song.externalPlatform === "youtube" && song.externalId) {
-          console.log("🎥 Fetching YouTube audio for:", song.externalId);
-
-          try {
-            const response = await authInstance.get(
-              `/youtube-audio?videoId=${song.externalId}`
-            );
-            console.log("YouTube response:", response);
-            const audioUrl = response.data?.data?.audioUrl;
-
-            if (audioUrl) {
-              console.log("✅ YouTube audio URL obtained");
-              setProcessedUrl(audioUrl);
-            } else {
-              setStreamError("Could not extract YouTube audio");
-            }
-          } catch (error: any) {
-            console.error("❌ YouTube fetch error:", error);
-            setStreamError(
-              "Failed to fetch YouTube audio. It may be restricted."
-            );
-          }
+          console.log("🎥 Processing YouTube content:", song.externalId);
+          // For YouTube, we can display the video directly
+          const youtubeUrl = `https://www.youtube.com/watch?v=${song.externalId}`;
+          setProcessedUrl(youtubeUrl);
+          setIsAudio(false); // YouTube is video
+          setIsProcessing(false);
+          return;
         }
+
         // Case 3: Spotify - fetch from API endpoint
-        else if (song.externalPlatform === "spotify" && song.externalId) {
+        if (song.externalPlatform === "spotify" && song.externalId) {
           console.log("🎵 Fetching Spotify audio for:", song.externalId);
 
           try {
             const response = await authInstance.get(
-              `/spotify-audio?trackId=${song.externalId}`
+              `/music-streaming/spotify-audio?trackId=${song.externalId}`
             );
             const audioUrl = response.data?.data?.audioUrl;
 
             if (audioUrl) {
               console.log("✅ Spotify audio URL obtained (30-second preview)");
               setProcessedUrl(audioUrl);
+              setIsAudio(true);
             } else {
               setStreamError("No preview available for this Spotify track");
             }
@@ -102,8 +190,9 @@ export default function MusicPlayerWithPrompts() {
             );
           }
         }
+
         // Case 4: Use audioEndpoint if provided
-        else if (song.audioEndpoint) {
+        if (song.audioEndpoint) {
           console.log("📡 Using audioEndpoint:", song.audioEndpoint);
 
           try {
@@ -113,6 +202,7 @@ export default function MusicPlayerWithPrompts() {
             if (audioUrl) {
               console.log("✅ Audio URL obtained from endpoint");
               setProcessedUrl(audioUrl);
+              setIsAudio(true);
             } else {
               setStreamError("Could not extract audio URL from server");
             }
@@ -120,7 +210,9 @@ export default function MusicPlayerWithPrompts() {
             console.error("❌ Endpoint fetch error:", error);
             setStreamError("Failed to fetch audio from server");
           }
-        } else {
+        }
+
+        if (!processedUrl) {
           setStreamError("No audio source available for this song");
         }
       } catch (error: any) {
@@ -132,15 +224,10 @@ export default function MusicPlayerWithPrompts() {
     };
 
     processUrl();
-  }, [
-    song.streamUrl,
-    song.externalPlatform,
-    song.externalId,
-    song.audioEndpoint,
-  ]);
+  }, [song.streamUrl, song.externalPlatform, song.externalId, song.audioEndpoint, processedUrl]);
 
-  // Initialize audio player with processed URL
-  const player = useAudioPlayer(processedUrl || "");
+  // Initialize audio player only for audio
+  const player = useAudioPlayer(isAudio ? processedUrl || "" : "");
 
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
   const [textAnswers, setTextAnswers] = useState<Record<string, string>>({});
@@ -149,31 +236,59 @@ export default function MusicPlayerWithPrompts() {
 
   const playPauseAudio = () => {
     if (!processedUrl || streamError) return;
-
-    if (player.playing) {
-      player.pause();
-    } else {
-      player.play();
+    if (isAudio) {
+      if (player.playing) {
+        player.pause();
+      } else {
+        player.play();
+      }
     }
   };
 
-  const skipForward = () => {
+  const skipForward = async () => {
     if (!processedUrl || streamError) return;
-    player.seekBy(10);
+
+    console.log("⏭️ Fetching random song...");
+    try {
+      const response = await authInstance.get("/songs/random-song");
+      const randomSong = response.data?.data;
+
+      if (randomSong?.uuid) {
+        console.log("✅ Random song fetched:", randomSong.title);
+        router.push(
+          `/(music)/MusicPlayerWithPrompts?songId=${randomSong.uuid}`
+        );
+      }
+    } catch (error) {
+      console.error("❌ Error fetching random song:", error);
+    }
   };
 
-  const skipBackward = () => {
+  const skipBackward = async () => {
     if (!processedUrl || streamError) return;
-    player.seekBy(-10); 
+
+    console.log("⏮️ Playing previous song...");
+    if (currentHistoryIndex > 0) {
+      const previousSongId = songHistory[currentHistoryIndex - 1];
+      setCurrentHistoryIndex((prev) => prev - 1);
+      router.push(`/(music)/MusicPlayerWithPrompts?songId=${previousSongId}`);
+    } else {
+      console.log("No previous songs in history");
+    }
   };
 
   const formatTime = (seconds: number) => {
+    if (!seconds || isNaN(seconds)) return "0:00";
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const handleAnswer = ( promptUuid: string, optionUuid: string, allowMultiple: boolean ) => {
+  const handleAnswer = (
+    promptUuid: string,
+    optionUuid: string,
+    allowMultiple: boolean
+  ) => {
     setAnswers((prev) => {
       const current = prev[promptUuid] || [];
       if (allowMultiple) {
@@ -198,7 +313,7 @@ export default function MusicPlayerWithPrompts() {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const surveyResponses = {
       songId: params.songId,
       answers: answers,
@@ -207,7 +322,16 @@ export default function MusicPlayerWithPrompts() {
     };
     console.log("Survey responses:", surveyResponses);
 
-    player.pause();
+    try {
+      await authInstance.post("/songs/survey-responses", surveyResponses);
+      console.log("✅ Survey submitted successfully");
+    } catch (error) {
+      console.error("❌ Error submitting survey:", error);
+    }
+
+    if (isAudio) {
+      player.pause();
+    }
     router.back();
   };
 
@@ -282,16 +406,18 @@ export default function MusicPlayerWithPrompts() {
     );
   };
 
-  const duration = player.duration || song.duration || 195;
-  const [currentTime, setCurrentTime] = useState(player.currentTime || 0);
+  const duration = isAudio ? player.duration || song.duration || 195 : 0;
+  const [currentTime, setCurrentTime] = useState(0);
 
   useEffect(() => {
+    if (!isAudio) return;
+
     const interval = setInterval(() => {
       setCurrentTime(player.currentTime || 0);
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [player]);
+  }, [player, isAudio]);
 
   if (isLoading) {
     return (
@@ -327,7 +453,7 @@ export default function MusicPlayerWithPrompts() {
           <View className="flex-row gap-2 px-5 pt-12 py-20 bg-primary">
             <TouchableOpacity
               onPress={() => {
-                player.pause();
+                if (isAudio) player.pause();
                 router.back();
               }}
               className="w-10 h-10 rounded-full bg-white items-center justify-center"
@@ -362,7 +488,6 @@ export default function MusicPlayerWithPrompts() {
             </TouchableOpacity>
           </View>
 
-          {/* Error Message */}
           {streamError && (
             <View className="mx-5 mb-4 mt-2 p-4 bg-red-900/50 rounded-xl border border-red-500">
               <View className="flex-row items-start">
@@ -377,13 +502,12 @@ export default function MusicPlayerWithPrompts() {
             </View>
           )}
 
-          {/* Processing Indicator */}
           {isProcessing && (
             <View className="mx-5 mb-4 p-4 bg-blue-900/50 rounded-xl border border-blue-500">
               <View className="flex-row items-center">
                 <ActivityIndicator size="small" color="#60A5FA" />
                 <Text className="text-blue-300 text-sm ml-3">
-                  Fetching audio...
+                  Loading media...
                 </Text>
               </View>
             </View>
@@ -412,40 +536,58 @@ export default function MusicPlayerWithPrompts() {
                 </Text>
               </View>
               <View className="flex-row items-center justify-center bg-primary px-3 py-4 rounded-xl">
-                <View className="flex-row items-center gap-1">
-                  <MaterialIcons name="thumb-up" color="#5F6368" size={18} />
+                <TouchableOpacity
+                  onPress={handleLike}
+                  disabled={isSubmittingReaction}
+                  className="flex-row items-center gap-1"
+                >
+                  <MaterialIcons
+                    name="thumb-up"
+                    color={likes[song.uuid] ? "#10B981" : "#5F6368"}
+                    size={18}
+                  />
                   <Text className="text-white text-[16px]">1.7m</Text>
-                </View>
+                </TouchableOpacity>
 
                 <Text className="text-white mx-3 text-[16px]">|</Text>
 
-                <View className="flex-row items-center gap-1">
-                  <MaterialIcons name="thumb-down" color="#5F6368" size={18} />
+                <TouchableOpacity
+                  onPress={handleDislike}
+                  disabled={isSubmittingReaction}
+                  className="flex-row items-center gap-1"
+                >
+                  <MaterialIcons
+                    name="thumb-down"
+                    color={dislikes[song.uuid] ? "#EF4444" : "#5F6368"}
+                    size={18}
+                  />
                   <Text className="text-white text-[16px]">1.7m</Text>
-                </View>
+                </TouchableOpacity>
               </View>
             </View>
 
-            <View className="mb-2 mt-4">
-              <View className="h-1 bg-accent rounded-full overflow-hidden">
-                <View
-                  className="h-full bg-white rounded-full"
-                  style={{
-                    width: `${
-                      duration > 0 ? (currentTime / duration) * 100 : 0
-                    }%`,
-                  }}
-                />
+            {isAudio && (
+              <View className="mb-2 mt-4">
+                <View className="h-1 bg-accent rounded-full overflow-hidden">
+                  <View
+                    className="h-full bg-white rounded-full"
+                    style={{
+                      width: `${
+                        duration > 0 ? (currentTime / duration) * 100 : 0
+                      }%`,
+                    }}
+                  />
+                </View>
+                <View className="flex-row justify-between mt-2">
+                  <Text className="text-icongray text-xs">
+                    {formatTime(currentTime)}
+                  </Text>
+                  <Text className="text-icongray text-xs">
+                    {formatTime(duration)}
+                  </Text>
+                </View>
               </View>
-              <View className="flex-row justify-between mt-2">
-                <Text className="text-icongray text-xs">
-                  {formatTime(currentTime)}
-                </Text>
-                <Text className="text-icongray text-xs">
-                  {formatTime(duration)}
-                </Text>
-              </View>
-            </View>
+            )}
 
             <View className="flex-row justify-center items-center gap-8 mb-6">
               <TouchableOpacity
@@ -468,7 +610,7 @@ export default function MusicPlayerWithPrompts() {
                 }}
               >
                 <Ionicons
-                  name={player.playing ? "pause" : "play"}
+                  name={isAudio ? (player.playing ? "pause" : "play") : "play"}
                   size={32}
                   color="#fff"
                 />
