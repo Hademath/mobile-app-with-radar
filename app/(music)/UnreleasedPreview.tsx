@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, } from "react-native";
+import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, ActivityIndicator, } from "react-native";
 import { useState, useEffect, useMemo } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import RNPickerSelect from "react-native-picker-select";
@@ -9,30 +9,66 @@ import useEndpointQuery from "@/hooks/useEndpointQuery";
 import * as AuthEndpoints from "@/endpoints/authEndpoints";
 import * as MusicEndpoints from "@/endpoints/musicEndpoints";
 import useDataMutation from "@/hooks/useEndpointMutation";
+import campaignStore from "@/store/campaign-store";
+import { authInstance } from "@/utils/apiService";
 
 export default function UnreleasedPreview() {
   const router = useRouter();
   const { data, updateData } = unrealeasedMucStore();
+  const { updateData:campaignData } = campaignStore();
 
   // Initialize from store
   const [uploadingAs, setUploadingAs] = useState(data.upload_as || "Artiste");
   const [genre, setGenre] = useState(data.genre || "");
   const [songTitle, setSongTitle] = useState(data.title || "");
 
+  const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'processing'>('idle');
+const [songId, setSongId] = useState<string | null>(null);
+
   const { data: genresResponse } = useEndpointQuery({
     queryFn: AuthEndpoints.getGenres,
     queryKey: ["fetch genre"],
   });
 
-   const { isPending, mutate } = useDataMutation({
-     mutationFn: (payload: any) => MusicEndpoints.uploadUnrealesedSong(payload),
-     mutationKey: ["upload unreleased song"],
-   });
 
+  const { isPending, mutate } = useDataMutation({
+    mutationFn: (payload: any) => MusicEndpoints.uploadUnrealesedSong(payload),
+    mutationKey: ["upload unreleased song"],
+  });
+
+  useEffect(() => {
+    if (!songId || uploadStatus !== "processing") return;
+
+    const checkStatus = setInterval(async () => {
+      try {
+        const response = await authInstance.get(`/songs/get-song/${songId}`);
+        console.log("Upload status:", response.data.data.uploadStatus);
+
+        if (response.data.data.uploadStatus === "completed") {
+          clearInterval(checkStatus);
+          setUploadStatus("idle");
+          campaignData({ music: response.data.data });
+          alert("Upload completed!");
+          router.push("/CampaignSetup");
+        }
+      } catch (error) {
+        console.error("Status check error:", error);
+        clearInterval(checkStatus);
+        setUploadStatus("idle");
+        alert("Failed to check upload status");
+      }
+    }, 1000); // Check every 1 seconds
+
+    // Cleanup on unmount
+    return () => clearInterval(checkStatus);
+  }, [campaignData, router, songId, uploadStatus]);  
 
   // Format genres for picker
   const genreItems = useMemo(() => {
-    if (!genresResponse?.data?.data || !Array.isArray(genresResponse.data.data)) {
+    if (
+      !genresResponse?.data?.data ||
+      !Array.isArray(genresResponse.data.data)
+    ) {
       return [];
     }
     return genresResponse.data.data.map((g: any) => ({
@@ -73,35 +109,66 @@ export default function UnreleasedPreview() {
     });
   }, [uploadingAs, genre, songTitle, genresResponse, updateData, data.genreImage]);
 
-  const handleContinue = () => {
-    // Final validation
-    if (!songTitle || !genre || !uploadingAs || !data.song) {
-      alert("Please fill in all required fields");
-      return; 
-    }
+  // const createSong = () => {
+  //   // Final validation
+  //   if (!songTitle || !genre || !uploadingAs || !data.song) {
+  //     alert("Please fill in all required fields");
+  //     return;
+  //   }
 
-    /// Call Api to submit unrealeased song 
-    const payload = {
-     ...data
-    };
-    console.log("✅✅✅✅✅✅✅✅✅✅✅✅ uuuuuuuuuuuuuuuuu", payload);    
-    
-    mutate(payload, {
-      onSuccess: async (res) => {
-        alert(res?.data.message || "Song uploaded successfully!");
-        router.push("/CampaignSetup");
-      },
-      onError: (err: any) => {
-        const msg = err?.response?.data?.message || err.message || "Failed to upload song. Please try again.";
-        alert(msg);
-      },
-    });
+  //   // Prepare payload for upload
+  //   const payload = {
+  //     song: data.song, // File URI
+  //     title: songTitle,
+  //     upload_as: uploadingAs,
+  //     genre: genre,
+  //   };
 
 
-    // Navigate to campaign setup
+  //     mutate(payload, {
+  //       onSuccess: async (res) => {
+  //         const songId = res?.data?.data?.uuid;
 
+  //         // Poll every 3 seconds until upload completes
+  //         const checkStatus = setInterval(async () => {
+  //           const status = await authInstance.get(`/songs/get-song/${songId}`);
+  //           console.log("Upload status:", status);
+  //           if (status.data.data.uploadStatus === "completed") {
+  //             clearInterval(checkStatus);
+  //             campaignData({ music: status.data.data });
+  //             router.push("/CampaignSetup");
+  //           }
+  //         }, 1000);
+  //       },
+  //     });
+  // };
+const createSong = () => {
+  if (!songTitle || !genre || !uploadingAs || !data.song) {
+    alert("Please fill in all required fields");
+    return;
+  }
+
+  const payload = {
+    song: data.song,
+    title: songTitle,
+    upload_as: uploadingAs,
+    genre: genre,
   };
 
+  mutate(payload, {
+    onSuccess: (res) => {
+      const id = res?.data?.data?.uuid;
+      setSongId(id);
+      setUploadStatus("processing"); // Trigger polling in useEffect
+      alert("Upload started! Processing in background...");
+    },
+    onError: (err: any) => {
+      const msg = err?.response?.data?.message || "Upload failed";
+      alert(msg);
+      setUploadStatus("idle");
+    },
+  });
+};
   return (
     <ScrollView className="flex-1 bg-primary px-5 pt-12">
       {/* Header */}
@@ -109,11 +176,18 @@ export default function UnreleasedPreview() {
         <TouchableOpacity
           onPress={() => router.back()}
           className="w-10 h-10 rounded-full bg-white items-center justify-center mr-4"
+          disabled={isPending}
         >
           <ArrowLeft size={20} color="black" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleContinue}>
-          <Text className="text-teal-400 font-semibold text-lg">Continue</Text>
+        <TouchableOpacity onPress={createSong} disabled={isPending}>
+          {isPending ? (
+            <ActivityIndicator size="small" color="#00BFA5" />
+          ) : (
+            <Text className="text-teal-400 font-semibold text-lg">
+              Continue
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
       <View className="w-full border-b border-accent mb-8"></View>
@@ -135,6 +209,7 @@ export default function UnreleasedPreview() {
               { label: "Artiste", value: "Artiste" },
               { label: "Producer", value: "Producer" },
             ]}
+            disabled={isPending}
             style={{
               inputAndroid: {
                 color: "#666767",
@@ -157,6 +232,7 @@ export default function UnreleasedPreview() {
           onChangeText={setSongTitle}
           placeholder="CVABank"
           placeholderTextColor="#666767"
+          editable={!isPending}
           className="bg-[#181819] rounded-xl text-white px-4 py-4"
         />
 
@@ -168,6 +244,7 @@ export default function UnreleasedPreview() {
             onValueChange={setGenre}
             placeholder={{ label: "Change genre", value: "" }}
             items={genreItems}
+            disabled={isPending}
             style={{
               inputAndroid: {
                 color: "#666767",
@@ -220,10 +297,22 @@ export default function UnreleasedPreview() {
             {songTitle || "Untitled"}
           </Text>
           <Text className="text-sm text-tertiary mt-2">
-            {uploadingAs} • {data.genreName || selectedGenreData?.genres_name} • {new Date().getFullYear()}
+            {uploadingAs} • {data.genreName || selectedGenreData?.genres_name} •{" "}
+            {new Date().getFullYear()}
           </Text>
         </View>
       </View>
+
+      {/* Loading indicator */}
+      {(isPending || uploadStatus === "processing") && (
+        <View className="mt-6 items-center">
+          <ActivityIndicator size="large" color="#00BFA5" />
+          <Text className="text-white mt-2">
+            {isPending ? "Uploading song..." : "Processing upload..."}
+          </Text>
+        </View>
+      )}
+
       <Text></Text>
       <Text></Text>
       <Text></Text>

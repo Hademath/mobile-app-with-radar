@@ -31,6 +31,7 @@ const baseInstance = axios.create({
 
 const authInstance = axios.create({
   baseURL: getBaseUrl(),
+  timeout: 300000, // 5 minutes timeout for uploads
   headers: {
     "Content-Type": "application/json",
   },

@@ -5,11 +5,13 @@ import { useRouter } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 import Slider from "@react-native-community/slider";
 import RangeSlider from "rn-range-slider";
-
+import campaignStore from "@/store/campaign-store";
 export default function CampaignSetup() {
   const router = useRouter();
   const [audienceType, setAudienceType] = useState("listeners");
-
+  
+  const { data, updateData } = campaignStore();
+  console.log("data-need-for-campaign", updateData); 
   // Age Range State
   const [low, setLow] = useState(18);
   const [high, setHigh] = useState(30);

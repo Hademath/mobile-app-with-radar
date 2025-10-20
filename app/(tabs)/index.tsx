@@ -249,7 +249,7 @@ export default function Index() {
                           artworkUrl: song.artworkUrl,
                           streamUrl: song.streamUrl,
                         },
-                      })
+                      }) 
                     }
                     className="flex-1 h-10 bg-white items-center justify-center rounded-xl"
                   >

@@ -25,7 +25,7 @@ export default function Unreleased() {
     queryKey: ["fetch genre"],
   });
 
-  console.log("✅ Genres Response:", genresResponse);
+  // console.log("✅ Genres Response:", genresResponse);
 
   // Format genres for picker - accessing the correct nested structure
   const genreItems = useMemo(() => {
