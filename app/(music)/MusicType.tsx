@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import ArtisteLogo3 from "../../assets/images/svgs/ArtisteLogo3";
 import { ArrowLeft } from "lucide-react-native";
+import unrealeasedMucStore from "@/store/unrealeased-music-store";
 
 interface profilePop {
   id: string;
@@ -29,10 +30,27 @@ const musicTypes = [
   },
 ];
 
+
+  
+
 export default function MusicType() {
   const [selected, setSelected] = useState<string | null>(null);
   const router = useRouter();
 
+  const { updateData, data } = unrealeasedMucStore();
+  const handleNext = () => {
+ 
+    updateData({ musicType: selected || "" });
+
+    if (selected === "unreleased") { 
+      router.push("./Unreleased");
+    } else if (selected === "released") {   
+      router.push("./Released");
+    }
+
+  }
+  
+  console.log(data); 
   return (
     <SafeAreaView className="flex-1 bg-primary px-6">
       <TouchableOpacity
@@ -92,13 +110,7 @@ export default function MusicType() {
 
         <View className="items-center">
           <TouchableOpacity
-            onPress={() => {
-              if (selected === "unreleased") {
-                router.push("./Unreleased");
-              } else if (selected === "released") {
-                router.push("./Released");
-              }
-            }}
+            onPress={handleNext}
             disabled={!selected}
             className={`py-4 rounded-xl px-12 items-center ${
               selected ? "bg-white" : ""

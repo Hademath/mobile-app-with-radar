@@ -5,7 +5,7 @@ interface resetPassData {
     email: string;
     token: string;
     newpassword: string;
-      confirmPassword: string;
+    confirmPassword: string;
   };
 }
 

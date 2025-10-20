@@ -70,8 +70,8 @@ export default function MusicPlayerWithPrompts() {
           setLikes(response.data.data.liked ? { [song.uuid]: true } : {});
           setDislikes(response.data.data.disliked ? { [song.uuid]: true } : {});
         }
-      } catch (error:any) {
-        console.log("Could not load reactions");
+      } catch (error) {
+        console.log(error, "Could not load reactions");
       }
     };
 
