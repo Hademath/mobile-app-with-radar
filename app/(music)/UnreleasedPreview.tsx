@@ -47,7 +47,7 @@ const [songId, setSongId] = useState<string | null>(null);
         if (response.data.data.uploadStatus === "completed") {
           clearInterval(checkStatus);
           setUploadStatus("idle");
-          campaignData({ music: response.data.data });
+          campaignData({ musicMetadata: response.data.data, music: data });
           alert("Upload completed!");
           router.push("/CampaignSetup");
         }
@@ -61,7 +61,7 @@ const [songId, setSongId] = useState<string | null>(null);
 
     // Cleanup on unmount
     return () => clearInterval(checkStatus);
-  }, [campaignData, router, songId, uploadStatus]);  
+  }, [campaignData, data, router, songId, uploadStatus]);  
 
   // Format genres for picker
   const genreItems = useMemo(() => {
@@ -108,40 +108,7 @@ const [songId, setSongId] = useState<string | null>(null);
       genreName: selectedGenre?.genres_name || genre,
     });
   }, [uploadingAs, genre, songTitle, genresResponse, updateData, data.genreImage]);
-
-  // const createSong = () => {
-  //   // Final validation
-  //   if (!songTitle || !genre || !uploadingAs || !data.song) {
-  //     alert("Please fill in all required fields");
-  //     return;
-  //   }
-
-  //   // Prepare payload for upload
-  //   const payload = {
-  //     song: data.song, // File URI
-  //     title: songTitle,
-  //     upload_as: uploadingAs,
-  //     genre: genre,
-  //   };
-
-
-  //     mutate(payload, {
-  //       onSuccess: async (res) => {
-  //         const songId = res?.data?.data?.uuid;
-
-  //         // Poll every 3 seconds until upload completes
-  //         const checkStatus = setInterval(async () => {
-  //           const status = await authInstance.get(`/songs/get-song/${songId}`);
-  //           console.log("Upload status:", status);
-  //           if (status.data.data.uploadStatus === "completed") {
-  //             clearInterval(checkStatus);
-  //             campaignData({ music: status.data.data });
-  //             router.push("/CampaignSetup");
-  //           }
-  //         }, 1000);
-  //       },
-  //     });
-  // };
+  
 const createSong = () => {
   if (!songTitle || !genre || !uploadingAs || !data.song) {
     alert("Please fill in all required fields");

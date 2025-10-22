@@ -2,10 +2,13 @@ import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { useState } from "react";
 import { ArrowLeft } from "lucide-react-native";
 import { useRouter } from "expo-router";
+import campaignStore from "@/store/campaign-store";
 
 export default function SelectFixedPrompt() {
   const router = useRouter();
 
+    const { data } = campaignStore();
+  // console.log("Campaign ID:", data.campaign);
   // Tab data
   const tabs = [
     { id: "all", title: "All" },

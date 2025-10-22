@@ -20,3 +20,8 @@ export const campaignSchema = z.object({
 
 
 export type campaignType = z.infer<typeof campaignSchema>;
+export type promptType = {
+  question: string;
+  allow_multiple_choice: boolean;
+  options: { option: string }[];
+}[];

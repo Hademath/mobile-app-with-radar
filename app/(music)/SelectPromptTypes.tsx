@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import ArtisteLogo3 from "../../assets/images/svgs/ArtisteLogo3";
 import { ArrowLeft } from "lucide-react-native";
+import campaignStore from "@/store/campaign-store";
 
 interface profilePop {
   id: string;
@@ -30,7 +31,17 @@ const SelectPromptTypes = [
 export default function SelectPromptType() {
   const [selected, setSelected] = useState<string | null>(null);
   const router = useRouter();
-
+  const { data, updateData } = campaignStore();
+console.log("prompt_data_section", data);
+    const handleSelectPromptType = (type: "create-prompt" | "fixed-prompt") => {
+      if (selected === "create-prompt") {
+        updateData({ fixed_prompt: "create-prompt" });
+        router.push("./CreatePrompt");
+      } else if (selected === "fixed-prompt") {
+        updateData({ fixed_prompt: "fixed-prompt" });
+        router.push("./SelectFixedPrompt");
+      }
+    };
   return (
     <SafeAreaView className="flex-1 bg-primary px-6">
       <TouchableOpacity
@@ -90,13 +101,7 @@ export default function SelectPromptType() {
 
         <View className="items-center">
           <TouchableOpacity
-            onPress={() => {
-              if (selected === "create-prompt") {
-                router.push("./CreatePrompt");
-              } else if (selected === "fixed-prompt") {
-                router.push("./SelectFixedPrompt");
-              }
-            }}
+            onPress={() => handleSelectPromptType(selected as "create-prompt" | "fixed-prompt")}
             disabled={!selected}
             className={`py-4 rounded-xl px-12 items-center ${
               selected ? "bg-white" : ""

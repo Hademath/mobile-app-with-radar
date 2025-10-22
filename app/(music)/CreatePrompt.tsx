@@ -1,51 +1,94 @@
-import { View, Text, TouchableOpacity, TextInput,Switch, ScrollView, } from "react-native";
-import { useState } from "react";
+import { View, Text, TouchableOpacity, TextInput, Switch, ScrollView, } from "react-native";
+import { useState, useEffect } from "react";
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
+import campaignStore from "@/store/campaign-store";
 
 export default function CreatePrompt() {
   const router = useRouter();
-  const [prompts, setPrompts] = useState([]) as any;
+  const { data, updateData } = campaignStore();
+  console.log(" create_prompt_data_section", data);  
+
+  // Initialize from store or empty array
+  const [prompts, setPrompts] = useState(data.prompts || []);
   const [editingOption, setEditingOption] = useState(null) as any;
 
+  // Sync prompts to store whenever they change
+  useEffect(() => {
+    updateData({ prompts });
+  }, [prompts, updateData]);
+
   const handleAddPrompt = () => {
-    setPrompts([...prompts, { question: "", options: [{ value: "" }] }]) ;
+    setPrompts([
+      ...prompts,
+      {
+        question: "",
+        allow_multiple_choice: false,
+        options: [{ option: "" }],
+      },
+    ]);
   };
 
-  const handleAddOption = (promptIndex:  number) => {
+  const handleAddOption = (promptIndex: number) => {
     const newPrompts = [...prompts];
-    newPrompts[promptIndex].options.push({ value: "" });
+    newPrompts[promptIndex].options.push({ option: "" });
     setPrompts(newPrompts);
   };
 
-  const handleRemoveOption = (promptIndex:  number, optionIndex: any) => {
+  const handleRemoveOption = (promptIndex: number, optionIndex: number) => {
     const newPrompts = [...prompts];
     newPrompts[promptIndex].options.splice(optionIndex, 1);
     setPrompts(newPrompts);
-    setEditingOption(null )as any;
+    setEditingOption(null);
   };
 
-  const handleOptionChange = (text: string, promptIndex:number, optionIndex:  number) => {
+  const handleOptionChange = (
+    text: string,
+    promptIndex: number,
+    optionIndex: number
+  ) => {
     const newPrompts = [...prompts];
-    newPrompts[promptIndex].options[optionIndex].value = text;
+    newPrompts[promptIndex].options[optionIndex].option = text;
     setPrompts(newPrompts);
   };
 
-  const handleQuestionChange = (text: string, index:  number) => {
+  const handleQuestionChange = (text: string, index: number) => {
     const newPrompts = [...prompts];
     newPrompts[index].question = text;
     setPrompts(newPrompts);
   };
 
-  const handleRemovePrompt = (index:number) => {
+  const handleRemovePrompt = (index: number) => {
     const newPrompts = [...prompts];
     newPrompts.splice(index, 1);
     setPrompts(newPrompts);
   };
 
-  const handleEditOption = (promptIndex:any, optionIndex:number) => {
+  const handleEditOption = (promptIndex: number, optionIndex: number) => {
     setEditingOption({ promptIndex, optionIndex });
+  };
+
+  const handleContinue = () => {
+    // Validate prompts before continuing
+    const hasEmptyQuestions = prompts.some((p) => !p.question.trim());
+    const hasEmptyOptions = prompts.some(
+      (p) => p.options.length === 0 || p.options.some((o) => !o.option.trim())
+    );
+
+    if (hasEmptyQuestions) {
+      alert("Please fill in all questions");
+      return;
+    }
+
+    if (hasEmptyOptions) {
+      alert("Please fill in all options");
+      return;
+    }
+
+    // Data already saved to store via useEffect
+    console.log("Prompts saved:", prompts);
+    router.push("/PreviewCampaign");
   };
 
   return (
@@ -59,7 +102,7 @@ export default function CreatePrompt() {
           <ArrowLeft size={20} color="black" />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push("/PreviewCampaign")}>
+        <TouchableOpacity onPress={handleContinue}>
           <Text className="text-teal-400 font-semibold text-lg">Continue</Text>
         </TouchableOpacity>
       </View>
@@ -84,7 +127,7 @@ export default function CreatePrompt() {
         </TouchableOpacity>
       </View>
 
-      {prompts.map((prompt: any, promptIndex: any) => (
+      {prompts.map((prompt: any, promptIndex: number) => (
         <View key={promptIndex}>
           <View className="bg-accent rounded-3xl p-5 gap-5 mb-6">
             <View className="flex-row justify-between items-center">
@@ -97,8 +140,9 @@ export default function CreatePrompt() {
                 />
               </TouchableOpacity>
             </View>
+
             <TextInput
-              className="bg-primary text-white text-xl rounded-lg p-4 border-b-4 "
+              className="bg-primary text-white text-xl rounded-lg p-4 border-b-4"
               style={{
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 6 },
@@ -111,25 +155,25 @@ export default function CreatePrompt() {
               value={prompt.question}
               onChangeText={(text) => handleQuestionChange(text, promptIndex)}
             />
+
             <View className="flex-row justify-between items-center">
               <Text className="text-white font-bold text-lg">
                 Multiple Choice
               </Text>
               <Switch
-                // trackColor={{ false: "bg-[#40E0D0]", true: "bg-[#40E0D0]" }}
                 thumbColor={"#5F6368"}
                 ios_backgroundColor="#5F6368"
                 onValueChange={(value) => {
                   const newPrompts = [...prompts];
-                  newPrompts[promptIndex].isMultipleChoice = value;
+                  newPrompts[promptIndex].allow_multiple_choice = value;
                   setPrompts(newPrompts);
                 }}
-                value={prompt.isMultipleChoice}
+                value={prompt.allow_multiple_choice}
               />
             </View>
 
-            {prompt.options.map((option: any, optionIndex: any) => (
-              <View key={optionIndex} className="flex-row  items-center">
+            {prompt.options.map((option: any, optionIndex: number) => (
+              <View key={optionIndex} className="flex-row items-center">
                 <MaterialCommunityIcons
                   name="checkbox-blank-outline"
                   color={"#121212"}
@@ -141,16 +185,16 @@ export default function CreatePrompt() {
                 editingOption.optionIndex === optionIndex ? (
                   <View className="flex-row flex-1">
                     <TextInput
-                      className="bg-primary rounded-tl-xl rounded-bl-xl text-white text-lg p-4 flex-1 border-b-4 "
+                      className="bg-primary rounded-tl-xl rounded-bl-xl text-white text-lg p-4 flex-1 border-b-4"
                       placeholder={`Option ${optionIndex + 1}`}
                       placeholderTextColor={"#5F6368"}
-                      value={option.value}
+                      value={option.option}
                       onChangeText={(text) =>
                         handleOptionChange(text, promptIndex, optionIndex)
                       }
                     />
                     <TouchableOpacity
-                      className="bg-primary p-[12.5px] rounded-tr-xl rounded-br-xl border-b-4  "
+                      className="bg-primary p-[12.5px] rounded-tr-xl rounded-br-xl border-b-4"
                       onPress={() =>
                         handleRemoveOption(promptIndex, optionIndex)
                       }
@@ -167,26 +211,21 @@ export default function CreatePrompt() {
                     onPress={() => handleEditOption(promptIndex, optionIndex)}
                   >
                     <Text className="text-white font-bold text-lg ml-2">
-                      {option.value
-                        ? option.value
-                        : `Option ${optionIndex + 1}`}
-                      <AntDesign
-                        name="edit"
-                        size={24}
-                        color="#5F6368"
-                        className=""
-                      />
+                      {option.option || `Option ${optionIndex + 1}`}
+                      <AntDesign name="edit" size={24} color="#5F6368" />
                     </Text>
                   </TouchableOpacity>
                 )}
               </View>
             ))}
+
             <TouchableOpacity onPress={() => handleAddOption(promptIndex)}>
               <Text className="text-white/60 font-bold text-lg">
                 Add option
               </Text>
             </TouchableOpacity>
           </View>
+
           {promptIndex === prompts.length - 1 && (
             <View className="flex-col justify-center items-center rounded-3xl h-30 border border-dashed border-accent mb-6">
               <TouchableOpacity
@@ -204,6 +243,7 @@ export default function CreatePrompt() {
           )}
         </View>
       ))}
+
       {prompts.length === 0 && (
         <View className="flex-col justify-center items-center rounded-3xl h-96 border border-dashed border-accent">
           <TouchableOpacity
@@ -219,6 +259,7 @@ export default function CreatePrompt() {
           </TouchableOpacity>
         </View>
       )}
+
       <Text></Text>
       <Text></Text>
       <Text></Text>
