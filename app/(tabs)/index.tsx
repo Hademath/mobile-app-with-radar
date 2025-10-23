@@ -89,7 +89,7 @@ export default function Index() {
           </View>
 
           <TouchableOpacity
-            onPress={() => router.push("/Registration/GetStarted")}
+            // onPress={() => router.push("/Registration/GetStarted")}
             className="flex-row gap-3 items-center space-x-2 bg-accent px-6 py-4 rounded-3xl"
           >
             <Image

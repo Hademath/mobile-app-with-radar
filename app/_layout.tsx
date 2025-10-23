@@ -7,7 +7,8 @@ import { StatusBar } from "expo-status-bar";
 import ReactQueryProvider from "@/providers/ReactQuery";
 import { AuthenticationProvider } from "@/providers/AuthContext";
 
-  // import AsyncStorage from "@react-native-async-storage/async-storage";
+  import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect } from "react";
 // import { useEffect } from "react";
 
 
@@ -35,7 +36,7 @@ export default function RootLayout() {
   // async function clearLoginData() {
 
   //     const storedData = await AsyncStorage.getItem("user");
-  //   // console.log("🔑usert_data!:", storedData);
+  //   console.log("🔑usert_data!:", storedData);
   // }
      
   // useEffect(() => {

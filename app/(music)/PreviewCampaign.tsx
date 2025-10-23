@@ -138,7 +138,8 @@ export default function PreviewCampaign() {
             {data.music?.title || "Untitled"}
           </Text>
           <Text className="text-sm text-tertiary mt-2">
-            {data.musicMetadata?.artist || "Artist"} •{" "}
+            {/* {data.musicMetadata?.artist || "Artist"} •{" "} */}
+            {"Artist"} •{" "}
             {new Date().getFullYear()}
           </Text>
         </View>

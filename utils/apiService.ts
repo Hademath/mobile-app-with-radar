@@ -77,9 +77,14 @@ authInstance.interceptors.request.use(
           console.log("✅ Token loaded from AsyncStorage and cached");
         } else {
           console.log("⚠️ No token found in parsed data"); 
+          //// route to login
+          // clearAuthToken();
+          router.replace("/(auth)/Login/LoginScreen");
         }
       } else {
         console.log("⚠️ No user data in AsyncStorage");
+          // clearAuthToken();
+          router.replace("/(auth)/Login/LoginScreen");
       }
 
       return config;

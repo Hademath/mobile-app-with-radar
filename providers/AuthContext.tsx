@@ -111,7 +111,7 @@ async function refreshUser() {
     if (err.response?.status === 403 || err.response?.status === 401) {
       await AsyncStorage.removeItem("user");
       await AsyncStorage.removeItem("account-exists");
-      clearAuthToken(); // ✅ Clear token on auth failure
+      clearAuthToken();
       setUser(null);
       setIsLoggedIn(false);
       queryClient.clear();
@@ -121,7 +121,7 @@ async function refreshUser() {
 }
 
   useEffect(() => {
-    checkIfLoggedIn();
+    checkIfLoggedIn();  
   }, []);
 
   const { mutate, isPending } = useDataMutation({

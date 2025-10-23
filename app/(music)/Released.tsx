@@ -3,12 +3,17 @@ import { useState } from "react";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { ArrowLeft, ArrowRight } from "lucide-react-native";
+import RNPickerSelect from "react-native-picker-select";
 
 export default function Released() {
   const router = useRouter();
 
   const [songLink, setSongLink] = useState("");
+    const [externalPlatform, setExternalPlatform] = useState("Artiste");
+  const handleContinue = () => { 
 
+     router.push("/ReleasedPreview")
+  }
 
   return (
     <View className="flex-1 bg-primary px-5 pt-12">
@@ -20,7 +25,7 @@ export default function Released() {
         >
           <ArrowLeft size={20} color="black" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/ReleasedPreview")}>
+        <TouchableOpacity onPress={handleContinue}>
           <Text className="text-secondary font-semibold text-lg">Continue</Text>
         </TouchableOpacity>
       </View>
@@ -33,6 +38,38 @@ export default function Released() {
         To proceed, copy and paste the music link
       </Text>
 
+      <View className="bg-accent rounded-3xl p-5 gap-5 mb-6">
+        <Text className="text-inputLabelCol">Link From</Text>
+        <View className="rounded-2xl overflow-hidden">
+          <RNPickerSelect
+            value={externalPlatform}
+            onValueChange={setExternalPlatform}
+            placeholder={{}}
+            items={[
+              { label: "Youtube", value: "youtube" },
+              { label: "Spotify", value: "spotify" },
+            ]}
+            style={{
+              inputAndroid: {
+                color: "#666767",
+                backgroundColor: "#181819",
+                paddingHorizontal: 10,
+              },
+              inputIOS: {
+                color: "#666767",
+                backgroundColor: "#181819",
+                paddingHorizontal: 10,
+                height: 44,
+              },
+              iconContainer: {
+                top: 14,
+                right: 10,
+              },
+            }}
+          />
+        </View>
+      </View>
+
       {/* Form Container */}
       <View className=" flex-row justify-between rounded-3xl  gap-5">
         <TextInput
@@ -44,7 +81,7 @@ export default function Released() {
         />
         <TouchableOpacity
           className="absolute right-0 bg-secondary py-5 px-4   rounded-xl"
-          onPress={()=>router.push("/ReleasedPreview")}
+          onPress={() => router.push("/ReleasedPreview")}
         >
           <ArrowRight />
         </TouchableOpacity>

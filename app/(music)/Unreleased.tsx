@@ -136,6 +136,11 @@ export default function Unreleased() {
                 color: "#666767",
                 backgroundColor: "#181819",
                 paddingHorizontal: 10,
+                height: 44,
+              },
+              iconContainer: {
+                top: 14,
+                right: 10,
               },
             }}
           />
@@ -169,6 +174,7 @@ export default function Unreleased() {
                 color: "#666767",
                 backgroundColor: "#181819",
                 paddingHorizontal: 10,
+                height: 44,
               },
               iconContainer: {
                 top: 14,
