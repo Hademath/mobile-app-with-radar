@@ -155,3 +155,24 @@ export const uploadUnrealesedSong = async ( data: any ): Promise<AxiosResponse<a
     return Promise.reject(error);
   }
 };
+
+export const extractLink = async ( data: any ): Promise<AxiosResponse<any>> => {
+    try {
+    const response = await authInstance.post("songs/extract-music-detail", data);
+    return response;
+  } catch (error) {
+    console.log("❌ Upload failed:", JSON.stringify(error, null, 2));
+    return Promise.reject(error);
+  }
+};
+
+
+export const uploadReleasedMusic = async ( data: any ): Promise<AxiosResponse<any>> => {
+    try {
+    const response = await authInstance.post("songs/upload-song-link", data);
+    return response;
+  } catch (error) {
+    console.log("❌❌❌❌ Upload failed:", JSON.stringify(error, null, 2));
+    return Promise.reject(error);
+  }
+};
