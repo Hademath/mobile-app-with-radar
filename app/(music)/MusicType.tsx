@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import ArtisteLogo3 from "../../assets/images/svgs/ArtisteLogo3";
 import { ArrowLeft } from "lucide-react-native";
-import unrealeasedMucStore from "@/store/unrealeased-music-store";
+import musicStore from "@/store/unrealeased-music-store";
 
 interface profilePop {
   id: string;
@@ -37,7 +37,7 @@ export default function MusicType() {
   const [selected, setSelected] = useState<string | null>(null);
   const router = useRouter();
 
-  const { updateData, data } = unrealeasedMucStore();
+  const { updateData, data } = musicStore();
   const handleNext = () => {
  
     updateData({ musicType: selected || "" });

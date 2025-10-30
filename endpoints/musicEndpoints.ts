@@ -1,6 +1,6 @@
 import { AxiosResponse } from "axios";
 import { authInstance,  } from "@/utils/apiService";
-import { unrealeasedMusicType } from "@/schemas/unrealeasedMusicSchema";
+import { unrealeasedMusicType } from "@/schemas/uploadMusicSchema";
 
 
 

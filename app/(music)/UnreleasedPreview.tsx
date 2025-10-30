@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import RNPickerSelect from "react-native-picker-select";
 import { useRouter } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
-import unrealeasedMucStore from "@/store/unrealeased-music-store";
+import musicStore from "@/store/unrealeased-music-store";
 import useEndpointQuery from "@/hooks/useEndpointQuery";
 import * as AuthEndpoints from "@/endpoints/authEndpoints";
 import * as MusicEndpoints from "@/endpoints/musicEndpoints";
@@ -14,16 +14,15 @@ import { authInstance } from "@/utils/apiService";
 
 export default function UnreleasedPreview() {
   const router = useRouter();
-  const { data, updateData } = unrealeasedMucStore();
+  const { data, updateData } = musicStore();
   const { updateData:campaignData } = campaignStore();
 
   // Initialize from store
   const [uploadingAs, setUploadingAs] = useState(data.upload_as || "Artiste");
   const [genre, setGenre] = useState(data.genre || "");
   const [songTitle, setSongTitle] = useState(data.title || "");
-
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'processing'>('idle');
-const [songId, setSongId] = useState<string | null>(null);
+  const [songId, setSongId] = useState<string | null>(null);
 
   const { data: genresResponse } = useEndpointQuery({
     queryFn: AuthEndpoints.getGenres,

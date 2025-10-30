@@ -13,7 +13,7 @@ export default function CampaignSetup() {
   const [audienceType, setAudienceType] = useState("listeners");
 
   const { data, updateData } = campaignStore();
-
+  console.log("✅✅✅✅✅ DATAAAA:", data);
   // Age Range State
   const [lowAge, setLowAge] = useState(18);
   const [highAge, setHighAge] = useState(30);

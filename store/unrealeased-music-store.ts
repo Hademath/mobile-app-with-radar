@@ -9,6 +9,8 @@ export interface unrealeasedMusicData {
     genre?: string;
     genreImage?: string | null;
     genreName?: string;
+    metaData?: any;
+    externalPlatform?: string
   };
 }
 
@@ -17,9 +19,9 @@ interface unnrealeaseFunc {
   updateData: (params: Partial<unrealeasedMusicData["data"]>) => void;
 }
 
-type musicStore = unrealeasedMusicData & unnrealeaseFunc;
+type musicStoreType = unrealeasedMusicData & unnrealeaseFunc;
 
-const unrealeasedMucStore = create<musicStore>()((set) => ({
+const musicStore = create<musicStoreType>()((set) => ({
   data: {
     musicType: "",
     song: "",
@@ -28,6 +30,8 @@ const unrealeasedMucStore = create<musicStore>()((set) => ({
     genre: "",
     genreImage: null,
     genreName: "",
+    metaData: {},
+    externalPlatform :""
   },
 
   setData: (val) => set({ data: val }),
@@ -38,4 +42,4 @@ const unrealeasedMucStore = create<musicStore>()((set) => ({
     })),
 }));
 
-export default unrealeasedMucStore;
+export default musicStore;

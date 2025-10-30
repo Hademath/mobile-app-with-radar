@@ -5,14 +5,14 @@ import * as DocumentPicker from "expo-document-picker";
 import RNPickerSelect from "react-native-picker-select";
 import { useRouter } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
-import unrealeasedMucStore from "@/store/unrealeased-music-store";
-import { unrealeasedMusicSchema } from "@/schemas/unrealeasedMusicSchema";
+import musicStore from "@/store/unrealeased-music-store";
+import { unrealeasedMusicSchema } from "@/schemas/uploadMusicSchema";
 import useEndpointQuery from "@/hooks/useEndpointQuery";
 import * as AuthEndpoints from "@/endpoints/authEndpoints";
 
 export default function Unreleased() {
   const router = useRouter();
-  const { updateData, data } = unrealeasedMucStore();
+  const { updateData, data } = musicStore();
 
   // Initialize from store if data exists
   const [uploadingAs, setUploadingAs] = useState(data.upload_as || "Artiste");
