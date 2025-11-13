@@ -141,3 +141,7 @@ import { ICreatePassword, ICreateProfile } from "@/types/userTypes";
     }
   }
 
+
+
+// WebSocket connection (if added WebSockets later)
+// const ws = new WebSocket(BASE_URL.replace('http', 'ws'));

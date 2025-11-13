@@ -52,3 +52,4 @@ export const launchCampaign = async ( campaignId: string ): Promise<AxiosRespons
       return Promise.reject(error);
     }
 }
+

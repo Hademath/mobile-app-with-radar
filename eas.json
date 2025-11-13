@@ -12,12 +12,18 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_BASE_URL": "https://artisteradar-user-api-vd39o.ondigitalocean.app/api"
       }
     },
     "production": {
       "autoIncrement": true,
       "android": {
         "buildType": "app-bundle"
+      },
+      "env": {
+        "EXPO_PUBLIC_BASE_URL": "https://artisteradar-user-api-vd39o.ondigitalocean.app/api"
       }
     }
   },

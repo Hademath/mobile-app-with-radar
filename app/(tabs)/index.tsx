@@ -41,7 +41,7 @@ export default function Index() {
     }
     setRefreshing(true);
     await refreshUser();
-    setRefreshing(false);
+    setRefreshing(false); 
   }, [refreshUser, isLoggedIn, user]);
 
   // const API = new musicEndpoints();

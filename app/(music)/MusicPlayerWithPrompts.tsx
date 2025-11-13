@@ -1,17 +1,18 @@
 import { View, Text, TouchableOpacity, ScrollView, Image, ActivityIndicator, TextInput, } from "react-native";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import * as musicAPI from "../../endpoints/musicEndpoints";
 import useEndpointQuery from "@/hooks/useEndpointQuery";
-import { useAudioPlayer } from "expo-audio";
+import { useAudioPlayer, AudioPlayer } from "expo-audio"; // Import AudioPlayer type
 import { CampaignPrompt } from "@/types/musicTypes";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import TextTicker from "react-native-text-ticker";
 import icons from "@/constants/icons";
 import { authInstance } from "@/utils/apiService";
+import { getSpotifyAudioUrl, getYouTubeAudioUrl } from "@/helper/musicHelper";
 
 export default function MusicPlayerWithPrompts() {
   const router = useRouter();
@@ -45,7 +46,6 @@ export default function MusicPlayerWithPrompts() {
   useEffect(() => {
     if (song.uuid && params.songId) {
       setSongHistory((prev) => {
-        // Remove duplicates and keep only last 20 songs
         const newHistory = prev.filter((id) => id !== params.songId);
         newHistory.push(params.songId as string);
         return newHistory.slice(-20);
@@ -137,7 +137,12 @@ export default function MusicPlayerWithPrompts() {
   const [processedUrl, setProcessedUrl] = useState<string>("");
   const [streamError, setStreamError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isAudio, setIsAudio] = useState(true); // true for audio, false for video
+  const [isAudio, setIsAudio] = useState(true);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  // ✅ Use ref to store player instance
+  const playerRef = useRef<AudioPlayer | null>(null);
 
   // Process audio/video URL based on platform
   useEffect(() => {
@@ -155,43 +160,46 @@ export default function MusicPlayerWithPrompts() {
           return;
         }
 
-        // Case 2: YouTube - can be audio or video
+        // Case 2: YouTube - fetch audio URL from backend
         if (song.externalPlatform === "youtube" && song.externalId) {
           console.log("🎥 Processing YouTube content:", song.externalId);
-          // For YouTube, we can display the video directly
-          const youtubeUrl = `https://www.youtube.com/watch?v=${song.externalId}`;
-          setProcessedUrl(youtubeUrl);
-          setIsAudio(false); // YouTube is video
+
+          const result = await getYouTubeAudioUrl(song.externalId);
+
+          if (result.success && result.data?.audioUrl) {
+            console.log("✅ YouTube audio URL obtained");
+            setProcessedUrl(result.data.audioUrl);
+            setIsAudio(true);
+          } else {
+            setStreamError(result.error || "Failed to load YouTube audio");
+          }
+
           setIsProcessing(false);
           return;
         }
 
-        // Case 3: Spotify - fetch from API endpoint
+        // Case 3: Spotify - fetch audio URL from backend
         if (song.externalPlatform === "spotify" && song.externalId) {
-          console.log("🎵 Fetching Spotify audio for:", song.externalId);
+          console.log("🎵 Processing Spotify content:", song.externalId);
 
-          try {
-            const response = await authInstance.get(
-              `/music-streaming/spotify-audio?trackId=${song.externalId}`
-            );
-            const audioUrl = response.data?.data?.audioUrl;
+          const result = await getSpotifyAudioUrl(song.externalId);
 
-            if (audioUrl) {
-              console.log("✅ Spotify audio URL obtained (30-second preview)");
-              setProcessedUrl(audioUrl);
-              setIsAudio(true);
-            } else {
-              setStreamError("No preview available for this Spotify track");
-            }
-          } catch (error: any) {
-            console.error("❌ Spotify fetch error:", error);
+          if (result.success && result.data?.audioUrl) {
+            console.log("✅ Spotify audio URL obtained (30-second preview)");
+            setProcessedUrl(result.data.audioUrl);
+            setIsAudio(true);
+          } else {
             setStreamError(
-              "Failed to fetch Spotify track. Requires Premium for full playback."
+              result.error ||
+                "Failed to load Spotify track. Premium may be required."
             );
           }
+
+          setIsProcessing(false);
+          return;
         }
 
-        // Case 4: Use audioEndpoint if provided
+        // Case 4: Use audioEndpoint if provided (fallback)
         if (song.audioEndpoint) {
           console.log("📡 Using audioEndpoint:", song.audioEndpoint);
 
@@ -210,9 +218,7 @@ export default function MusicPlayerWithPrompts() {
             console.error("❌ Endpoint fetch error:", error);
             setStreamError("Failed to fetch audio from server");
           }
-        }
-
-        if (!processedUrl) {
+        } else {
           setStreamError("No audio source available for this song");
         }
       } catch (error: any) {
@@ -223,11 +229,45 @@ export default function MusicPlayerWithPrompts() {
       }
     };
 
-    processUrl();
-  }, [song.streamUrl, song.externalPlatform, song.externalId, song.audioEndpoint, processedUrl]);
+    if (song.uuid) {
+      processUrl();
+    }
+  }, [
+    song.streamUrl,
+    song.externalPlatform,
+    song.externalId,
+    song.audioEndpoint,
+    song.uuid,
+  ]);
 
-  // Initialize audio player only for audio
-  const player = useAudioPlayer(isAudio ? processedUrl || "" : "");
+  // ✅ Initialize player when processedUrl changes
+  const player = useAudioPlayer(processedUrl || "");
+
+  // ✅ Update playerRef when player changes
+  useEffect(() => {
+    playerRef.current = player;
+
+    // Set duration when player is ready
+    if (player.duration) {
+      setDuration(player.duration);
+    }
+  }, [player]);
+
+  // ✅ Fixed interval for currentTime updates
+  useEffect(() => {
+    if (!isAudio || !processedUrl) return;
+
+    const interval = setInterval(() => {
+      if (playerRef.current) {
+        setCurrentTime(playerRef.current.currentTime || 0);
+        if (playerRef.current.duration) {
+          setDuration(playerRef.current.duration);
+        }
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isAudio, processedUrl]);
 
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
   const [textAnswers, setTextAnswers] = useState<Record<string, string>>({});
@@ -235,13 +275,12 @@ export default function MusicPlayerWithPrompts() {
   const campaignPrompts: CampaignPrompt[] = song.campaigns || [];
 
   const playPauseAudio = () => {
-    if (!processedUrl || streamError) return;
-    if (isAudio) {
-      if (player.playing) {
-        player.pause();
-      } else {
-        player.play();
-      }
+    if (!processedUrl || streamError || !isAudio) return;
+
+    if (player.playing) {
+      player.pause();
+    } else {
+      player.play();
     }
   };
 
@@ -255,6 +294,9 @@ export default function MusicPlayerWithPrompts() {
 
       if (randomSong?.uuid) {
         console.log("✅ Random song fetched:", randomSong.title);
+        if (player.playing) {
+          player.pause();
+        }
         router.push(
           `/(music)/MusicPlayerWithPrompts?songId=${randomSong.uuid}`
         );
@@ -271,6 +313,9 @@ export default function MusicPlayerWithPrompts() {
     if (currentHistoryIndex > 0) {
       const previousSongId = songHistory[currentHistoryIndex - 1];
       setCurrentHistoryIndex((prev) => prev - 1);
+      if (player.playing) {
+        player.pause();
+      }
       router.push(`/(music)/MusicPlayerWithPrompts?songId=${previousSongId}`);
     } else {
       console.log("No previous songs in history");
@@ -283,6 +328,9 @@ export default function MusicPlayerWithPrompts() {
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
+
+  // Rest of your component code remains the same...
+  // (handleAnswer, handleTextAnswer, handleSubmit, renderPrompt functions)
 
   const handleAnswer = (
     promptUuid: string,
@@ -329,7 +377,7 @@ export default function MusicPlayerWithPrompts() {
       console.error("❌ Error submitting survey:", error);
     }
 
-    if (isAudio) {
+    if (isAudio && player.playing) {
       player.pause();
     }
     router.back();
@@ -406,19 +454,6 @@ export default function MusicPlayerWithPrompts() {
     );
   };
 
-  const duration = isAudio ? player.duration || song.duration || 195 : 0;
-  const [currentTime, setCurrentTime] = useState(0);
-
-  useEffect(() => {
-    if (!isAudio) return;
-
-    const interval = setInterval(() => {
-      setCurrentTime(player.currentTime || 0);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [player, isAudio]);
-
   if (isLoading) {
     return (
       <View className="flex-1 bg-black items-center justify-center">
@@ -450,10 +485,11 @@ export default function MusicPlayerWithPrompts() {
         className="flex-1"
       >
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+          {/* Header - same as before */}
           <View className="flex-row gap-2 px-5 pt-12 py-20 bg-primary">
             <TouchableOpacity
               onPress={() => {
-                if (isAudio) player.pause();
+                if (isAudio && player.playing) player.pause();
                 router.back();
               }}
               className="w-10 h-10 rounded-full bg-white items-center justify-center"
@@ -488,6 +524,7 @@ export default function MusicPlayerWithPrompts() {
             </TouchableOpacity>
           </View>
 
+          {/* Error and Loading states */}
           {streamError && (
             <View className="mx-5 mb-4 mt-2 p-4 bg-red-900/50 rounded-xl border border-red-500">
               <View className="flex-row items-start">
@@ -513,6 +550,7 @@ export default function MusicPlayerWithPrompts() {
             </View>
           )}
 
+          {/* Album Art */}
           <View className="w-full items-center mb-10">
             <Image
               source={
@@ -525,6 +563,7 @@ export default function MusicPlayerWithPrompts() {
             />
           </View>
 
+          {/* Player Controls */}
           <View className="px-5 mb-6">
             <View className="flex-row justify-between items-start mb-2">
               <View className="flex-1">
@@ -543,7 +582,7 @@ export default function MusicPlayerWithPrompts() {
                 >
                   <MaterialIcons
                     name="thumb-up"
-                    color={likes[song.uuid] ? "#10B981" : "#5F6368"}
+                    color={likes[song.uuid] ? "#40E0D0" : "#5F6368"}
                     size={18}
                   />
                   <Text className="text-white text-[16px]">1.7m</Text>
@@ -561,12 +600,13 @@ export default function MusicPlayerWithPrompts() {
                     color={dislikes[song.uuid] ? "#EF4444" : "#5F6368"}
                     size={18}
                   />
-                  <Text className="text-white text-[16px]">1.7m</Text>
+                  <Text className="text-white text-[16px]">1.1m</Text>
                 </TouchableOpacity>
               </View>
             </View>
 
-            {isAudio && (
+            {/* Progress bar - only show for audio */}
+            {isAudio && processedUrl && (
               <View className="mb-2 mt-4">
                 <View className="h-1 bg-accent rounded-full overflow-hidden">
                   <View
@@ -589,6 +629,7 @@ export default function MusicPlayerWithPrompts() {
               </View>
             )}
 
+            {/* Playback Controls */}
             <View className="flex-row justify-center items-center gap-8 mb-6">
               <TouchableOpacity
                 onPress={skipBackward}
@@ -634,6 +675,7 @@ export default function MusicPlayerWithPrompts() {
             </View>
           </View>
 
+          {/* Campaigns Section */}
           {campaignPrompts.length === 0 && (
             <View className="px-5 mt-8 items-center justify-center">
               <Text className="text-white text-center mt-10 text-lg">
