@@ -9,7 +9,7 @@ import {  Ionicons, } from "@expo/vector-icons";
 import { useState } from "react";
 
 
-export default function Index() {
+export default function Store() {
 
 const Tabs = [
   { id: "spotlight", title: "Spotlight" },

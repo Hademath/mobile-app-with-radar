@@ -65,7 +65,7 @@ export function AuthenticationProvider({ children }: PropsWithChildren) {
       setUser(parsed);
       setIsProcessing(false);
       refreshUser();
-      router.replace("/(tabs)/Index");
+      router.replace("/(tabs)");
     } else {
       clearAuthToken(); // ✅ Ensure token is cleared
       setIsLoggedIn(false);
@@ -135,7 +135,7 @@ async function login(val: loginType) {
         const loginData: IUserData = res.data.data;
         if (loginData.token) {
           setUserOnLogin(loginData);
-          router.replace("/(tabs)/Index"); 
+          router.replace("/(tabs)"); 
           alert(res.data.message);
         }
       },

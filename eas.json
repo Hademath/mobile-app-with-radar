@@ -14,7 +14,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_BASE_URL": "https://artisteradar-user-api-vd39o.ondigitalocean.app/api"
+        "EXPO_PUBLIC_BASE_URL":"https://artisteradar-user-api-vd39o.ondigitalocean.app/api"
       }
     },
     "production": {
@@ -23,7 +23,7 @@
         "buildType": "app-bundle"
       },
       "env": {
-        "EXPO_PUBLIC_BASE_URL": "https://artisteradar-user-api-vd39o.ondigitalocean.app/api"
+        "EXPO_PUBLIC_BASE_URL":"https://artisteradar-user-api-vd39o.ondigitalocean.app/api"
       }
     }
   },

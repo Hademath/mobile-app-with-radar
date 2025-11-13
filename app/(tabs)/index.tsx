@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import  {
+import {
   Text,
   TouchableOpacity,
   View,
@@ -17,18 +17,18 @@ import * as musicAPI from "../../endpoints/musicEndpoints";
 import useEndpointQuery from "@/hooks/useEndpointQuery";
 
 // Type for song
-    interface Song {
-      uuid: string;
-      title: string;
-      artist: {
-        name: string;
-        uuid: string;
-      };
-      artworkUrl: string | null;
-      streamUrl: string;
-      externalPlatform: string | null;
-      releaseDate: string | null;
-    }
+interface Song {
+  uuid: string;
+  title: string;
+  artist: {
+    name: string;
+    uuid: string;
+  };
+  artworkUrl: string | null;
+  streamUrl: string;
+  externalPlatform: string | null;
+  releaseDate: string | null;
+}
 
 export default function Index() {
   const { user, isLoggedIn, refreshUser } = useAuth();
@@ -41,7 +41,7 @@ export default function Index() {
     }
     setRefreshing(true);
     await refreshUser();
-    setRefreshing(false); 
+    setRefreshing(false);
   }, [refreshUser, isLoggedIn, user]);
 
   // const API = new musicEndpoints();
@@ -50,7 +50,7 @@ export default function Index() {
     queryKey: ["fetch songs"],
   });
 
-  const songs: Song[] = useMemo(() => data?.data?.data || [], [data]); 
+  const songs: Song[] = useMemo(() => data?.data?.data || [], [data]);
 
   return (
     <LinearGradient
@@ -249,7 +249,7 @@ export default function Index() {
                           artworkUrl: song.artworkUrl,
                           streamUrl: song.streamUrl,
                         },
-                      }) 
+                      })
                     }
                     className="flex-1 h-10 bg-white items-center justify-center rounded-xl"
                   >
