@@ -1,7 +1,7 @@
 
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import ProgressHeader from "../../components/ProgressHeader";
 import useProfileSetupStore from "@/store/profilesetup-store";

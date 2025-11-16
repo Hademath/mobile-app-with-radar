@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, FlatList, Dimensions,Image } from "react-native";
-import { useMemo, useState } from "react";
+import React,{ useMemo, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import ProgressHeader from "../../components/ProgressHeader";

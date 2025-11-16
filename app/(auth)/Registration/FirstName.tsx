@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import RegistrationStepProps from "../../components/RegistrationStep";
 import useRegisterStore from "@/store/register-store";
 import { firstNameSchema } from "@/schemas/registerSchema";
+import React from "react";
 
 
 

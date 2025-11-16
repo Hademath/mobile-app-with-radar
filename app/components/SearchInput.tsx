@@ -2,6 +2,7 @@
 import {  TextInput, Pressable } from "react-native";
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import React from "react";
 
 const SearchInput = () => {
   const router = useRouter();

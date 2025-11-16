@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, TextInput, ActivityIndicator, } from "react-native";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "expo-router";
 import { ArrowLeft, ArrowRight } from "lucide-react-native";
 import RNPickerSelect from "react-native-picker-select";

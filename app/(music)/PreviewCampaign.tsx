@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react-native";
 import campaignStore from "@/store/campaign-store";
 import useDataMutation from "@/hooks/useEndpointMutation";
 import * as CampaignEndpoints from "@/endpoints/campaignEndpoints";
+import React from "react";
 
 export default function PreviewCampaign() {
   const router = useRouter();

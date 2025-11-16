@@ -4,6 +4,7 @@ import useRegisterStore from "@/store/register-store";
 import { emailSchema } from "@/schemas/registerSchema";
 import * as AuthEndpoints from "@/endpoints/authEndpoints";
 import useDataMutation from "@/hooks/useEndpointMutation";
+import React from "react";
 
 export default function EmailScreen() {
 

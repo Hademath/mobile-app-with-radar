@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
-import { useState, useMemo } from "react";
+import React,{ useState, useMemo } from "react";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import RNPickerSelect from "react-native-picker-select";

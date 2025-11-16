@@ -2,7 +2,7 @@ import {
   View, Text, TextInput, TouchableOpacity, ActivityIndicator, } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import CreateAccountHeader from "@/app/components/CreateAccountHeader";
 import * as AuthEndpoints from "@/endpoints/authEndpoints";
 import useDataMutation from "@/hooks/useEndpointMutation";

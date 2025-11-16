@@ -1,10 +1,11 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import { useState } from "react";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import CreateAccountHeader from "@/app/components/CreateAccountHeader";
 import useRegisterStore from "@/store/register-store";
 import { genderSchema } from "@/schemas/registerSchema";
+
 const genders = ["Male", "Female"];
 
 export default function GenderScreen() {

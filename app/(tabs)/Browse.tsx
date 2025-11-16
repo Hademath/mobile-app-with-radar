@@ -3,6 +3,7 @@ import { Text, TouchableOpacity, View, Image, ScrollView } from "react-native";
 import {  Ionicons } from "@expo/vector-icons";
 import ProgressHeader from "../components/ProgressHeader";
 import SearchInput from "../components/SearchInput";
+import React from "react";
 
 export default function Browse() {
   return (

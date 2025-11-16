@@ -6,7 +6,7 @@ import {
   Alert,
 
 } from "react-native";
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";

@@ -1,17 +1,10 @@
 import { router } from "expo-router";
-import {
-  Text,
-  TouchableOpacity,
-  View,
-  Image,
-  ScrollView,
-  RefreshControl,
-} from "react-native";
+import { Text, TouchableOpacity, View, Image, ScrollView, RefreshControl, } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome6, Ionicons, Entypo } from "@expo/vector-icons";
 import ProgressHeader from "../components/ProgressHeader";
 import { useAuth } from "@/providers/AuthContext";
-import { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 // import musicEndpoints from "@/endpoints/musicEndpoints";
 import * as musicAPI from "../../endpoints/musicEndpoints";
 import useEndpointQuery from "@/hooks/useEndpointQuery";

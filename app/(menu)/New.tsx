@@ -3,6 +3,7 @@ import { Text, TouchableOpacity, View, Image, ScrollView } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import {  Ionicons, } from "@expo/vector-icons";
 import { ArrowLeft } from "lucide-react-native";
+import React from "react";
 
 export default function Index() {
   return (

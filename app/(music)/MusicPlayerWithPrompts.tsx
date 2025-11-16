@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, ScrollView, Image, ActivityIndicator, TextInput, } from "react-native";
-import { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useMemo, useEffect, useRef,  } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";

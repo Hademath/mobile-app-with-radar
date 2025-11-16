@@ -6,7 +6,7 @@ import SadIcon from "@/assets/icons/sadIcon";
 import {storeDetail} from "@/data/storedetail";
 
 import {  Ionicons, } from "@expo/vector-icons";
-import { useState } from "react";
+import React, { useState } from "react";
 
 
 export default function Store() {

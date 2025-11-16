@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, ScrollView, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { ArrowLeft, Copy } from "lucide-react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
+import React from "react";
 
 export default function Referrals() {
   const router = useRouter();

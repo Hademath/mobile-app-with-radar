@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "artisteradar",
-    "slug": "artisteradar",
+    "slug": "artist-radar",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo1.png",
@@ -55,8 +55,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "2634df20-c995-4fcd-874c-cbe2a087c11c"
+        "projectId": "4fa2daaf-0ab4-4223-b5c4-79b9439e0ad7"
       }
-    }
+    },
+    "owner": "artiste-radar-dev"
   }
 }

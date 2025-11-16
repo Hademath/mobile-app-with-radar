@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Image, FlatList, Dimensions, Alert, } from "react-native";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";

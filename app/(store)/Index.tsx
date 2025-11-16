@@ -5,7 +5,7 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import {  FontAwesome6, Ionicons, Entypo } from "@expo/vector-icons";
 import ProgressHeader from "../components/ProgressHeader";
-import { useState } from "react";
+import React,{ useState } from "react";
 
 
 export default function Index() {

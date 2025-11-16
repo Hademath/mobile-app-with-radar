@@ -6,6 +6,7 @@ import * as AuthEndpoints from "@/endpoints/authEndpoints";
 import useProfileSetupStore from "@/store/profilesetup-store";
 import useDataMutation from "@/hooks/useEndpointMutation";
 import { notificationSchema, } from "@/schemas/registerSchema";
+import React from "react";
 // import { ICreateProfile } from "@/utils/types";
 
 

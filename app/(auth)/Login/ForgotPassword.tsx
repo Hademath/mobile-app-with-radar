@@ -1,6 +1,6 @@
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useState } from "react";
+import React,{ useState } from "react";
 import { useRouter } from "expo-router";
 import CreateAccountHeader from "@/app/components/CreateAccountHeader";
 import * as AuthEndpoints from "@/endpoints/authEndpoints";

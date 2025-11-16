@@ -1,13 +1,5 @@
-// app/SearchScreen.tsx
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  FlatList,
-  Image,
-} from "react-native";
-import { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, FlatList, Image, } from "react-native";
+import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 

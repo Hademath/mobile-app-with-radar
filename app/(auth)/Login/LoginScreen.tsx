@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import icons from "@/constants/icons";
 import ArtisteSecondaryLogo from "../../../assets/images/svgs/ArtisteSecondaryLogo";
-import { useState } from "react";
+import React,  { useState } from "react";
 import { Check, Eye, EyeOff } from "lucide-react-native";
 import { useAuth } from "@/providers/AuthContext";
 import { useForm } from "react-hook-form";

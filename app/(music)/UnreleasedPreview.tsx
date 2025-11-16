@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, ActivityIndicator, } from "react-native";
-import { useState, useEffect, useMemo } from "react";
+import React,{ useState, useEffect, useMemo } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import RNPickerSelect from "react-native-picker-select";
 import { useRouter } from "expo-router";

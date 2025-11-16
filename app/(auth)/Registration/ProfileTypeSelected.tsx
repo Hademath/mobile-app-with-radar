@@ -1,8 +1,8 @@
-// app/register/11-profile-type-selected.tsx
 import { View, Text, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import ProgressHeader from "../../components/ProgressHeader";
+import React from "react";
 
 // Simulated selected type (in real app, pull from global state)
 const selectedType = {

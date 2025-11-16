@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
 import { View, Platform } from "react-native";
 import { ChevronDown } from "lucide-react-native";

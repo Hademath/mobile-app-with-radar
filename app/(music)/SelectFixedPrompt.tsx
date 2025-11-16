@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import { useState } from "react";
+import React, { useState } from "react";
 import { ArrowLeft } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import campaignStore from "@/store/campaign-store";

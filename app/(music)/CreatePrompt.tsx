@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, TextInput, Switch, ScrollView, } from "react-native";
-import { useState, useEffect } from "react";
+import React,{ useState, useEffect } from "react";
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";

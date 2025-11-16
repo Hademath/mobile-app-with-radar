@@ -1,12 +1,5 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  Image,
-  ActivityIndicator,
-} from "react-native";
-import { useMemo, useState, useEffect } from "react";
+import { View, Text, TouchableOpacity, TextInput, Image, ActivityIndicator, } from "react-native";
+import React, { useMemo, useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { ArrowLeft, ArrowRight } from "lucide-react-native";

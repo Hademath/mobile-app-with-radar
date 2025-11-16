@@ -1,6 +1,7 @@
 import { View, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
+import React from "react";
 // import clsx from "clsx"; // Optional: install  for className merging
 
 const typeToColor = {
