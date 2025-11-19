@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Stack } from "expo-router";
 import "./globals.css";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -8,7 +8,7 @@ import { StatusBar } from "expo-status-bar";
 import ReactQueryProvider from "@/providers/ReactQuery";
 import { AuthenticationProvider } from "@/providers/AuthContext";
 
-  import AsyncStorage from "@react-native-async-storage/async-storage";
+  // import AsyncStorage from "@react-native-async-storage/async-storage";
 // import { useEffect } from "react";
 
 
@@ -50,7 +50,7 @@ export default function RootLayout() {
         <SafeAreaProvider>
           <SafeAreaView className="flex-1 bg-primary">
               <StatusBar style="light" />
-            <Stack>
+            <Stack> 
               <Stack.Screen name="launch" options={{ headerShown: false }} />
               <Stack.Screen name="onboarding" options={{ headerShown: false }} />
               <Stack.Screen name="(auth)/Registration" options={{ headerShown: false }} />

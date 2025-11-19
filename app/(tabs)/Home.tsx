@@ -201,7 +201,7 @@ export default function Index() {
                     : require("@/assets/images/content/rema1.jpg")
                 }
               />
-
+ 
               <View className="absolute top-3 right-2 mr-3 bg-black/40 p-2 rounded-full">
                 <Ionicons name="volume-high" size={16} color="white" />
               </View>

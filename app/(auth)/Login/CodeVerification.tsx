@@ -49,7 +49,7 @@ export default function CodeVerification() {
     if (code.length === 6 && !otp.includes("")) {
       onSubmit(code);
     }
-  }, [otp]);
+  }, [ otp ]);
 
   function onSubmit(code: string) {
     if (isPending) return;

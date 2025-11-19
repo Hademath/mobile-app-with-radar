@@ -6,11 +6,11 @@ import { authInstance } from "@/utils/apiService";
  */
 export const getYouTubeAudioUrl = async (videoId: string) => {
   try {
-    console.log("🎥 Fetching YouTube audio for videoId:", videoId);
+    // console.log("🎥 Fetching YouTube audio for videoId:", videoId);
 
     const response = await authInstance.get( `/music-streaming/youtube-audio?videoId=${videoId}` );
 
-    console.log("✅ YouTube Response:", response.data);
+    // console.log("✅ YouTube Response:", response.data);
 
     if (response.data.status && response.data.data?.audioUrl) {
       return {

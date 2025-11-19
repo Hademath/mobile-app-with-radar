@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { View, Text, FlatList, TouchableOpacity, } from "react-native";
+import { View, FlatList, } from "react-native";
 import { onboardingData } from "../data/onboardingData";
 import  OnboardingItem  from "./components/OnboardingItem";
 import React,{ useRef, useState } from "react";
@@ -46,7 +46,7 @@ export default function OnboardingScreen() {
           textClassName="text-lg text-white"
           className="py-4 px-[50px]  rounded-xl items-center"
           title="Skip"
-          onPress={() => router.replace("/(tabs)")}
+          onPress={() => router.replace("/(tabs)/Home")}
           // onPress={async () => {
           //   await AsyncStorage.setItem("seen_onboarding", "true");
           //   router.replace("/Index"); // navigate to main screen

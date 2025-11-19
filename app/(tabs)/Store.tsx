@@ -1,4 +1,3 @@
-import {  router } from "expo-router";
 import { Text, TouchableOpacity, View, Image, ScrollView, FlatList } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import SmileIcon from "@/assets/icons/smileIcon";

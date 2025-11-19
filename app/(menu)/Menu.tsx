@@ -2,7 +2,7 @@
 import { View, Text, TouchableOpacity, ScrollView, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { Zap, Clock3, Settings, User, UserPlus, LogOutIcon } from "lucide-react-native";
-import React, { useEffect } from "react";
+import React, {  } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Profile() {
