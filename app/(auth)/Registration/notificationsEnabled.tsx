@@ -67,7 +67,7 @@ export default function NotificationScreen() {
     mutate(formData, {
       onSuccess: async (res) => {
         Alert.alert("Success", res?.data?.message || "Registration successful!");
-        router.push("/(tabs)/Home");
+        router.push("/(tabs)");
       },
       onError: (err: any) => {
         const msg = err?.response?.data?.message || err.message || "Failed to update user profile. Please try again.";

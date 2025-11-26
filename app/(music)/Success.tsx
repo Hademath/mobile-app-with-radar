@@ -13,7 +13,7 @@ export default function Success() {
         >
           <ArrowLeft size={20} color="black" />
         </TouchableOpacity>
-        <TouchableOpacity className="bg-accent rounded-full w-10 h-10 items-center justify-center" onPress={() => router.push("/(tabs)/Home")}>
+        <TouchableOpacity className="bg-accent rounded-full w-10 h-10 items-center justify-center" onPress={() => router.push("/(tabs)")}>
           < X size={24} className="" color="#C2C2C280" />
         </TouchableOpacity>
       </View>

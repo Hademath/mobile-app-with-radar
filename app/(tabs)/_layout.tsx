@@ -69,9 +69,10 @@ export default function Layout() {
           // tabBarActiveTintColor: "#fff",
           // tabBarInactiveTintColor: "#888",
         }}
+        // initialRouteName="Home" 
       >
         <Tabs.Screen
-          name="Home"
+          name="index"
           options={{
             title: "Home",
             headerShown: false,
@@ -81,7 +82,7 @@ export default function Layout() {
           }}
         />
         <Tabs.Screen
-          name="Browse"
+          name="browse"
           options={{
             title: "Browse",
             headerShown: false,
@@ -95,7 +96,7 @@ export default function Layout() {
           }}
         />
         <Tabs.Screen
-          name="Store"
+          name="store"
           options={{
             title: "Store",
             headerShown: false,
@@ -109,7 +110,7 @@ export default function Layout() {
           }}
         />
         <Tabs.Screen
-          name="Rank"
+          name="rank"
           options={{
             title: "Rank",
             headerShown: false,
@@ -120,7 +121,7 @@ export default function Layout() {
         />
 
         <Tabs.Screen
-          name="Activity"
+          name="activity"
           options={{
             title: "Activity",
             headerShown: false,

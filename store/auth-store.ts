@@ -1,4 +1,5 @@
-import AuthEndpoints from "@/endpoints/authEndpoints";
+// import AuthEndpoints from "@/endpoints/authEndpoints";
+import * as AuthEndpoints from "@/endpoints/authEndpoints";
 import useDataMutation from "@/hooks/useEndpointMutation";
 import { IUserData } from "@/types/userTypes";
 import { create } from "zustand";
@@ -19,7 +20,7 @@ export const useAuthStore = create<Store>()((set) => ({
 }));
 
 export const useAuthActions = () => {
-  const API = new AuthEndpoints();
+  // const API = new AuthEndpoints();
 
   const checkLoginStatus = async () => {
     try {
@@ -36,7 +37,8 @@ export const useAuthActions = () => {
 
   const { mutate, isPending } = useDataMutation({
     mutationKey: ["login user"],
-    mutationFn: API.login,
+    mutationFn: (payload: { email: string; password: string }) =>
+      AuthEndpoints.login(payload),
   });
 
   return {

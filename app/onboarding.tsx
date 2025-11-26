@@ -46,7 +46,7 @@ export default function OnboardingScreen() {
           textClassName="text-lg text-white"
           className="py-4 px-[50px]  rounded-xl items-center"
           title="Skip"
-          onPress={() => router.replace("/(tabs)/Home")}
+          onPress={() => router.replace("/(tabs)")}
           // onPress={async () => {
           //   await AsyncStorage.setItem("seen_onboarding", "true");
           //   router.replace("/Index"); // navigate to main screen
