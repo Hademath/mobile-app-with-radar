@@ -4,8 +4,12 @@ import {  Ionicons } from "@expo/vector-icons";
 import ProgressHeader from "../components/ProgressHeader";
 import SearchInput from "../components/SearchInput";
 import React from "react";
+import { useAuth } from "@/providers/AuthContext";
 
 export default function Browse() {
+
+  const { user } = useAuth();
+  
   return (
     <ScrollView className="flex-1 bg-primary px-4 pt-14">
       <View className="flex-row justify-between items-center mb-6">
@@ -13,7 +17,11 @@ export default function Browse() {
           <TouchableOpacity onPress={() => router.push("/Menu")}>
             <Image
               className="w-10 h-10 rounded-full"
-              source={require("@/assets/images/avatars/avatar1.png")}
+              source={
+                user?.avatar
+                  ? { uri: user.avatar as string }
+                  : require("@/assets/images/avatars/avatar1.png")
+              }
             />
           </TouchableOpacity>
 
@@ -30,7 +38,7 @@ export default function Browse() {
             source={require("@/assets/images/ArtisteRadarLogo.png")}
             className="w-5 h-5"
           />
-          <Text className="text-white font-semibold">5000.00</Text>
+          <Text className="text-white font-semibold"> {`${user?.radar} `}</Text>
         </TouchableOpacity>
       </View>
       {/* Logo + Title */}

@@ -7,7 +7,7 @@ import React from "react";
 
 
 
-export default function FirstNameScreen({ setSteps }: { setSteps: (val: number) => void }) {
+export default function FirstNameScreen() {
   
   
   const { updateData } = useRegisterStore();
@@ -20,7 +20,7 @@ export default function FirstNameScreen({ setSteps }: { setSteps: (val: number) 
     // console.log(parsed);
     router.push("/Registration/Lastname");
     updateData({ firstName: val });
-    setSteps(2);
+    // setSteps(2);
   };
 
 

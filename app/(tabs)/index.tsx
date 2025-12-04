@@ -8,6 +8,7 @@ import React, { useCallback, useMemo, useState } from "react";
 // import musicEndpoints from "@/endpoints/musicEndpoints";
 import * as musicAPI from "../../endpoints/musicEndpoints";
 import useEndpointQuery from "@/hooks/useEndpointQuery";
+import { formatPlays } from "@/utils/Format";
 
 // Type for song
 interface Song {
@@ -21,6 +22,7 @@ interface Song {
   streamUrl: string;
   externalPlatform: string | null;
   releaseDate: string | null;
+  totalPlays: number;
 }
 
 export default function Index() {
@@ -45,6 +47,8 @@ export default function Index() {
 
   const songs: Song[] = useMemo(() => data?.data?.data || [], [data]);
 
+
+
   return (
     <LinearGradient
       colors={["#0f1e1d", "#000000", "#242424"]}
@@ -61,7 +65,20 @@ export default function Index() {
         {/* Top Row: Avatar - Days - Balance */}
         <View className="flex-row justify-between items-center mb-6">
           <View className="flex-row items-center space-x-4">
-            <TouchableOpacity onPress={() => router.push("/Menu")}>
+            <TouchableOpacity
+              onPress={() =>
+                router.push({
+                  pathname: "/Menu",
+                  params: {
+                    // songId: song.uuid,
+                    // title: song.title,
+                    // artist: song.artist.name,
+                    // artworkUrl: song.artworkUrl,
+                    // streamUrl: song.streamUrl,
+                  },
+                })
+              }
+            >
               <Image
                 className="w-12 h-12 rounded-full"
                 source={
@@ -83,6 +100,7 @@ export default function Index() {
 
           <TouchableOpacity
             // onPress={() => router.push("/Registration/GetStarted")}
+
             className="flex-row gap-3 items-center space-x-2 bg-accent px-6 py-4 rounded-3xl"
           >
             <Image
@@ -164,7 +182,9 @@ export default function Index() {
 
                       <View className="absolute bottom-2 left-2 bg-black/60 px-2 py-1 rounded-full flex-row items-center">
                         <Ionicons name="play" size={14} color="white" />
-                        <Text className="text-white text-xs ml-1">20.4k</Text>
+                        <Text className="text-white text-xs ml-1">
+                          {formatPlays(song.totalPlays)}
+                        </Text>
                       </View>
                     </View>
                   </View>
@@ -180,9 +200,12 @@ export default function Index() {
             <View className="flex-row gap-3 items-center space-x-2 mb-4">
               <Image
                 source={
-                  song.artworkUrl
-                    ? { uri: song.artworkUrl }
-                    : require("@/assets/images/content/moreafro.jpg")
+                  // song.artworkUrl
+                  //   ? { uri: song.artworkUrl }
+                  //   : require("@/assets/images/content/moreafro.jpg")
+                  user?.avatar
+                    ? { uri: user.avatar as string }
+                    : require("@/assets/images/avatars/avatar1.png")
                 }
                 className="w-10 h-10 rounded-full"
               />
@@ -201,7 +224,7 @@ export default function Index() {
                     : require("@/assets/images/content/rema1.jpg")
                 }
               />
- 
+
               <View className="absolute top-3 right-2 mr-3 bg-black/40 p-2 rounded-full">
                 <Ionicons name="volume-high" size={16} color="white" />
               </View>

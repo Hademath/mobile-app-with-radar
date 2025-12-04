@@ -4,15 +4,17 @@ import { useRouter } from "expo-router";
 import { Zap, Clock3, Settings, User, UserPlus, LogOutIcon } from "lucide-react-native";
 import React, {  } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuth } from "@/providers/AuthContext";
 
 export default function Profile() {
+    const { user } = useAuth();
   const router = useRouter();
 
   const menuItems = [
     {
       icon: <User size={26} color="white" />,
       label: "Profile",
-      route: "/Referrals",
+      // route: "/Menu",
     },
     {
       icon: <Zap size={26} color="white" />,
@@ -22,7 +24,7 @@ export default function Profile() {
     {
       icon: <Clock3 size={26} color="white" />,
       label: "update profile....",
-      route: "(auth)/Registration/ProfileType",
+      // route: "(auth)/Registration/ProfileType",
     },
     {
       icon: <Clock3 size={26} color="white" />,
@@ -50,6 +52,9 @@ export default function Profile() {
     },
   ];
 
+  // console.log("Fresh User Profile:", user);
+
+
   async function clearLoginData() {
     await AsyncStorage.removeItem("user");
     await AsyncStorage.removeItem("account-exists");
@@ -60,18 +65,24 @@ export default function Profile() {
     <ScrollView className="flex-1 bg-primary px-6 pt-14">
       <View className="flex-row justify-between items-center mb-6 ">
         <View className="flex-row items-center gap-4">
-          <TouchableOpacity onPress={() => router.push("/Menu")}>
+          <TouchableOpacity
+            // onPress={() => router.push("/Menu")}
+          >
             <Image
               className="w-12 h-12 rounded-full"
-              source={require("@/assets/images/avatars/avatar1.png")}
+              source={
+                user?.avatar
+                  ? { uri: user.avatar as string }
+                  : require("@/assets/images/avatars/avatar1.png")
+              }
             />
           </TouchableOpacity>
 
           <View className="">
             <Text className="text-white text-lg font-semibold">
-              Tobi Ade-Ajayi
+              {`${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim()}
             </Text>
-            <Text className="text-gray-400">@_tobiajayi</Text>
+            <Text className="text-gray-400">@{`${user?.username} `}</Text>
           </View>
         </View>
 
@@ -83,12 +94,14 @@ export default function Profile() {
             source={require("@/assets/images/ArtisteRadarLogo.png")}
             className="w-5 h-5"
           />
-          <Text className="text-white font-semibold">5000.00</Text>
+          <Text className="text-white font-semibold">
+            {`${user?.radar} `}
+          </Text>
         </TouchableOpacity>
       </View>
 
       <View className=" w-full border-b border-accent"></View>
-      {menuItems.map((item, index) => (
+      {menuItems.map((item, index) =>
         item.isLogout ? (
           <TouchableOpacity
             key={index}
@@ -127,8 +140,9 @@ export default function Profile() {
             </View>
           </TouchableOpacity>
         )
-      ))}
-
+      )}
     </ScrollView>
   );
 }
+
+

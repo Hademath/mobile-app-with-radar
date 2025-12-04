@@ -89,7 +89,7 @@ async function refreshUser() {
 
   try {
     const res = await AuthEndpoints.getUserProfile();
-    const freshUserProfile = res.data.user; // This only has profile data, no token
+    const freshUserProfile = res.data.user;
 
     if (freshUserProfile) {
       // ✅ Merge the fresh profile data with the existing token

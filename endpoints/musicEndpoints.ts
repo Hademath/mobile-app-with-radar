@@ -176,3 +176,26 @@ export const uploadReleasedMusic = async ( data: any ): Promise<AxiosResponse<an
     return Promise.reject(error);
   }
 };
+
+
+/// track music playback history
+export const trackSongPlay = async ( data: { songId: string;  durationListened: number; } ): Promise<AxiosResponse<any>> => {
+    try {
+    const response = await authInstance.post("songs/track-play", data);
+    return response;
+  } catch (error) {
+    console.log("❌ Tracking playback failed:", JSON.stringify(error, null, 2));
+    return Promise.reject(error);
+  }
+}
+
+/// get track music playback == /api/songs/track-play-history
+export const getSongPlayHistory = async (): Promise<AxiosResponse<any>> => {
+    try {
+    const response = await authInstance.get(`songs/track-play-history`);
+    return response;
+  } catch (error) {
+    console.log("❌ Fetching playback history failed:", JSON.stringify(error, null, 2));
+    return Promise.reject(error);
+  }
+}

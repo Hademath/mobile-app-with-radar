@@ -4,6 +4,8 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
+    "start:local": "EXPO_PUBLIC_BASE_URL=http://192.168.0.255:5000/api expo start -c",
+    "start:prod": "EXPO_PUBLIC_BASE_URL=https://artisteradar-user-api-vd39o.ondigitalocean.app/api expo start -c",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",

@@ -13,6 +13,8 @@ import TextTicker from "react-native-text-ticker";
 import icons from "@/constants/icons";
 import { authInstance } from "@/utils/apiService";
 import { getSpotifyAudioUrl, getYouTubeAudioUrl } from "@/helper/musicHelper";
+import useDataMutation from "@/hooks/useEndpointMutation";
+// import { trackSongPlay } from "../../endpoints/musicEndpoints";
 
 export default function MusicPlayerWithPrompts() {
   const router = useRouter();
@@ -274,6 +276,26 @@ export default function MusicPlayerWithPrompts() {
 
   const campaignPrompts: CampaignPrompt[] = song.campaigns || [];
 
+  // Player controls
+  // Mutation to track song play
+  const { isPending, mutate } = useDataMutation({
+    mutationFn: (payload: any) => musicAPI.trackSongPlay(payload.songId),
+    mutationKey: ["track song playback"],
+  });
+
+  // handle play back tracking
+  const handlePlayBackTracking = (songId: string) => { 
+    mutate(songId, {
+      onSuccess: (res) => {
+        console.log("✅ Playback tracked successfully:", res?.data);
+      },
+      onError: (err: any) => {
+        console.error("❌ Failed to track playback:", err);
+      },
+    });
+    
+  }
+
   const playPauseAudio = () => {
     if (!processedUrl || streamError || !isAudio) return;
 
@@ -281,6 +303,9 @@ export default function MusicPlayerWithPrompts() {
       player.pause();
     } else {
       player.play();
+      // track play back
+      // mutate({ songId: song.uuid });  
+      // trackSongPlay(song.uuid);
     }
   };
 
