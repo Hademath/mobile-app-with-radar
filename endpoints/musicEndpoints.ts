@@ -1,6 +1,5 @@
 import { AxiosResponse } from "axios";
 import { authInstance,  } from "@/utils/apiService";
-// import { unrealeasedMusicType } from "@/schemas/uploadMusicSchema";
 
 
 
@@ -196,6 +195,17 @@ export const getSongPlayHistory = async (): Promise<AxiosResponse<any>> => {
     return response;
   } catch (error) {
     console.log("❌ Fetching playback history failed:", JSON.stringify(error, null, 2));
+    return Promise.reject(error);
+  }
+}
+
+// search songs by title or artist, genres 
+export const searchSongs = async ( query: string ): Promise<AxiosResponse<any>> => {
+    try {
+    const response = await authInstance.get(`songs/music-search?query=${encodeURIComponent(query)}`);
+    return response;
+  } catch (error) {
+    console.log("❌ Search failed:", JSON.stringify(error, null, 2));
     return Promise.reject(error);
   }
 }

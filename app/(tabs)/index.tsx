@@ -11,12 +11,13 @@ import useEndpointQuery from "@/hooks/useEndpointQuery";
 import { formatPlays } from "@/utils/Format";
 
 // Type for song
-interface Song {
+export interface Song {
   uuid: string;
   title: string;
   artist: {
     name: string;
     uuid: string;
+    avatar: string;
   };
   artworkUrl: string | null;
   streamUrl: string;

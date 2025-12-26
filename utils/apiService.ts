@@ -23,7 +23,7 @@ function getBaseUrl(): string {
     const debuggerHost = Constants.expoConfig?.hostUri?.split(":")[0];
     if (debuggerHost) {
       const localUrl = `http://${debuggerHost}:5000/api`;
-      console.log("Auto-detected local URL:", localUrl);
+      console.log("Auto-detected local URL:", localUrl);  
       return localUrl;
     }
   }

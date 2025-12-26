@@ -14,15 +14,27 @@ import icons from "@/constants/icons";
 import { authInstance } from "@/utils/apiService";
 import { getSpotifyAudioUrl, getYouTubeAudioUrl } from "@/helper/musicHelper";
 import useDataMutation from "@/hooks/useEndpointMutation";
+import { formatPlays } from "@/utils/Format";
+import { useAuth } from "@/providers/AuthContext";
 // import { trackSongPlay } from "../../endpoints/musicEndpoints";
 
 export default function MusicPlayerWithPrompts() {
   const router = useRouter();
   const params = useLocalSearchParams();
+    const { user } = useAuth();
 
   // Song history for next/previous navigation
   const [songHistory, setSongHistory] = useState<string[]>([]);
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState(-1);
+
+  const [likes, setLikes] = useState<Record<string, boolean>>({});
+  const [countLikes, setCountLikes] = useState(0);
+  const [countDislikes, setCountDislikes] = useState(0);
+  const [dislikes, setDislikes] = useState<Record<string, boolean>>({});
+  const [isSubmittingReaction, setIsSubmittingReaction] = useState(false);
+
+const [followedArtist, setFollowedArtist] = useState(false);
+const [isFollowing, setIsFollowing] = useState(false);
 
   const { data, isLoading, error } = useEndpointQuery({
     queryFn: () => musicAPI.getSongByIdIncludePrompts(params.songId as string),
@@ -56,10 +68,6 @@ export default function MusicPlayerWithPrompts() {
     }
   }, [params.songId, song.uuid]);
 
-  // Like/Dislike state
-  const [likes, setLikes] = useState<Record<string, boolean>>({});
-  const [dislikes, setDislikes] = useState<Record<string, boolean>>({});
-  const [isSubmittingReaction, setIsSubmittingReaction] = useState(false);
 
   // Load reactions from backend
   useEffect(() => {
@@ -71,6 +79,8 @@ export default function MusicPlayerWithPrompts() {
         if (response.data?.data) {
           setLikes(response.data.data.liked ? { [song.uuid]: true } : {});
           setDislikes(response.data.data.disliked ? { [song.uuid]: true } : {});
+          setCountLikes(response.data.data.totalLikes || 0);
+          setCountDislikes(response.data.data.totalDislikes || 0);
         }
       } catch (error) {
         console.log(error, "Could not load reactions");
@@ -78,9 +88,10 @@ export default function MusicPlayerWithPrompts() {
     };
 
     if (song.uuid) {
-      loadReactions();
+      loadReactions(); 
+      
     }
-  }, [song.uuid]);
+  }, [song.uuid, isSubmittingReaction]);
 
   const handleLike = async () => {
     setIsSubmittingReaction(true);
@@ -101,7 +112,7 @@ export default function MusicPlayerWithPrompts() {
 
       await authInstance.post(`/songs/reactions/${song.uuid}`, {
         type: isLiked ? "remove" : "like",
-      });
+      });  
     } catch (error) {
       console.error("Error saving reaction:", error);
     } finally {
@@ -136,6 +147,47 @@ export default function MusicPlayerWithPrompts() {
     }
   };
 
+  // handle follow artist
+
+
+  const handleFollowArtist = async () => {
+  console.log(song.artist, "Artist to follow/unfollow");
+  if (!song?.artist) return;
+  setIsFollowing(true);
+  try {
+    const res = await authInstance.post(`/songs/follow-artist/${song.artist.uuid}` );
+    setFollowedArtist((prev) => !prev);
+
+    // Optional: you can also read message
+    console.log(res.data.message);
+  } catch (error) {
+    alert("Error following/unfollowing artist");
+    console.error("Follow/unfollow error:", error);
+  } finally {
+    setIsFollowing(false);
+  }
+};
+  
+  useEffect(() => {
+    const getFollowStatus = async () => {
+      if (!song?.artist?.uuid) return;
+       if (song?.artist?.uuid === user?.uuid) return;
+
+      try {
+        const res = await authInstance.get(
+          `/songs/follow-status/${song.artist.uuid}`
+        );
+        setFollowedArtist(res.data.data.isFollowing); 
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    getFollowStatus();
+  }, [song?.artist, user?.uuid]);
+
+
+
   const [processedUrl, setProcessedUrl] = useState<string>("");
   const [streamError, setStreamError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -165,7 +217,6 @@ export default function MusicPlayerWithPrompts() {
         // Case 2: YouTube - fetch audio URL from backend
         if (song.externalPlatform === "youtube" && song.externalId) {
           console.log("🎥 Processing YouTube content:", song.externalId);
-
           const result = await getYouTubeAudioUrl(song.externalId);
 
           if (result.success && result.data?.audioUrl) {
@@ -266,7 +317,7 @@ export default function MusicPlayerWithPrompts() {
           setDuration(playerRef.current.duration);
         }
       }
-    }, 1000);
+    }, 100); /// it can be in 1000 ms for less frequent updates
 
     return () => clearInterval(interval);
   }, [isAudio, processedUrl]);
@@ -276,25 +327,123 @@ export default function MusicPlayerWithPrompts() {
 
   const campaignPrompts: CampaignPrompt[] = song.campaigns || [];
 
-  // Player controls
-  // Mutation to track song play
-  const { isPending, mutate } = useDataMutation({
-    mutationFn: (payload: any) => musicAPI.trackSongPlay(payload.songId),
+  // PLAYBACK TRACKING STATE
+  const [lastTrackedTime, setLastTrackedTime] = useState(0);
+  const trackingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const hasTrackedInitialPlay = useRef(false);
+
+  const { mutate: trackPlay } = useDataMutation({
+    mutationFn: (payload: { songId: string; durationListened: number }) =>
+      musicAPI.trackSongPlay(payload),
     mutationKey: ["track song playback"],
   });
 
-  // handle play back tracking
-  const handlePlayBackTracking = (songId: string) => { 
-    mutate(songId, {
-      onSuccess: (res) => {
-        console.log("✅ Playback tracked successfully:", res?.data);
+  // Function to track playback
+  const trackPlayback = (currentSeconds: number) => {
+    if (!song.uuid || !player.playing) return;
+
+    const durationListened = Math.floor(currentSeconds);
+
+    console.log(`📊 Tracking playback at ${durationListened}s`);
+
+    trackPlay(
+      {
+        songId: song.uuid,
+        durationListened,
       },
-      onError: (err: any) => {
-        console.error("❌ Failed to track playback:", err);
-      },
-    });
-    
-  }
+      {
+        onSuccess: (res) => {
+          console.log(
+            `✅ Playback tracked at ${durationListened}s:`,
+            res?.data
+          );
+          setLastTrackedTime(durationListened);
+        },
+        onError: (err: any) => {
+          console.error(
+            `❌ Failed to track playback at ${durationListened}s:`,
+            err
+          );
+        },
+      }
+    );
+  };
+
+  // Track playback at intervals (1s, then every 10s)
+  useEffect(() => {
+    // Clear any existing interval
+    if (trackingIntervalRef.current) {
+      clearInterval(trackingIntervalRef.current);
+      trackingIntervalRef.current = null;
+    }
+
+    // Only track if player is playing and we have a valid song
+    if (!player.playing || !song.uuid || !processedUrl) {
+      hasTrackedInitialPlay.current = false;
+      return;
+    }
+
+    // Track initial play at 1 second
+    if (!hasTrackedInitialPlay.current) {
+      const initialTimeout = setTimeout(() => {
+        if (player.playing && player.currentTime >= 1) {
+          trackPlayback(player.currentTime);
+          hasTrackedInitialPlay.current = true;
+        }
+      }, 1000);
+
+      return () => clearTimeout(initialTimeout);
+    }
+
+    // Track every 10 seconds after initial play
+    trackingIntervalRef.current = setInterval(() => {
+      const currentSeconds = Math.floor(player.currentTime);
+      
+      // Only track if we've progressed at least 10 seconds since last track
+      if (currentSeconds - lastTrackedTime >= 10) {
+        trackPlayback(currentSeconds);
+      }
+    }, 10000); // Check every 10 seconds
+
+    return () => {
+      if (trackingIntervalRef.current) {
+        clearInterval(trackingIntervalRef.current);
+      }
+    };
+  }, [player.playing, song.uuid, processedUrl, lastTrackedTime, player.currentTime]);
+ 
+  // Track when song ends
+  useEffect(() => {
+    if (!player.playing || !song.uuid) return;
+
+    // Check if song has ended (within 1 second of duration)
+    const isNearEnd = duration > 0 && currentTime >= duration - 1;
+
+    if (isNearEnd && lastTrackedTime < duration) {
+      console.log("🎵 Song ended, tracking final playback");
+      trackPlayback(duration);
+    }
+  }, [currentTime, duration, player.playing, song.uuid, lastTrackedTime]);
+
+  // Reset tracking when song changes
+  useEffect(() => {
+    setLastTrackedTime(0);
+    hasTrackedInitialPlay.current = false;
+
+    if (trackingIntervalRef.current) {
+      clearInterval(trackingIntervalRef.current);
+      trackingIntervalRef.current = null;
+    }
+  }, [song.uuid]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (trackingIntervalRef.current) {
+        clearInterval(trackingIntervalRef.current);
+      }
+    };
+  }, []);
 
   const playPauseAudio = () => {
     if (!processedUrl || streamError || !isAudio) return;
@@ -303,22 +452,20 @@ export default function MusicPlayerWithPrompts() {
       player.pause();
     } else {
       player.play();
-      // track play back
-      // mutate({ songId: song.uuid });  
-      // trackSongPlay(song.uuid);
+   
     }
-  };
+  }; 
 
   const skipForward = async () => {
     if (!processedUrl || streamError) return;
 
-    console.log("⏭️ Fetching random song...");
+    // console.log("⏭️ Fetching random song...");
     try {
-      const response = await authInstance.get("/songs/random-song");
+      const response = await authInstance.get("/songs/random-song");   
       const randomSong = response.data?.data;
 
       if (randomSong?.uuid) {
-        console.log("✅ Random song fetched:", randomSong.title);
+        // console.log("✅ Random song fetched:", randomSong.title);
         if (player.playing) {
           player.pause();
         }
@@ -357,11 +504,7 @@ export default function MusicPlayerWithPrompts() {
   // Rest of your component code remains the same...
   // (handleAnswer, handleTextAnswer, handleSubmit, renderPrompt functions)
 
-  const handleAnswer = (
-    promptUuid: string,
-    optionUuid: string,
-    allowMultiple: boolean
-  ) => {
+  const handleAnswer = ( promptUuid: string, optionUuid: string, allowMultiple: boolean ) => {
     setAnswers((prev) => {
       const current = prev[promptUuid] || [];
       if (allowMultiple) {
@@ -393,7 +536,7 @@ export default function MusicPlayerWithPrompts() {
       textAnswers: textAnswers,
       campaignId: campaignPrompts[0]?.campaignId || null,
     };
-    console.log("Survey responses:", surveyResponses);
+    console.log("Survey responses:", surveyResponses);    
 
     try {
       await authInstance.post("/songs/survey-responses", surveyResponses);
@@ -402,10 +545,10 @@ export default function MusicPlayerWithPrompts() {
       console.error("❌ Error submitting survey:", error);
     }
 
-    if (isAudio && player.playing) {
-      player.pause();
-    }
-    router.back();
+    // if (isAudio && player.playing) {
+    //   player.pause();
+    // }
+    // router.back();
   };
 
   const renderPrompt = (prompt: CampaignPrompt) => {
@@ -521,7 +664,6 @@ export default function MusicPlayerWithPrompts() {
             >
               <Ionicons name="arrow-back" size={20} color="black" />
             </TouchableOpacity>
-
             <View className="flex-1 justify-center items-center">
               <Text className="text-white font-[400px] text-base">
                 {song.title.length > 15 ? (
@@ -542,11 +684,27 @@ export default function MusicPlayerWithPrompts() {
                 )}
               </Text>
             </View>
-
-            <TouchableOpacity className="px-4 py-3 flex-row justify-center gap-1 bg-accent rounded-lg">
-              <Text className="text-white font-semibold">Follow </Text>
-              <FontAwesome name="plus-circle" size={18} color="white" />
-            </TouchableOpacity>
+            {song?.artist?.uuid !== user?.uuid && (
+              <TouchableOpacity
+                onPress={handleFollowArtist}
+                disabled={isFollowing}
+                className="px-4 py-2 flex-row justify-center bg-accent rounded-lg"
+              >
+                <Text className="text-white font-semibold">
+                  {followedArtist ? (
+                    <>
+                      <FontAwesome name="check" size={16} color="white" />{" "}
+                      Following
+                    </>
+                  ) : (
+                    <>
+                      Follow{" "}
+                      <FontAwesome name="plus-circle" size={18} color="white" />
+                    </>
+                  )}
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           {/* Error and Loading states */}
@@ -610,7 +768,9 @@ export default function MusicPlayerWithPrompts() {
                     color={likes[song.uuid] ? "#40E0D0" : "#5F6368"}
                     size={18}
                   />
-                  <Text className="text-white text-[16px]">1.7m</Text>
+                  <Text className="text-white text-[16px]">
+                    {formatPlays(countLikes)}{" "}
+                  </Text>
                 </TouchableOpacity>
 
                 <Text className="text-white mx-3 text-[16px]">|</Text>
@@ -625,7 +785,9 @@ export default function MusicPlayerWithPrompts() {
                     color={dislikes[song.uuid] ? "#EF4444" : "#5F6368"}
                     size={18}
                   />
-                  <Text className="text-white text-[16px]">1.1m</Text>
+                  <Text className="text-white text-[16px]">
+                    {formatPlays(countDislikes)}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -715,15 +877,29 @@ export default function MusicPlayerWithPrompts() {
                 Share Your Feedback
               </Text>
               {campaignPrompts.map(renderPrompt)}
+              {/* Include textarea for text response */}
 
-              <TouchableOpacity
-                onPress={handleSubmit}
-                className="bg-white rounded-2xl py-4 mb-8 items-center"
-              >
-                <Text className="text-black font-bold text-lg">Submit</Text>
-              </TouchableOpacity>
+              <TextInput
+                className="bg-primary rounded-2xl p-4 min-h-[100px] text-white text-sm mt-4"
+                placeholder="Additional comments..."
+                placeholderTextColor="#9CA3AF"
+                multiline
+                textAlignVertical="top"
+                value={textAnswers["additional_comments"] || ""}
+                onChangeText={(text) =>
+                  handleTextAnswer("additional_comments", text)
+                }
+              />
             </View>
           )}
+          <View className="px-20 mb-10 mt-6">
+            <TouchableOpacity
+              onPress={handleSubmit}
+              className="bg-white rounded-2xl py-4  items-center"
+            >
+              <Text className="text-black font-bold text-lg">Submit</Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
       </LinearGradient>
     </View>
