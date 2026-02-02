@@ -16,7 +16,6 @@ import { getSpotifyAudioUrl, getYouTubeAudioUrl } from "@/helper/musicHelper";
 import useDataMutation from "@/hooks/useEndpointMutation";
 import { formatPlays } from "@/utils/Format";
 import { useAuth } from "@/providers/AuthContext";
-// import { trackSongPlay } from "../../endpoints/musicEndpoints";
 
 export default function MusicPlayerWithPrompts() {
   const router = useRouter();
@@ -148,18 +147,13 @@ const [isFollowing, setIsFollowing] = useState(false);
   };
 
   // handle follow artist
-
-
   const handleFollowArtist = async () => {
-  console.log(song.artist, "Artist to follow/unfollow");
   if (!song?.artist) return;
   setIsFollowing(true);
   try {
     const res = await authInstance.post(`/songs/follow-artist/${song.artist.uuid}` );
     setFollowedArtist((prev) => !prev);
-
-    // Optional: you can also read message
-    console.log(res.data.message);
+    // console.log(res.data.message);
   } catch (error) {
     alert("Error following/unfollowing artist");
     console.error("Follow/unfollow error:", error);
@@ -174,9 +168,7 @@ const [isFollowing, setIsFollowing] = useState(false);
        if (song?.artist?.uuid === user?.uuid) return;
 
       try {
-        const res = await authInstance.get(
-          `/songs/follow-status/${song.artist.uuid}`
-        );
+        const res = await authInstance.get(`/songs/follow-status/${song.artist.uuid}`);
         setFollowedArtist(res.data.data.isFollowing); 
       } catch (error) {
         console.error(error);
@@ -195,7 +187,7 @@ const [isFollowing, setIsFollowing] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  // ✅ Use ref to store player instance
+  // Use ref to store player instance
   const playerRef = useRef<AudioPlayer | null>(null);
 
   // Process audio/video URL based on platform
@@ -293,10 +285,10 @@ const [isFollowing, setIsFollowing] = useState(false);
     song.uuid,
   ]);
 
-  // ✅ Initialize player when processedUrl changes
+  // Initialize player when processedUrl changes
   const player = useAudioPlayer(processedUrl || "");
 
-  // ✅ Update playerRef when player changes
+  // update playerRef when player changes
   useEffect(() => {
     playerRef.current = player;
 
@@ -306,7 +298,7 @@ const [isFollowing, setIsFollowing] = useState(false);
     }
   }, [player]);
 
-  // ✅ Fixed interval for currentTime updates
+  // Fixed interval for currentTime updates
   useEffect(() => {
     if (!isAudio || !processedUrl) return;
 
@@ -539,7 +531,7 @@ const [isFollowing, setIsFollowing] = useState(false);
     console.log("Survey responses:", surveyResponses);    
 
     try {
-      await authInstance.post("/songs/survey-responses", surveyResponses);
+      await authInstance.post(`/feedback/survey-responses/${campaignPrompts[0]?.campaignId}/${song?.uuid}`, surveyResponses);
       console.log("✅ Survey submitted successfully");
     } catch (error) {
       console.error("❌ Error submitting survey:", error);
