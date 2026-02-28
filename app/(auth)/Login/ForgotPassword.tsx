@@ -7,6 +7,7 @@ import * as AuthEndpoints from "@/endpoints/authEndpoints";
 import useDataMutation from "@/hooks/useEndpointMutation";
 import { emailSchema } from "@/schemas/registerSchema";
 import useResetPassStore from "@/store/reset-password-store";
+import { Toast } from "react-native-toast-notifications";
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
@@ -24,22 +25,36 @@ export default function ForgotPasswordScreen() {
   const handleNext = (val: string) => {
     const parsed = emailSchema.safeParse({ email: val });
     if (!parsed.success) {
-      alert(parsed.error.errors[0].message);
+      // alert(parsed.error.errors[0].message);
+      Toast.show(parsed.error.errors[0].message, {
+        type: "danger",
+      });
       return;
     }
 
     mutate(val, {
       onSuccess: (res) => {
-        alert(res.data.message);
+        // alert(res.data.message);
+        Toast.show(res.data.message, {
+          type: "success",
+        });
         updateData({ email: val });
         router.push("./CodeVerification");
       },
       onError: (err: any) => {
-        alert(
-          "Failed to send OTP: " + err?.response?.data?.message ||
+        // alert(
+        //   "Failed to send OTP: " + err?.response?.data?.message ||
+        //     err.message ||
+        //     err
+        // );
+        const msg =
+          "Failed to send OTP: " +
+          (err?.response?.data?.message ||
             err.message ||
-            err
-        );
+            "An unexpected error occurred. Please try again.");
+        Toast.show(msg, {
+          type: "danger",
+        });
       },
     });
   };

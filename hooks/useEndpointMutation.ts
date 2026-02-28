@@ -1,5 +1,5 @@
 import { MutationFunction, useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import  { isAxiosError } from "axios";
 import { useState } from "react";
 import { useToast } from "react-native-toast-notifications";
 
@@ -15,6 +15,7 @@ const useDataMutation = <T>({ mutationFn, mutationKey }: Props<T>) => {
     mutationKey,
     mutationFn,
     onSuccess: (res) => {
+      // console.log("✅ Mutation successful:", res);
       if (res?.success) {
         toast.show(res.message, {
           placement: "top",
@@ -26,7 +27,7 @@ const useDataMutation = <T>({ mutationFn, mutationKey }: Props<T>) => {
       }
     },
     onError: (error: unknown) => {
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         if (error && error.message?.toLowerCase() === "network error") {
           toast.show(
             "Unable to connect to the server. Please check your network and try again",
@@ -39,10 +40,10 @@ const useDataMutation = <T>({ mutationFn, mutationKey }: Props<T>) => {
         if (typeof error.response?.data?.message !== "string") {
           Object.keys(error.response?.data?.message).map((field) => {
             toast.show(error.response?.data?.message[field][0], {
-              // data: error.response?.data?.message[field][0],
+              data: error.response?.data?.message[field][0],
               type: "danger",
             });
-            console.error("38", error.response?.data?.message[field][0]);
+            // console.error("38", error.response?.data?.message[field][0]);
           });
           return;
         }
@@ -51,15 +52,15 @@ const useDataMutation = <T>({ mutationFn, mutationKey }: Props<T>) => {
           placement: "top",
         });
 
-        console.log("45 endpoint", error.request);
-        console.error("45", error.response?.data);
+        // console.log("45 endpoint", error.request);
+        // console.error("45", error.response?.data);
         return;
       }
       if (error instanceof Error) {
         toast.show(error.message, {
           type: "danger",
         });
-        console.error("52", error.message);
+        // console.error("52", error.message);
         return;
       }
       if (typeof error === "string") {

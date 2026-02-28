@@ -9,7 +9,7 @@ import * as AuthEndpoints from "@/endpoints/authEndpoints";
 import useResetPassStore from "@/store/reset-password-store";
 import useDataMutation from "@/hooks/useEndpointMutation";
 import { resetpasswordSchema } from "@/schemas/loginSchema";
-
+import { Toast } from "react-native-toast-notifications";
 
 
 export default function PasswordScreen() {
@@ -57,12 +57,16 @@ export default function PasswordScreen() {
         mutate(payload, {
           onSuccess: async (res) => {
             router.push("/Login/LoginScreen");
-            alert(res?.data?.message || "Password reset successful!");
+            // alert(res?.data?.message || "Password reset successful!");
+            Toast.show(res?.data?.message || "Password reset successful!", {
+              type: "success",
+            });
           },
           onError: (err: any) => {
             const msg =
               err?.response?.data?.message || err.message || "Failed to reset password. Please try again.";
-            alert(msg);
+            // alert(msg);
+            // console.error(msg);
           },
         });
       };

@@ -6,6 +6,7 @@ import CreateAccountHeader from "@/app/components/CreateAccountHeader";
 import useResetPassStore from "@/store/reset-password-store";
 import useDataMutation from "@/hooks/useEndpointMutation";
 import * as AuthEndpoints from "@/endpoints/authEndpoints";
+import { Toast } from "react-native-toast-notifications";
 
 export default function CodeVerification() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -28,8 +29,6 @@ export default function CodeVerification() {
   };
 
   const { data, updateData } = useResetPassStore();
-  // const API = new AuthEndpoints();
-
   // Verify OTP mutation
   const { isPending, mutate } = useDataMutation({
     mutationFn: (data: { token: string; }) => AuthEndpoints.verifyForgotPassOtp(data),
@@ -58,7 +57,10 @@ export default function CodeVerification() {
       { token: code, },
       {
         onSuccess: (res) => {
-          alert(res.data.message);
+          // alert(res.data.message);
+          Toast.show(res.data.message, {
+            type: "success",
+          });
           updateData({ token: code });
           setOtp(["", "", "", "", "", ""]);
           router.push("./ResetPassword");
@@ -83,11 +85,17 @@ export default function CodeVerification() {
         inputs.current[0]?.focus();
         setTimer(60);
         setStartTimer(true);
-        alert("A new OTP has been sent to your email.");
+        Toast.show("A new OTP has been sent to your email.", {  
+          type: "success",
+        });
+        // alert("A new OTP has been sent to your email.");
       },
       onError: (err: any) => {
         const msg =
           err?.response?.data?.message || err.message || "Failed to resend OTP. Please try again."; setErrorMsg(msg);
+        Toast.show(msg, {
+          type: "danger",
+        });
       },
     });
   }
@@ -160,9 +168,7 @@ export default function CodeVerification() {
 
           <Text className="text-white">
             Didn’t get a code?{" "}
-            <TouchableOpacity
-              onPress={() => router.push("/Registration/Email")}
-            >
+            <TouchableOpacity onPress={() => router.push("./ForgotPassword")}>
               <Text className="text-boarderColor/45">
                 {" "}
                 Change email address

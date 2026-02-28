@@ -136,7 +136,7 @@ async function login(val: loginType) {
         if (loginData.token) {
           setUserOnLogin(loginData);
           router.replace("/(tabs)"); 
-          alert(res.data.message);
+          // alert(res.data.message);
         }
       },
       onError: (err: any) => {
@@ -144,7 +144,7 @@ async function login(val: loginType) {
           err?.response?.data?.message ||
           err.message ||
           "Failed to register user. Please try again.";
-        alert(msg);
+        // alert(msg);
       },
     });
 }

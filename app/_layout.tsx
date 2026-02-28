@@ -7,7 +7,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import ReactQueryProvider from "@/providers/ReactQuery";
 import { AuthenticationProvider } from "@/providers/AuthContext";
-
+import { ToastProvider } from "react-native-toast-notifications";
   // import AsyncStorage from "@react-native-async-storage/async-storage";
 // import { useEffect } from "react";
 
@@ -45,9 +45,16 @@ export default function RootLayout() {
 
 
   return (
+  <ToastProvider
+        placement="top"
+        duration={6000}
+        animationType="slide-in"
+        offsetTop={50}
+      >
     <ReactQueryProvider>
       <AuthenticationProvider>
         <SafeAreaProvider>
+            {/* <NavigationContainer theme={MyTheme}> */}
           <SafeAreaView className="flex-1 bg-primary">
               <StatusBar style="light" />
             <Stack> 
@@ -60,10 +67,11 @@ export default function RootLayout() {
               <Stack.Screen name="(music)" options={{ headerShown: false }} />
             </Stack>
             
-          </SafeAreaView>
+            </SafeAreaView>
         </SafeAreaProvider>
       </AuthenticationProvider>
     </ReactQueryProvider>
+  </ToastProvider>
   );
 }
  
