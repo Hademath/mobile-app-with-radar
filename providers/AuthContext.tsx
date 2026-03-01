@@ -144,7 +144,7 @@ async function login(val: loginType) {
           err?.response?.data?.message ||
           err.message ||
           "Failed to register user. Please try again.";
-        // alert(msg);
+        console.log(msg);
       },
     });
 }

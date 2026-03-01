@@ -159,7 +159,7 @@ export const getSpotifyAudioUrl = async (trackId: string) => {
   try {
     console.log("🎵 Fetching Spotify audio for trackId:", trackId);
 
-    const response = await authInstance.get(`/music-streaming/spotify-audio-full?trackId=${trackId}` );
+    const response = await authInstance.get(`/music-streaming/spotify-audio?trackId=${trackId}` );
 
     console.log("✅ Spotify Response:", response.data);
 

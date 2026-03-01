@@ -212,7 +212,7 @@ const [isFollowing, setIsFollowing] = useState(false);
           const result = await getYouTubeAudioUrl(song.externalId);
 
           if (result.success && result.data?.audioUrl) {
-            console.log("✅ YouTube audio URL obtained");
+            // console.log("✅ YouTube audio URL obtained");
             setProcessedUrl(result.data.audioUrl);
             setIsAudio(true);
           } else {
@@ -309,7 +309,7 @@ const [isFollowing, setIsFollowing] = useState(false);
           setDuration(playerRef.current.duration);
         }
       }
-    }, 100); /// it can be in 1000 ms for less frequent updates
+    }, 1000); /// it can be in 1000 ms for less frequent updates
 
     return () => clearInterval(interval);
   }, [isAudio, processedUrl]);
